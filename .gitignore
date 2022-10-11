@@ -129,6 +129,6 @@ dmypy.json
 .pyre/
 
 # Added by me
-Data/
-
+Data/Dataset_1/Files/
+Data/Dataset_2/
 
