@@ -325,6 +325,8 @@ def chart_create_diagram(df_input, string_reference_feature,
             direction="counterclockwise",
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
+            griddash='dot',
+            layer='below traces',
         ))
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
