@@ -1,132 +1,432 @@
+import math
+import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.projections import PolarAxes
-import mpl_toolkits.axisartist.grid_finder as gf
-import mpl_toolkits.axisartist.floating_axes as fa
-# From this link: https://colab.research.google.com/drive/19WJ8L2NlWA7xrDhieHE1Zvi90hyZAjcR?usp=sharing#scrollTo=f4ufHavradwW # noqa
+
+from npeet import entropy_estimators
+from sklearn.metrics import mean_squared_error
+from scipy.stats import differential_entropy
+from sklearn.feature_selection import mutual_info_regression
+
+import plotly.express as px
+import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 
-class TaylorDiagram(object):
-    def __init__(self, STD, fig=None, rect=111, label='_'):
-        self.STD = STD
-        tr = PolarAxes.PolarTransform()
-
-        # Correlation labels
-        rlocs = np.concatenate(((np.arange(11.0) / 10.0), [0.95, 0.99]))
-        tlocs = np.arccos(rlocs)  # Conversion to polar angles
-        gl1 = gf.FixedLocator(tlocs)  # Positions
-        tf1 = gf.DictFormatter(dict(zip(tlocs, map(str, rlocs))))
-
-        # Standard deviation axis extent
-        self.smin = 0
-        self.smax = 1.5 * self.STD
-        gh = fa.GridHelperCurveLinear(
-            tr, extremes=(0, (np.pi/2), self.smin, self.smax),
-            grid_locator1=gl1, tick_formatter1=tf1)
-
-        if fig is None:
-            fig = plt.figure()
-
-        ax = fa.FloatingSubplot(fig, rect, grid_helper=gh)
-        fig.add_subplot(ax)
-
-        # Angle axis
-        ax.axis['top'].set_axis_direction('bottom')
-        ax.axis['top'].label.set_text("Correlation coefficient")
-        ax.axis['top'].toggle(ticklabels=True, label=True)
-        ax.axis['top'].major_ticklabels.set_axis_direction('top')
-        ax.axis['top'].label.set_axis_direction('top')
-
-        # X axis
-        ax.axis['left'].set_axis_direction('bottom')
-        ax.axis['left'].label.set_text("Standard deviation")
-        ax.axis['left'].toggle(ticklabels=True, label=True)
-        ax.axis['left'].major_ticklabels.set_axis_direction('bottom')
-        ax.axis['left'].label.set_axis_direction('bottom')
-
-        # Y axis
-        ax.axis['right'].set_axis_direction('top')
-        ax.axis['right'].label.set_text("Standard deviation")
-        ax.axis['right'].toggle(ticklabels=True, label=True)
-        ax.axis['right'].major_ticklabels.set_axis_direction('left')
-        ax.axis['right'].label.set_axis_direction('top')
-
-        # Useless
-        ax.axis['bottom'].set_visible(False)
-
-        # Contours along standard deviations
-        ax.grid()
-        self._ax = ax  # Graphical axes
-        self.ax = ax.get_aux_axes(tr)  # Polar coordinates
-
-        # Add reference point and STD contour
-        labels, = self.ax.plot([0], self.STD, 'k*', ls='', ms=8, label=label)
-        t = np.linspace(0, (np.pi / 2.0))
-        r = np.zeros_like(t) + self.STD
-        self.ax.plot(t, r, 'k--', label='_')
-
-        # Collect sample points for latter use (e.g. legend)
-        self.samplePoints = [labels]
-
-    def add_sample(self, STD, r, *args, **kwargs):
-        # (theta, radius)
-        labels, = self.ax.plot(np.arccos(r), STD, *args, **kwargs)
-        self.samplePoints.append(labels)
-        return labels
-
-    def add_contours(self, levels=5, **kwargs):
-        rs, ts = np.meshgrid(np.linspace(self.smin, self.smax),
-                             np.linspace(0, (np.pi / 2.0)))
-        RMSE = np.sqrt(
-            np.power(self.STD, 2) + np.power(rs, 2)
-            - (2.0 * self.STD * rs * np.cos(ts)))
-
-        contours = self.ax.contour(ts, rs, RMSE, levels, **kwargs)
-
-        return contours
+# https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_regression.html?highlight=entropy
+# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.differential_entropy.html
+# https://github.com/paulbrodersen/entropy_estimators/
+# https://github.com/gregversteeg/NPEET <- USE THIS ONE FIRST !!!!!!!!!!!!!!!!
+# https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
 
 
-def srl(obsSTD, s, r, labels, fname):
-    fig = plt.figure()
-    dia = TaylorDiagram(obsSTD, fig=fig, rect=111, label='Observed')
-    plt.clabel(dia.add_contours(colors='0.5'), inline=1, fontsize=10)
-    cs = plt.matplotlib.cm.Set1(np.linspace(0, 1, len(labels)))
-    srlc = zip(s, r, labels, cs)
+def calculate_td_properties(df_input, string_reference_feature,
+                            string_method='pearson'):
 
-    for i in srlc:
-        dia.add_sample(i[0], i[1], label=i[2], c=i[3], marker='s',
-                       markersize=12)
+    list_all_features = df_input.columns.to_list()
 
-    spl = [p.get_label() for p in dia.samplePoints]
-    fig.legend(dia.samplePoints, spl, numpoints=1, prop=dict(size='small'),
-               loc=[0.7, 0.7])
-    plt.title('Taylor diagram')
-    plt.savefig(fname, dpi=300, bbox_inches='tight')
-    plt.clf()
-    plt.close(fig)
+    # Initialize dict
+    dict_result = {}
+    for string_one_feature in list_all_features:
+        dict_result[string_one_feature] = []
+
+    for string_one_feature in list_all_features:
+        # Calculating standard deviations
+        dict_result[string_one_feature].append(
+            df_input[string_one_feature].std(ddof=0))
+
+        # Calculating Pearson's correlation
+        dict_result[string_one_feature].append(
+            df_input[string_reference_feature].corr(
+                df_input[string_one_feature], method=string_method))
+
+        # Calculate arccos of Pearson's correlation
+        dict_result[string_one_feature].append(math.degrees(
+            math.acos(dict_result[string_one_feature][-1])))
+
+        # Calculating RMS
+        dict_result[string_one_feature].append(
+            mean_squared_error(
+                df_input[string_reference_feature],
+                df_input[string_one_feature], squared=False))
+
+    for string_one_feature in list_all_features:
+        # Calculating correlation using RMS formula
+        # dict_result[string_one_feature].append(
+        #    (dict_result[string_one_feature][0]**2 + dict_result[string_reference_feature][0]**2 - dict_result[string_one_feature][3]**2) / (2 * dict_result[string_one_feature][0] * dict_result[string_reference_feature][0]) # noqa
+        # )
+
+        # Calculating the angle using calculated correlation
+        # dict_result[string_one_feature].append(math.degrees(
+        #    math.acos(dict_result[string_one_feature][-1])))
+
+        # Normalizing the RMS as in the paper
+        dict_result[string_one_feature].append(
+            dict_result[string_one_feature][3] /
+            dict_result[string_reference_feature][0])
+
+        # Calculating normalized standard deviation
+        dict_result[string_one_feature].append(
+            dict_result[string_one_feature][0] / dict_result[
+                string_reference_feature][0])
+
+    df_result = pd.DataFrame().from_dict(
+        dict_result, orient='index',
+        # columns=['STD', 'Correlation', 'Angle', 'RMS', 'Calculated_Corr',
+        #         'Calculated_Angle', 'Normalized_RMS', 'Normalized_STD']
+        columns=['STD', 'Correlation', 'Angle', 'RMS', 'Normalized_RMS',
+                 'Normalized_STD'])
+
+    df_result = df_result.reset_index().rename(columns={'index': 'Model'})
+
+    return df_result
 
 
-def main():
-    # Standard deviation of observed data
-    obsSTD = 0.35
-
-    # Standard deviation of each predicted data
-    s = [0.33, 0.34, 0.36, 0.38]
-
-    # The correlation coefficient of each predicted data
-    r = [0.70, 0.67, 0.81, 0.58]
-
-    # Labels of each predicted data
-    labels = ['A', 'B', 'C', 'D']
-
-    # Output file name
-    fname = 'TaylorDiagram.jpg'
-
-    # Note:s, r, and l has the same length
-    srl(obsSTD, s, r, labels, fname)
-
-    return None
+def list_adapt_to_npeet(list_input):
+    return [[i] for i in list_input]
 
 
-if __name__ == '__main__':
-    main()
+def calculate_mid_properties(df_input, string_reference_feature,
+                             string_library):
+
+    list_all_features = df_input.columns.to_list()
+
+    list_adapted_npeet_reference = list_adapt_to_npeet(
+        df_input[string_reference_feature])
+
+    # Initialize dict
+    dict_result = {}
+    for string_one_feature in list_all_features:
+        dict_result[string_one_feature] = []
+
+    # TODO: Entropies are negative often when using default parameters
+    # That is causing an error when calculating angles
+    # Try to find better default parameters so it doesn't happen
+    for string_one_feature in list_all_features:
+        list_adapted_npeet_one = list_adapt_to_npeet(
+            df_input[string_one_feature])
+
+        if string_library == 'scipy_sklearn':
+            # Calculate entropies
+            # 0 in the list
+            dict_result[string_one_feature].append(
+                differential_entropy(df_input[string_one_feature], base=2))
+            # dict_result[string_one_feature].append(
+            #    mutual_info_regression(
+            #        df_input[string_one_feature].to_numpy().reshape(-1, 1),
+            #        df_input[string_one_feature],
+            #        discrete_features=False)[0])
+
+            # Calculate mutual informations against the reference feature
+            # 1 in the liststring_angular_column
+            dict_result[string_one_feature].append(
+                mutual_info_regression(
+                    df_input[string_reference_feature].to_numpy().reshape(
+                        -1, 1),
+                    df_input[string_one_feature],
+                    discrete_features=False)[0])
+
+        elif string_library == 'npeet':
+            # Calculate entropies
+            # 0 in the list
+            dict_result[string_one_feature].append(
+                entropy_estimators.entropy(list_adapted_npeet_one))
+
+            # Calculate mutual informations against the reference feature
+            # 1 in the liststring_angular_column
+            dict_result[string_one_feature].append(
+                entropy_estimators.mi(list_adapted_npeet_reference,
+                                      list_adapted_npeet_one))
+
+        else:
+            print('BAD LIB ARGUMENT')
+            return None
+
+    for string_one_feature in list_all_features:
+        # Calculating fixed MI from equation 17 from the paper
+        # I(X,Y) = I~(X,Y) * (H(X) / I~(X,X)) where I~ is MI calculated using
+        # some estimation method. This MI is used for every calculation
+        # afterwards
+        # 2 in the list
+        dict_result[string_one_feature].append(
+            dict_result[string_one_feature][1] *
+            (dict_result[string_reference_feature][0] /
+             dict_result[string_reference_feature][1])
+        )
+
+        # Calculate scaled entropies
+        # 3 in the list
+        dict_result[string_one_feature].append(
+            dict_result[string_one_feature][0] /
+            dict_result[string_reference_feature][0]
+        )
+
+        # Calculate normalized mutual information according to the paper
+        # NMI(X,Y) = I(X,Y) / sqrt(H(X) * H(Y))
+        # This has to be modified because H(X)*H(Y) can be negative for
+        # differential entropies. NMI is not used at all for the MI chart
+        # that spans two quadrants
+        # 4 in the list
+        float_product = dict_result[string_reference_feature][0] *\
+            dict_result[string_one_feature][0]
+
+        if float_product < 0:
+            dict_result[string_one_feature].append(1)
+
+        else:
+            dict_result[string_one_feature].append(
+                dict_result[string_one_feature][2] / math.sqrt(float_product))
+
+        # Calculate arccos of normalized mutual information according to the
+        # paper arccos(NMI(X,Y))
+        # 5 in the list
+        dict_result[string_one_feature].append(
+            math.degrees(math.acos(dict_result[string_one_feature][4])))
+
+    for string_one_feature in list_all_features:
+        ######################################################################
+        # This part is for the chart that spans two quadrants
+
+        # First calculate joint entropies by using equation 10 from the paper
+        # I(X,Y) = H(X) + H(Y) - H(X,Y) => H(X,Y) = H(X) + H(Y) - I(X,Y)
+        # 6 in the list
+        dict_result[string_one_feature].append(
+            dict_result[string_reference_feature][0] +
+            dict_result[string_one_feature][0] -
+            dict_result[string_one_feature][2]
+        )
+
+        # Calculate scaled mutual information according to the paper
+        # SMI(X,Y) = I(X,Y) * ((H(X,Y) / (H(X)*H(Y)))) (equation 15)
+        # 7 in the list
+        smi_x_y = dict_result[string_one_feature][2] * (
+            dict_result[string_one_feature][6] /
+            (dict_result[string_reference_feature][0]
+             * dict_result[string_one_feature][0]))
+
+        dict_result[string_one_feature].append(smi_x_y)
+
+        # Calculate arccos of biased scaled mutual information according to the
+        # paper arccos(c(X,Y)) where c(X,Y) = 2*SMI(X,Y) - 1
+        # 8 in the list
+        float_c_x_y = 2*smi_x_y - 1
+
+        if float_c_x_y > 1:
+            dict_result[string_one_feature].append(
+                math.degrees(math.acos(1)))
+        elif float_c_x_y < -1:
+            dict_result[string_one_feature].append(
+                math.degrees(math.acos(-1)))
+        else:
+            dict_result[string_one_feature].append(
+                math.degrees(math.acos(float_c_x_y)))
+
+        # Calculate root entropy
+        # 9 in the list
+        if dict_result[string_one_feature][0] >= 0:
+            float_root_entropy = math.sqrt(dict_result[string_one_feature][0])
+        else:
+            float_root_entropy = -1
+
+        dict_result[string_one_feature].append(float_root_entropy)
+        ######################################################################
+
+    df_result = pd.DataFrame().from_dict(
+        dict_result, orient='index',
+        columns=['Entropy', 'Mutual_information', 'Fixed_MI', 'Scaled_entropy',
+                 'Normalized_MI', 'Angle_NMI', 'Joint_entropies', 'Scaled_MI',
+                 'Angle_SMI', 'Root_Entropy'])
+
+    df_result = df_result.reset_index().rename(columns={'index': 'Model'})
+
+    return df_result
+
+
+def df_calculate_all_properties(df_input, string_reference_feature,
+                                string_library, string_method):
+    string_method = 'pearson'
+    string_library = 'scipy_sklearn'
+
+    df_td = calculate_td_properties(df_input, string_reference_feature,
+                                    string_method=string_method)
+    df_mid = calculate_mid_properties(df_input, string_reference_feature,
+                                      string_library=string_library)
+
+    return df_td.merge(df_mid, on='Model', how='inner')
+
+
+def chart_create_diagram(df_input, string_reference_feature,
+                         string_mid_type='scaled', bool_flag_as_subplot=False,
+                         chart_result_upper=None,
+                         string_diagram_type='taylor'):
+
+    # General properties
+    list_color_scheme = None
+    int_number_of_models = len(df_input['Model'].to_list())
+
+    if int_number_of_models <= 9:
+        list_color_scheme = px.colors.qualitative.Set1
+    else:
+        list_color_scheme = px.colors.qualitative.Light24
+
+    np_tmp = np.array(
+        [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
+
+    if string_diagram_type == 'taylor':
+        string_radial_column = 'STD'
+        string_angular_column = 'Angle'
+        string_angular_column_label = 'Correlation'
+        bool_only_half = True if (
+            df_input[string_angular_column] <= 90).all() else False
+        int_subplot_column_number = 1
+
+    elif string_diagram_type == 'mid':
+        int_subplot_column_number = 2
+
+        if string_mid_type == 'scaled':
+            string_angular_column = 'Angle_SMI'
+            string_radial_column = 'Entropy'
+            string_angular_column_label = 'Scaled Mutual Information'
+            bool_only_half = False
+
+        elif string_mid_type == 'normalized':
+            string_angular_column = 'Angle_NMI'
+            string_radial_column = 'Root_Entropy'
+            string_angular_column_label = 'Normalized Mutual Information'
+            bool_only_half = True
+
+        else:
+            # TODO: Raise an error
+            print('Type has to be either "scaled" or "normalized"')
+            return None
+
+    else:
+        # TODO: Raise an error
+        return None
+
+    int_max_angle = 90 if bool_only_half else 180
+    np_angular_labels = np_tmp if bool_only_half else np.concatenate(
+        (-np_tmp[:0:-1], np_tmp))
+    np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
+    float_max_r = df_input[string_radial_column].max() +\
+        df_input[string_radial_column].mean()
+
+    if bool_flag_as_subplot is True:
+        chart_result = chart_result_upper
+    else:
+        chart_result = go.Figure()
+
+    dict_polar_chart = dict(
+        radialaxis_range=[0, float_max_r],
+        radialaxis_title_text=string_radial_column,
+        sector=[0, int_max_angle],
+        angularaxis=dict(
+            direction="counterclockwise",
+            tickvals=np_angular_ticks,
+            ticktext=np_angular_labels,
+        ))
+
+    for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
+            df_input[string_radial_column], df_input[string_angular_column],
+            pd.factorize(df_input['Model'])[0], df_input['Model']):
+
+        if bool_flag_as_subplot is True:
+            chart_result.add_trace(
+                go.Scatterpolar(
+                    name=tmp_model,
+                    r=[tmp_r],
+                    theta=[tmp_angle],
+                    mode='markers',
+                    legendgroup=tmp_model,
+                    showlegend=False,
+                    marker=dict(
+                        color=list_color_scheme[tmp_model_int])),
+                row=1,
+                col=int_subplot_column_number)
+
+        else:
+            chart_result.add_trace(
+                go.Scatterpolar(
+                    name=tmp_model,
+                    r=[tmp_r],
+                    theta=[tmp_angle],
+                    mode='markers',
+                    marker=dict(
+                        color=list_color_scheme[tmp_model_int],
+                    )))
+
+    if bool_flag_as_subplot is True:
+        if string_diagram_type == 'taylor':
+            chart_result.update_layout(
+                polar=dict_polar_chart,
+                height=600,
+                showlegend=True)
+
+        else:
+            chart_result.update_layout(
+                polar2=dict_polar_chart,
+                height=600,
+                showlegend=True
+            )
+
+    else:
+        chart_result.update_layout(
+            polar=dict_polar_chart,
+            height=600,
+            title=dict(
+                text=string_angular_column_label,
+                x=0.494,
+                y=0.9,
+                xanchor='center',
+                yanchor='top',
+                font=dict(
+                    size=16)))
+
+    return chart_result
+
+
+def chart_create_all_charts(df_input, string_reference_feature,
+                            string_td_method, string_mid_type,
+                            string_mid_library='scipy_sklearn'):
+
+    string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
+
+    string_angular_title_td = 'Correlation'
+    if string_mid_type == 'scaled':
+        string_angular_title_mid = 'Scaled Mutual Information'
+    elif string_mid_type == 'normalized':
+        string_angular_title_mid = 'Normalized Mutual Information'
+    else:
+        # TODO: Raise an error
+        print('Type has to be either "scaled" or "normalized"')
+        return None
+
+    df_all = df_calculate_all_properties(
+        df_input=df_input, string_reference_feature=string_reference_feature,
+        string_method=string_td_method, string_library=string_mid_library)
+
+    chart_result = make_subplots(
+        rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
+        subplot_titles=(string_angular_title_td,  string_angular_title_mid))
+
+    chart_result = chart_create_diagram(
+        df_all, string_reference_feature=string_reference_feature,
+        bool_flag_as_subplot=True, chart_result_upper=chart_result,
+        string_diagram_type='taylor')
+
+    chart_result = chart_create_diagram(
+        df_all, string_reference_feature=string_reference_feature,
+        string_mid_type=string_mid_type, bool_flag_as_subplot=True,
+        chart_result_upper=chart_result, string_diagram_type='mid')
+
+    chart_result.update_annotations(yshift=10)
+    chart_result.update_layout(
+        title=dict(
+                text=string_combined_chart_title,
+                x=0.5,
+                y=0.95,
+                xanchor='center',
+                yanchor='top',
+                font=dict(
+                    size=18)))
+
+    return chart_result
