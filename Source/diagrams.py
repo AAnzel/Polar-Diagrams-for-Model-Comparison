@@ -279,6 +279,8 @@ def chart_create_diagram(df_input, string_reference_feature,
         bool_only_half = True if (
             df_input[string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
+        np_angular_labels = np_tmp if bool_only_half else np.concatenate(
+            (-np_tmp[:0:-1], np_tmp))
 
     elif string_diagram_type == 'mid':
         bool_show_legend = False
@@ -301,13 +303,15 @@ def chart_create_diagram(df_input, string_reference_feature,
             print('Type has to be either "scaled" or "normalized"')
             return None
 
+        # BUG: Fix labels for MI (it should go from 0 to 1 always)
+        np_angular_labels = np_tmp if bool_only_half else np.concatenate(
+            (np_tmp[:0:-1], np_tmp))
+
     else:
         # TODO: Raise an error
         return None
 
     int_max_angle = 90 if bool_only_half else 180
-    np_angular_labels = np_tmp if bool_only_half else np.concatenate(
-        (-np_tmp[:0:-1], np_tmp))
     np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
     float_max_r = df_input[string_radial_column].max() +\
         df_input[string_radial_column].mean()
