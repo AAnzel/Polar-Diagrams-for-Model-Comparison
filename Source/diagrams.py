@@ -384,9 +384,9 @@ def chart_create_diagram(df_input, string_reference_feature,
     return chart_result
 
 
-def chart_create_all_charts(df_input, string_reference_feature,
-                            string_td_method, string_mid_type,
-                            string_mid_library='scipy_sklearn'):
+def chart_create_all_diagrams(df_input, string_reference_feature,
+                              string_td_method, string_mid_type,
+                              string_mid_library='scipy_sklearn'):
 
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
 
