@@ -272,6 +272,7 @@ def chart_create_diagram(df_input, string_reference_feature,
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
 
     if string_diagram_type == 'taylor':
+        bool_show_legend = True
         string_radial_column = 'STD'
         string_angular_column = 'Angle'
         string_angular_column_label = 'Correlation'
@@ -280,6 +281,7 @@ def chart_create_diagram(df_input, string_reference_feature,
         int_subplot_column_number = 1
 
     elif string_diagram_type == 'mid':
+        bool_show_legend = False
         int_subplot_column_number = 2
 
         if string_mid_type == 'scaled':
@@ -337,7 +339,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     theta=[tmp_angle],
                     mode='markers',
                     legendgroup=tmp_model,
-                    showlegend=False,
+                    showlegend=bool_show_legend,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])),
                 row=1,
@@ -365,8 +367,7 @@ def chart_create_diagram(df_input, string_reference_feature,
             chart_result.update_layout(
                 polar2=dict_polar_chart,
                 height=600,
-                showlegend=True
-            )
+                showlegend=True)
 
     else:
         chart_result.update_layout(
