@@ -19,9 +19,9 @@ from plotly.subplots import make_subplots
 # https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
 
 
-string_background_color = '#F8F8F8'
-string_grid_color = '#C0C0C0'
-string_label_title_color = '#404040'
+STRING_BACKGROUND_COLOR = '#F8F8F8'
+STRING_GRID_COLOR = '#C0C0C0'
+STRING_LABEL_TITLE_COLOR = '#404040'
 
 
 def calculate_td_properties(df_input, string_reference_feature,
@@ -346,33 +346,33 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
-        bgcolor=string_background_color,
+        bgcolor=STRING_BACKGROUND_COLOR,
         radialaxis=dict(
             range=[0, float_max_r],
             griddash='dot',
-            gridcolor=string_grid_color,
-            tickcolor=string_label_title_color,
-            tickfont=dict(color=string_label_title_color),
+            gridcolor=STRING_GRID_COLOR,
+            tickcolor=STRING_LABEL_TITLE_COLOR,
+            tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
             layer='below traces',
             title=dict(
                 text=string_radial_column,
                 font=dict(
-                    color=string_label_title_color))),
+                    color=STRING_LABEL_TITLE_COLOR))),
         angularaxis=dict(
             direction="counterclockwise",
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
-            tickcolor=string_label_title_color,
-            tickfont=dict(color=string_label_title_color),
+            tickcolor=STRING_LABEL_TITLE_COLOR,
+            tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
             griddash='dot',
-            gridcolor=string_grid_color,
+            gridcolor=STRING_GRID_COLOR,
             layer='below traces'))
     dict_legend = dict(
         title=dict(text=string_tooltip_label_0),
         font=dict(
-            color=string_label_title_color),
-        bgcolor=string_background_color,
-        bordercolor=string_grid_color,
+            color=STRING_LABEL_TITLE_COLOR),
+        bgcolor=STRING_BACKGROUND_COLOR,
+        bordercolor=STRING_GRID_COLOR,
         borderwidth=0.2)
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
@@ -438,7 +438,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                 yanchor='top',
                 font=dict(
                     size=16,
-                    color=string_label_title_color)))
+                    color=STRING_LABEL_TITLE_COLOR)))
 
     return chart_result
 
@@ -478,7 +478,7 @@ def chart_create_all_diagrams(df_input, string_reference_feature,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
     chart_result.update_annotations(
-        yshift=10, font_color=string_label_title_color)
+        yshift=10, font_color=STRING_LABEL_TITLE_COLOR)
     chart_result.update_layout(
         title=dict(
             text=string_combined_chart_title,
@@ -488,6 +488,6 @@ def chart_create_all_diagrams(df_input, string_reference_feature,
             yanchor='top',
             font=dict(
                 size=18,
-                color=string_label_title_color)))
+                color=STRING_LABEL_TITLE_COLOR)))
 
     return chart_result
