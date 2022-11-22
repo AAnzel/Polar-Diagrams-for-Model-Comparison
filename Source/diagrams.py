@@ -266,7 +266,8 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     # General properties
     list_color_scheme = None
-    int_number_of_models = len(df_input['Model'].to_list())
+    string_tooltip_label_0 = 'Model'
+    int_number_of_models = len(df_input[string_tooltip_label_0].to_list())
 
     if int_number_of_models <= 9:
         list_color_scheme = px.colors.qualitative.Set1
@@ -275,7 +276,6 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
-    string_tooltip_label_0 = 'Model'
 
     if string_diagram_type == 'taylor':
         bool_show_legend = True
@@ -340,8 +340,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                   string_tooltip_label_2]].to_numpy())
     string_tooltip_hovertemplate = (
         string_tooltip_label_0 + ': %{customdata[0]}<br>' +
-        string_tooltip_label_1 + ': %{customdata[1]}<br>' +
-        string_tooltip_label_2 + ': %{customdata[2]}<br>' +
+        string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
+        string_tooltip_label_2 + ': %{customdata[2]:.3f}<br>' +
         '<extra></extra>')
 
     dict_polar_chart = dict(
@@ -370,7 +370,8 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
             df_input[string_radial_column], df_input[string_angular_column],
-            pd.factorize(df_input['Model'])[0], df_input['Model']):
+            pd.factorize(df_input[string_tooltip_label_0])[0],
+            df_input[string_tooltip_label_0]):
 
         if bool_flag_as_subplot is True:
             chart_result.add_trace(
@@ -383,6 +384,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     showlegend=bool_show_legend,
                     customdata=[
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,
+                    hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])),
                 row=1,
@@ -397,6 +399,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     mode='markers',
                     customdata=[
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,
+                    hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])))
 
@@ -426,8 +429,6 @@ def chart_create_diagram(df_input, string_reference_feature,
                 font=dict(
                     size=16,
                     color=string_label_title_color)))
-
-    chart_result.update_traces(hovertemplate=string_tooltip_hovertemplate)
 
     return chart_result
 
