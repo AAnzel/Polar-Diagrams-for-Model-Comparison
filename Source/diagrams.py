@@ -26,8 +26,8 @@ STRING_LABEL_TITLE_COLOR = '#404040'
 # TODO: Generate docstrings
 
 
-def calculate_td_properties(df_input, string_reference_model,
-                            string_corr_method='pearson'):
+def df_calculate_td_properties(df_input, string_reference_model,
+                               string_corr_method='pearson'):
 
     list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
     if string_corr_method not in list_valid_corr_methods:
@@ -97,10 +97,10 @@ def list_adapt_to_npeet(list_input):
     return [[i] for i in list_input]
 
 
-def calculate_mid_properties(df_input, string_reference_model,
-                             dict_mi_parameters=dict(
-                                 string_library='scipy_sklearn',
-                                 string_entropy_method='auto')):
+def df_calculate_mid_properties(df_input, string_reference_model,
+                                dict_mi_parameters=dict(
+                                    string_library='scipy_sklearn',
+                                    string_entropy_method='auto')):
 
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
@@ -271,10 +271,10 @@ def calculate_mid_properties(df_input, string_reference_model,
 def df_calculate_all_properties(df_input, string_reference_model,
                                 dict_mi_parameters, string_corr_method):
 
-    df_td = calculate_td_properties(df_input, string_reference_model,
-                                    string_corr_method)
-    df_mid = calculate_mid_properties(df_input, string_reference_model,
-                                      dict_mi_parameters)
+    df_td = df_calculate_td_properties(
+        df_input, string_reference_model, string_corr_method)
+    df_mid = df_calculate_mid_properties(
+        df_input, string_reference_model, dict_mi_parameters)
 
     return df_td.merge(df_mid, on='Model', how='inner')
 
@@ -458,6 +458,36 @@ def chart_create_diagram(df_input, string_reference_model,
                 font=dict(
                     size=16,
                     color=STRING_LABEL_TITLE_COLOR)))
+
+    return chart_result
+
+
+def chart_create_taylor_diagram(df_input, string_reference_model,
+                                string_corr_method):
+
+    df_td = df_calculate_td_properties(
+        df_input, string_reference_model, string_corr_method)
+    chart_result = chart_create_diagram(
+        df_td, string_reference_model=string_reference_model,
+        bool_flag_as_subplot=False, string_diagram_type='taylor')
+
+    return chart_result
+
+
+def chart_create_mi_diagram(df_input, string_reference_model,
+                            string_mid_type, dict_mi_parameters):
+    list_valid_mid_types = ['normalized', 'scaled']
+
+    if string_mid_type not in list_valid_mid_types:
+        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
+
+    df_mid = df_calculate_mid_properties(
+        df_input, string_reference_model, dict_mi_parameters)
+
+    chart_result = chart_create_diagram(
+        df_mid, string_reference_model=string_reference_model,
+        string_mid_type=string_mid_type, bool_flag_as_subplot=False,
+        string_diagram_type='mid')
 
     return chart_result
 
