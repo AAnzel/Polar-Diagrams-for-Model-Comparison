@@ -23,6 +23,8 @@ STRING_BACKGROUND_COLOR = '#F8F8F8'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
 
+# TODO: Generate docstrings
+
 
 def calculate_td_properties(df_input, string_reference_model,
                             string_corr_method='pearson'):
