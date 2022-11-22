@@ -27,7 +27,6 @@ STRING_LABEL_TITLE_COLOR = '#404040'
 def calculate_td_properties(df_input, string_reference_model,
                             string_corr_method='pearson'):
 
-    # TODO: Check if the method string is valid
     list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
     if string_corr_method not in list_valid_corr_methods:
         raise ValueError('string_corr_method is not one of the following:' +
@@ -283,6 +282,15 @@ def chart_create_diagram(df_input, string_reference_model,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
 
+    list_valid_diagram_types = ['taylor', 'mid']
+    list_valid_mid_types = ['scaled', 'normalized']
+
+    if string_diagram_type not in list_valid_diagram_types:
+        raise ValueError('string_diagram_type not in ' +
+                         str(list_valid_diagram_types))
+    if string_mid_type not in list_valid_mid_types:
+        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
+
     # General properties
     list_color_scheme = None
     string_tooltip_label_0 = 'Model'
@@ -310,7 +318,7 @@ def chart_create_diagram(df_input, string_reference_model,
             (-np_tmp[:0:-1], np_tmp))
         np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
-    elif string_diagram_type == 'mid':
+    else:
         bool_show_legend = False
         int_subplot_column_number = 2
 
@@ -325,7 +333,7 @@ def chart_create_diagram(df_input, string_reference_model,
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
             np_angular_labels = np.round((np_angular_labels + 1) / 2, 3)
 
-        elif string_mid_type == 'normalized':
+        else:
             string_angular_column = 'Angle_NMI'
             string_radial_column = 'Root_Entropy'
             string_angular_column_label = 'Normalized Mutual Information'
@@ -334,15 +342,6 @@ def chart_create_diagram(df_input, string_reference_model,
             bool_only_half = True
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
-
-        else:
-            # TODO: Raise an error
-            print('Type has to be either "scaled" or "normalized"')
-            return None
-
-    else:
-        # TODO: Raise an error
-        return None
 
     int_max_angle = 90 if bool_only_half else 180
     float_max_r = df_input[string_radial_column].max() +\
@@ -353,7 +352,6 @@ def chart_create_diagram(df_input, string_reference_model,
     else:
         chart_result = go.Figure()
 
-    # TODO: Change tooltip information to show more meaningful info
     np_tooltip_data = list(
         df_input[[string_tooltip_label_0, string_tooltip_label_1,
                   string_tooltip_label_2]].to_numpy())
