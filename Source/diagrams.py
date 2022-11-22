@@ -24,55 +24,61 @@ STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
 
 
-def calculate_td_properties(df_input, string_reference_feature,
-                            string_method='pearson'):
+def calculate_td_properties(df_input, string_reference_model,
+                            string_corr_method='pearson'):
+
+    # TODO: Check if the method string is valid
+    list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
+    if string_corr_method not in list_valid_corr_methods:
+        raise ValueError('string_corr_method is not one of the following:' +
+                         str(list_valid_corr_methods))
 
     list_all_features = df_input.columns.to_list()
 
     # Initialize dict
     dict_result = {}
-    for string_one_feature in list_all_features:
-        dict_result[string_one_feature] = []
+    for string_one_model in list_all_features:
+        dict_result[string_one_model] = []
 
-    for string_one_feature in list_all_features:
+    for string_one_model in list_all_features:
         # Calculating standard deviations
-        dict_result[string_one_feature].append(
-            df_input[string_one_feature].std(ddof=0))
+        dict_result[string_one_model].append(
+            df_input[string_one_model].std(ddof=0))
 
         # Calculating Pearson's correlation
-        dict_result[string_one_feature].append(
-            df_input[string_reference_feature].corr(
-                df_input[string_one_feature], method=string_method))
+        dict_result[string_one_model].append(
+            df_input[string_reference_model].corr(
+                df_input[string_one_model], method=string_corr_method))
 
         # Calculate arccos of Pearson's correlation
-        dict_result[string_one_feature].append(math.degrees(
-            math.acos(dict_result[string_one_feature][-1])))
+        dict_result[string_one_model].append(math.degrees(
+            math.acos(dict_result[string_one_model][-1])))
 
         # Calculating RMS
-        dict_result[string_one_feature].append(
+        dict_result[string_one_model].append(
             mean_squared_error(
-                df_input[string_reference_feature],
-                df_input[string_one_feature], squared=False))
+                df_input[string_reference_model],
+                df_input[string_one_model], squared=False))
 
-    for string_one_feature in list_all_features:
+    for string_one_model in list_all_features:
         # Calculating correlation using RMS formula
-        # dict_result[string_one_feature].append(
-        #    (dict_result[string_one_feature][0]**2 + dict_result[string_reference_feature][0]**2 - dict_result[string_one_feature][3]**2) / (2 * dict_result[string_one_feature][0] * dict_result[string_reference_feature][0]) # noqa
+        # dict_result[string_one_model].append(
+        #    (dict_result[string_one_model][0]**2 + dict_result[string_reference_model][0]**2 - dict_result[string_one_model][3]**2) / (2 * dict_result[string_one_model][0] * dict_result[string_reference_model][0]) # noqa
         # )
 
         # Calculating the angle using calculated correlation
-        # dict_result[string_one_feature].append(math.degrees(
-        #    math.acos(dict_result[string_one_feature][-1])))
+        # dict_result[string_one_model].append(math.degrees(
+        #    math.acos(dict_result[string_one_model][-1])))
 
         # Normalizing the RMS as in the paper
-        dict_result[string_one_feature].append(
-            dict_result[string_one_feature][3] /
-            dict_result[string_reference_feature][0])
+        dict_result[string_one_model].append(
+            dict_result[string_one_model][3] /
+            dict_result[string_reference_model][0])
 
         # Calculating normalized standard deviation
-        dict_result[string_one_feature].append(
-            dict_result[string_one_feature][0] / dict_result[
-                string_reference_feature][0])
+        dict_result[string_one_model].append(
+            dict_result[string_one_model][0] / dict_result[
+                string_reference_model][0])
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
@@ -90,55 +96,55 @@ def list_adapt_to_npeet(list_input):
     return [[i] for i in list_input]
 
 
-def calculate_mid_properties(df_input, string_reference_feature,
+def calculate_mid_properties(df_input, string_reference_model,
                              string_library):
 
     list_all_features = df_input.columns.to_list()
 
     list_adapted_npeet_reference = list_adapt_to_npeet(
-        df_input[string_reference_feature])
+        df_input[string_reference_model])
 
     # Initialize dict
     dict_result = {}
-    for string_one_feature in list_all_features:
-        dict_result[string_one_feature] = []
+    for string_one_model in list_all_features:
+        dict_result[string_one_model] = []
 
     # TODO: Entropies are negative often when using default parameters
     # That is causing an error when calculating angles
     # Try to find better default parameters so it doesn't happen
-    for string_one_feature in list_all_features:
+    for string_one_model in list_all_features:
         list_adapted_npeet_one = list_adapt_to_npeet(
-            df_input[string_one_feature])
+            df_input[string_one_model])
 
         if string_library == 'scipy_sklearn':
             # Calculate entropies
             # 0 in the list
-            dict_result[string_one_feature].append(
-                differential_entropy(df_input[string_one_feature], base=2))
-            # dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
+                differential_entropy(df_input[string_one_model], base=2))
+            # dict_result[string_one_model].append(
             #    mutual_info_regression(
-            #        df_input[string_one_feature].to_numpy().reshape(-1, 1),
-            #        df_input[string_one_feature],
+            #        df_input[string_one_model].to_numpy().reshape(-1, 1),
+            #        df_input[string_one_model],
             #        discrete_features=False)[0])
 
             # Calculate mutual informations against the reference feature
             # 1 in the liststring_angular_column
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 mutual_info_regression(
-                    df_input[string_reference_feature].to_numpy().reshape(
+                    df_input[string_reference_model].to_numpy().reshape(
                         -1, 1),
-                    df_input[string_one_feature],
+                    df_input[string_one_model],
                     discrete_features=False)[0])
 
         elif string_library == 'npeet':
             # Calculate entropies
             # 0 in the list
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 entropy_estimators.entropy(list_adapted_npeet_one))
 
             # Calculate mutual informations against the reference feature
             # 1 in the liststring_angular_column
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 entropy_estimators.mi(list_adapted_npeet_reference,
                                       list_adapted_npeet_one))
 
@@ -146,23 +152,23 @@ def calculate_mid_properties(df_input, string_reference_feature,
             print('BAD LIB ARGUMENT')
             return None
 
-    for string_one_feature in list_all_features:
+    for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
         # I(X,Y) = I~(X,Y) * (H(X) / I~(X,X)) where I~ is MI calculated using
         # some estimation method. This MI is used for every calculation
         # afterwards
         # 2 in the list
-        dict_result[string_one_feature].append(
-            dict_result[string_one_feature][1] *
-            (dict_result[string_reference_feature][0] /
-             dict_result[string_reference_feature][1])
+        dict_result[string_one_model].append(
+            dict_result[string_one_model][1] *
+            (dict_result[string_reference_model][0] /
+             dict_result[string_reference_model][1])
         )
 
         # Calculate scaled entropies
         # 3 in the list
-        dict_result[string_one_feature].append(
-            dict_result[string_one_feature][0] /
-            dict_result[string_reference_feature][0]
+        dict_result[string_one_model].append(
+            dict_result[string_one_model][0] /
+            dict_result[string_reference_model][0]
         )
 
         # Calculate normalized mutual information according to the paper
@@ -171,44 +177,44 @@ def calculate_mid_properties(df_input, string_reference_feature,
         # differential entropies. NMI is not used at all for the MI chart
         # that spans two quadrants
         # 4 in the list
-        float_product = dict_result[string_reference_feature][0] *\
-            dict_result[string_one_feature][0]
+        float_product = dict_result[string_reference_model][0] *\
+            dict_result[string_one_model][0]
 
         if float_product < 0:
-            dict_result[string_one_feature].append(1)
+            dict_result[string_one_model].append(1)
 
         else:
-            dict_result[string_one_feature].append(
-                dict_result[string_one_feature][2] / math.sqrt(float_product))
+            dict_result[string_one_model].append(
+                dict_result[string_one_model][2] / math.sqrt(float_product))
 
         # Calculate arccos of normalized mutual information according to the
         # paper arccos(NMI(X,Y))
         # 5 in the list
-        dict_result[string_one_feature].append(
-            math.degrees(math.acos(dict_result[string_one_feature][4])))
+        dict_result[string_one_model].append(
+            math.degrees(math.acos(dict_result[string_one_model][4])))
 
-    for string_one_feature in list_all_features:
+    for string_one_model in list_all_features:
         ######################################################################
         # This part is for the chart that spans two quadrants
 
         # First calculate joint entropies by using equation 10 from the paper
         # I(X,Y) = H(X) + H(Y) - H(X,Y) => H(X,Y) = H(X) + H(Y) - I(X,Y)
         # 6 in the list
-        dict_result[string_one_feature].append(
-            dict_result[string_reference_feature][0] +
-            dict_result[string_one_feature][0] -
-            dict_result[string_one_feature][2]
+        dict_result[string_one_model].append(
+            dict_result[string_reference_model][0] +
+            dict_result[string_one_model][0] -
+            dict_result[string_one_model][2]
         )
 
         # Calculate scaled mutual information according to the paper
         # SMI(X,Y) = I(X,Y) * ((H(X,Y) / (H(X)*H(Y)))) (equation 15)
         # 7 in the list
-        smi_x_y = dict_result[string_one_feature][2] * (
-            dict_result[string_one_feature][6] /
-            (dict_result[string_reference_feature][0]
-             * dict_result[string_one_feature][0]))
+        smi_x_y = dict_result[string_one_model][2] * (
+            dict_result[string_one_model][6] /
+            (dict_result[string_reference_model][0]
+             * dict_result[string_one_model][0]))
 
-        dict_result[string_one_feature].append(smi_x_y)
+        dict_result[string_one_model].append(smi_x_y)
 
         # Calculate arccos of biased scaled mutual information according to the
         # paper arccos(c(X,Y)) where c(X,Y) = 2*SMI(X,Y) - 1
@@ -216,23 +222,23 @@ def calculate_mid_properties(df_input, string_reference_feature,
         float_c_x_y = 2*smi_x_y - 1
 
         if float_c_x_y > 1:
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 math.degrees(math.acos(1)))
         elif float_c_x_y < -1:
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 math.degrees(math.acos(-1)))
         else:
-            dict_result[string_one_feature].append(
+            dict_result[string_one_model].append(
                 math.degrees(math.acos(float_c_x_y)))
 
         # Calculate root entropy
         # 9 in the list
-        if dict_result[string_one_feature][0] >= 0:
-            float_root_entropy = math.sqrt(dict_result[string_one_feature][0])
+        if dict_result[string_one_model][0] >= 0:
+            float_root_entropy = math.sqrt(dict_result[string_one_model][0])
         else:
             float_root_entropy = -1
 
-        dict_result[string_one_feature].append(float_root_entropy)
+        dict_result[string_one_model].append(float_root_entropy)
         ######################################################################
 
     df_result = pd.DataFrame().from_dict(
@@ -246,20 +252,20 @@ def calculate_mid_properties(df_input, string_reference_feature,
     return df_result
 
 
-def df_calculate_all_properties(df_input, string_reference_feature,
+def df_calculate_all_properties(df_input, string_reference_model,
                                 string_library, string_method):
     string_method = 'pearson'
     string_library = 'scipy_sklearn'
 
-    df_td = calculate_td_properties(df_input, string_reference_feature,
+    df_td = calculate_td_properties(df_input, string_reference_model,
                                     string_method=string_method)
-    df_mid = calculate_mid_properties(df_input, string_reference_feature,
+    df_mid = calculate_mid_properties(df_input, string_reference_model,
                                       string_library=string_library)
 
     return df_td.merge(df_mid, on='Model', how='inner')
 
 
-def chart_create_diagram(df_input, string_reference_feature,
+def chart_create_diagram(df_input, string_reference_model,
                          string_mid_type='scaled', bool_flag_as_subplot=False,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
@@ -443,7 +449,7 @@ def chart_create_diagram(df_input, string_reference_feature,
     return chart_result
 
 
-def chart_create_all_diagrams(df_input, string_reference_feature,
+def chart_create_all_diagrams(df_input, string_reference_model,
                               string_td_method, string_mid_type,
                               string_mid_library='scipy_sklearn'):
 
@@ -460,7 +466,7 @@ def chart_create_all_diagrams(df_input, string_reference_feature,
         return None
 
     df_all = df_calculate_all_properties(
-        df_input=df_input, string_reference_feature=string_reference_feature,
+        df_input=df_input, string_reference_model=string_reference_model,
         string_method=string_td_method, string_library=string_mid_library)
 
     chart_result = make_subplots(
@@ -468,12 +474,12 @@ def chart_create_all_diagrams(df_input, string_reference_feature,
         subplot_titles=(string_angular_title_td,  string_angular_title_mid))
 
     chart_result = chart_create_diagram(
-        df_all, string_reference_feature=string_reference_feature,
+        df_all, string_reference_model=string_reference_model,
         bool_flag_as_subplot=True, chart_result_upper=chart_result,
         string_diagram_type='taylor')
 
     chart_result = chart_create_diagram(
-        df_all, string_reference_feature=string_reference_feature,
+        df_all, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=True,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
