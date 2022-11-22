@@ -264,8 +264,6 @@ def chart_create_diagram(df_input, string_reference_feature,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
 
-    # TODO: Change tooltip information to show more meaningful info
-    
     # General properties
     list_color_scheme = None
     int_number_of_models = len(df_input['Model'].to_list())
@@ -277,12 +275,15 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
+    string_tooltip_label_0 = 'Model'
 
     if string_diagram_type == 'taylor':
         bool_show_legend = True
         string_radial_column = 'STD'
         string_angular_column = 'Angle'
         string_angular_column_label = 'Correlation'
+        string_tooltip_label_1 = string_radial_column
+        string_tooltip_label_2 = string_angular_column_label
         bool_only_half = True if (
             df_input[string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
@@ -298,6 +299,8 @@ def chart_create_diagram(df_input, string_reference_feature,
             string_angular_column = 'Angle_SMI'
             string_radial_column = 'Entropy'
             string_angular_column_label = 'Scaled Mutual Information'
+            string_tooltip_label_1 = string_radial_column
+            string_tooltip_label_2 = 'Scaled_MI'
             bool_only_half = False
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
@@ -307,6 +310,8 @@ def chart_create_diagram(df_input, string_reference_feature,
             string_angular_column = 'Angle_NMI'
             string_radial_column = 'Root_Entropy'
             string_angular_column_label = 'Normalized Mutual Information'
+            string_tooltip_label_1 = string_radial_column
+            string_tooltip_label_2 = 'Normalized_MI'
             bool_only_half = True
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
@@ -328,6 +333,16 @@ def chart_create_diagram(df_input, string_reference_feature,
         chart_result = chart_result_upper
     else:
         chart_result = go.Figure()
+
+    # TODO: Change tooltip information to show more meaningful info
+    np_tooltip_data = list(
+        df_input[[string_tooltip_label_0, string_tooltip_label_1,
+                  string_tooltip_label_2]].to_numpy())
+    string_tooltip_hovertemplate = (
+        string_tooltip_label_0 + ': %{customdata[0]}<br>' +
+        string_tooltip_label_1 + ': %{customdata[1]}<br>' +
+        string_tooltip_label_2 + ': %{customdata[2]}<br>' +
+        '<extra></extra>')
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
@@ -366,6 +381,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                     mode='markers',
                     legendgroup=tmp_model,
                     showlegend=bool_show_legend,
+                    customdata=[
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])),
                 row=1,
@@ -378,6 +395,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                     r=[tmp_r],
                     theta=[tmp_angle],
                     mode='markers',
+                    customdata=[
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])))
 
@@ -407,6 +426,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                 font=dict(
                     size=16,
                     color=string_label_title_color)))
+
+    chart_result.update_traces(hovertemplate=string_tooltip_hovertemplate)
 
     return chart_result
 
