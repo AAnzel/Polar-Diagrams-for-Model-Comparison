@@ -97,7 +97,26 @@ def list_adapt_to_npeet(list_input):
 
 
 def calculate_mid_properties(df_input, string_reference_model,
-                             string_library):
+                             dict_mi_parameters=dict(
+                                 string_library='scipy_sklearn',
+                                 string_entropy_method='auto')):
+
+    list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
+                                  'auto']
+    list_valid_libraries = ['scipy_sklearn', 'npeet']
+    # dict_mi_parameters = dict(
+    #    string_library='',
+    #    string_entropy_method='')
+
+    if dict_mi_parameters['string_library'] not in list_valid_libraries:
+        raise ValueError('string_library is not one of the following:' +
+                         str(list_valid_libraries))
+    if dict_mi_parameters['string_library'] == 'scipy_sklearn':
+        if dict_mi_parameters[
+                'string_entropy_method'] not in list_valid_entropy_methods:
+            raise ValueError('string_entropy_method is not one of the' +
+                             ' following:' +
+                             str(list_valid_entropy_methods))
 
     list_all_features = df_input.columns.to_list()
 
@@ -116,7 +135,7 @@ def calculate_mid_properties(df_input, string_reference_model,
         list_adapted_npeet_one = list_adapt_to_npeet(
             df_input[string_one_model])
 
-        if string_library == 'scipy_sklearn':
+        if dict_mi_parameters['string_library'] == 'scipy_sklearn':
             # Calculate entropies
             # 0 in the list
             dict_result[string_one_model].append(
@@ -136,7 +155,7 @@ def calculate_mid_properties(df_input, string_reference_model,
                     df_input[string_one_model],
                     discrete_features=False)[0])
 
-        elif string_library == 'npeet':
+        else:
             # Calculate entropies
             # 0 in the list
             dict_result[string_one_model].append(
@@ -147,10 +166,6 @@ def calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model].append(
                 entropy_estimators.mi(list_adapted_npeet_reference,
                                       list_adapted_npeet_one))
-
-        else:
-            print('BAD LIB ARGUMENT')
-            return None
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
@@ -253,14 +268,12 @@ def calculate_mid_properties(df_input, string_reference_model,
 
 
 def df_calculate_all_properties(df_input, string_reference_model,
-                                string_library, string_method):
-    string_method = 'pearson'
-    string_library = 'scipy_sklearn'
+                                dict_mi_parameters, string_corr_method):
 
     df_td = calculate_td_properties(df_input, string_reference_model,
-                                    string_method=string_method)
+                                    string_corr_method)
     df_mid = calculate_mid_properties(df_input, string_reference_model,
-                                      string_library=string_library)
+                                      dict_mi_parameters)
 
     return df_td.merge(df_mid, on='Model', how='inner')
 
@@ -450,24 +463,26 @@ def chart_create_diagram(df_input, string_reference_model,
 
 
 def chart_create_all_diagrams(df_input, string_reference_model,
-                              string_td_method, string_mid_type,
-                              string_mid_library='scipy_sklearn'):
+                              string_corr_method, string_mid_type,
+                              dict_mi_parameters):
+
+    list_valid_mid_types = ['normalized', 'scaled']
+
+    if string_mid_type not in list_valid_mid_types:
+        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
-
     string_angular_title_td = 'Correlation'
+
     if string_mid_type == 'scaled':
         string_angular_title_mid = 'Scaled Mutual Information'
-    elif string_mid_type == 'normalized':
-        string_angular_title_mid = 'Normalized Mutual Information'
     else:
-        # TODO: Raise an error
-        print('Type has to be either "scaled" or "normalized"')
-        return None
+        string_angular_title_mid = 'Normalized Mutual Information'
 
     df_all = df_calculate_all_properties(
         df_input=df_input, string_reference_model=string_reference_model,
-        string_method=string_td_method, string_library=string_mid_library)
+        string_corr_method=string_corr_method,
+        dict_mi_parameters=dict_mi_parameters)
 
     chart_result = make_subplots(
         rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
