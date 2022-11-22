@@ -281,6 +281,7 @@ def chart_create_diagram(df_input, string_reference_feature,
         int_subplot_column_number = 1
         np_angular_labels = np_tmp if bool_only_half else np.concatenate(
             (-np_tmp[:0:-1], np_tmp))
+        np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
     elif string_diagram_type == 'mid':
         bool_show_legend = False
@@ -291,28 +292,28 @@ def chart_create_diagram(df_input, string_reference_feature,
             string_radial_column = 'Entropy'
             string_angular_column_label = 'Scaled Mutual Information'
             bool_only_half = False
+            np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
+            np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
+            np_angular_labels = np.round((np_angular_labels + 1) / 2, 3)
 
         elif string_mid_type == 'normalized':
             string_angular_column = 'Angle_NMI'
             string_radial_column = 'Root_Entropy'
             string_angular_column_label = 'Normalized Mutual Information'
             bool_only_half = True
+            np_angular_labels = np_tmp
+            np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
         else:
             # TODO: Raise an error
             print('Type has to be either "scaled" or "normalized"')
             return None
 
-        # BUG: Fix labels for MI (it should go from 0 to 1 always)
-        np_angular_labels = np_tmp if bool_only_half else np.concatenate(
-            (np_tmp[:0:-1], np_tmp))
-
     else:
         # TODO: Raise an error
         return None
 
     int_max_angle = 90 if bool_only_half else 180
-    np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
     float_max_r = df_input[string_radial_column].max() +\
         df_input[string_radial_column].mean()
 
@@ -322,16 +323,19 @@ def chart_create_diagram(df_input, string_reference_feature,
         chart_result = go.Figure()
 
     dict_polar_chart = dict(
-        radialaxis_range=[0, float_max_r],
-        radialaxis_title_text=string_radial_column,
         sector=[0, int_max_angle],
+        radialaxis=dict(
+            range=[0, float_max_r],
+            griddash='dot',
+            layer='below traces',
+            title=dict(
+                text=string_radial_column)),
         angularaxis=dict(
             direction="counterclockwise",
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
             griddash='dot',
-            layer='below traces',
-        ))
+            layer='below traces'))
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
             df_input[string_radial_column], df_input[string_angular_column],
@@ -359,8 +363,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     theta=[tmp_angle],
                     mode='markers',
                     marker=dict(
-                        color=list_color_scheme[tmp_model_int],
-                    )))
+                        color=list_color_scheme[tmp_model_int])))
 
     if bool_flag_as_subplot is True:
         if string_diagram_type == 'taylor':
