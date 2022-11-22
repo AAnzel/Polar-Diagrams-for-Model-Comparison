@@ -19,8 +19,8 @@ from plotly.subplots import make_subplots
 # https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
 
 
-string_background_color = '#F5F5F5'
-string_grid_color = '#808080'
+string_background_color = '#F8F8F8'
+string_grid_color = '#C0C0C0'
 string_label_title_color = '#404040'
 
 
@@ -264,6 +264,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
 
+    # TODO: Change tooltip information to show more meaningful info
+    
     # General properties
     list_color_scheme = None
     int_number_of_models = len(df_input['Model'].to_list())
@@ -335,6 +337,7 @@ def chart_create_diagram(df_input, string_reference_feature,
             griddash='dot',
             gridcolor=string_grid_color,
             tickcolor=string_label_title_color,
+            tickfont=dict(color=string_label_title_color),
             layer='below traces',
             title=dict(
                 text=string_radial_column,
@@ -345,6 +348,7 @@ def chart_create_diagram(df_input, string_reference_feature,
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
             tickcolor=string_label_title_color,
+            tickfont=dict(color=string_label_title_color),
             griddash='dot',
             gridcolor=string_grid_color,
             layer='below traces'))
