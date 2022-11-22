@@ -19,6 +19,11 @@ from plotly.subplots import make_subplots
 # https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
 
 
+string_background_color = '#F5F5F5'
+string_grid_color = '#808080'
+string_label_title_color = '#404040'
+
+
 def calculate_td_properties(df_input, string_reference_feature,
                             string_method='pearson'):
 
@@ -324,17 +329,24 @@ def chart_create_diagram(df_input, string_reference_feature,
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
+        bgcolor=string_background_color,
         radialaxis=dict(
             range=[0, float_max_r],
             griddash='dot',
+            gridcolor=string_grid_color,
+            tickcolor=string_label_title_color,
             layer='below traces',
             title=dict(
-                text=string_radial_column)),
+                text=string_radial_column,
+                font=dict(
+                    color=string_label_title_color))),
         angularaxis=dict(
             direction="counterclockwise",
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
+            tickcolor=string_label_title_color,
             griddash='dot',
+            gridcolor=string_grid_color,
             layer='below traces'))
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
@@ -389,7 +401,8 @@ def chart_create_diagram(df_input, string_reference_feature,
                 xanchor='center',
                 yanchor='top',
                 font=dict(
-                    size=16)))
+                    size=16,
+                    color=string_label_title_color)))
 
     return chart_result
 
@@ -428,15 +441,17 @@ def chart_create_all_diagrams(df_input, string_reference_feature,
         string_mid_type=string_mid_type, bool_flag_as_subplot=True,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
-    chart_result.update_annotations(yshift=10)
+    chart_result.update_annotations(
+        yshift=10, font_color=string_label_title_color)
     chart_result.update_layout(
         title=dict(
-                text=string_combined_chart_title,
-                x=0.5,
-                y=0.95,
-                xanchor='center',
-                yanchor='top',
-                font=dict(
-                    size=18)))
+            text=string_combined_chart_title,
+            x=0.5,
+            y=0.95,
+            xanchor='center',
+            yanchor='top',
+            font=dict(
+                size=18,
+                color=string_label_title_color)))
 
     return chart_result
