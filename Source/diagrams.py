@@ -367,6 +367,13 @@ def chart_create_diagram(df_input, string_reference_feature,
             griddash='dot',
             gridcolor=string_grid_color,
             layer='below traces'))
+    dict_legend = dict(
+        title=dict(text=string_tooltip_label_0),
+        font=dict(
+            color=string_label_title_color),
+        bgcolor=string_background_color,
+        bordercolor=string_grid_color,
+        borderwidth=0.2)
 
     for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
             df_input[string_radial_column], df_input[string_angular_column],
@@ -383,7 +390,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     legendgroup=tmp_model,
                     showlegend=bool_show_legend,
                     customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])),
@@ -398,7 +405,7 @@ def chart_create_diagram(df_input, string_reference_feature,
                     theta=[tmp_angle],
                     mode='markers',
                     customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
                         color=list_color_scheme[tmp_model_int])))
@@ -407,12 +414,14 @@ def chart_create_diagram(df_input, string_reference_feature,
         if string_diagram_type == 'taylor':
             chart_result.update_layout(
                 polar=dict_polar_chart,
+                legend=dict_legend,
                 height=600,
                 showlegend=True)
 
         else:
             chart_result.update_layout(
                 polar2=dict_polar_chart,
+                legend=dict_legend,
                 height=600,
                 showlegend=True)
 
@@ -420,9 +429,10 @@ def chart_create_diagram(df_input, string_reference_feature,
         chart_result.update_layout(
             polar=dict_polar_chart,
             height=600,
+            legend=dict_legend,
             title=dict(
                 text=string_angular_column_label,
-                x=0.494,
+                x=0.5,
                 y=0.9,
                 xanchor='center',
                 yanchor='top',
