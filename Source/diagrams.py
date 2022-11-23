@@ -52,7 +52,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
         pandas DataFrame: This dataframe contains model names as indices and
         statistical properties as columns.
     """
-    
+
     list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
     if string_corr_method not in list_valid_corr_methods:
         raise ValueError('string_corr_method is not one of the following:' +
@@ -118,6 +118,17 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
 
 def list_adapt_to_npeet(list_input):
+    """
+    list_adapt_to_npeet function takes list of values from one model and adapts
+    that list to the npeet functions.
+
+    Args:
+        list_input (list): This list holds values of one model.
+
+    Returns:
+        list: The elements of this list are lists that contain one value from
+        the passed argument.
+    """
     return [[i] for i in list_input]
 
 
@@ -125,7 +136,34 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                                 dict_mi_parameters=dict(
                                     string_library='scipy_sklearn',
                                     string_entropy_method='auto')):
+    """
+    df_calculate_mid_properties caclulates all necessary information theory
+    properties for the Mutual Information diagram from the input data set.
 
+    Args:
+        df_input (pandas DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        dict_mi_parameters (dict, optional): This dictionary contains
+        configuration parameters for the calculation of entropy and mutual
+        information. Defaults to
+        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+
+    Raises:
+        ValueError: The error is raised if string_library is not one of the
+        following 'scipy_sklearn', 'npeet'
+        ValueError: The error is raised if string_entropy_method is not one of
+        the following 'vasicek', 'van es', 'ebrahimi', 'correa', 'auto'
+
+    Returns:
+        pandas DataFrame: This dataframe contains model names as indices and
+        information theory properties as columns.
+    """
+    
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_libraries = ['scipy_sklearn', 'npeet']
