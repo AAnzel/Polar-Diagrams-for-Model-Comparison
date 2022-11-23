@@ -23,8 +23,6 @@ STRING_BACKGROUND_COLOR = '#F8F8F8'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
 
-# TODO: Generate docstrings
-
 
 def df_calculate_td_properties(df_input, string_reference_model,
                                string_corr_method='pearson'):
@@ -389,8 +387,8 @@ def chart_create_diagram(df_input, string_reference_model,
         bool_flag_as_subplot (bool, optional): This boolean parameter is used
         to determine if the passed chart is a subplot or not. If it is False,
         then only one diagram is created. If it is True, both Taylor and Mutual
-        Information diagrams are created and placed side by side.
-        Defaults to False.
+        Information diagrams are created and placed side-by-side. Defaults to
+        False.
         chart_result_upper (plotly.graph_objects.Figure, optional): This chart
         is not None only if both diagrams have to be created. It contains the
         blank canvas (1 row, 2 columns) for both objects. Defaults to None.
@@ -588,6 +586,27 @@ def chart_create_diagram(df_input, string_reference_model,
 
 def chart_create_taylor_diagram(df_input, string_reference_model,
                                 string_corr_method):
+    """
+    chart_create_taylor_diagram creates the Taylor diagram according to the
+    df_input argument where models are placed in columns and rows contain
+    model predictions.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        string_corr_method (str, optional): This string contains the name of
+        the method to be used when calculating the correlation. Defaults to
+        'pearson'.
+
+    Returns:
+       plotly.graph_objects.Figure: This chart contains the resulting Taylor
+       diagram.
+    """
 
     df_td = df_calculate_td_properties(
         df_input, string_reference_model, string_corr_method)
@@ -600,6 +619,37 @@ def chart_create_taylor_diagram(df_input, string_reference_model,
 
 def chart_create_mi_diagram(df_input, string_reference_model,
                             string_mid_type, dict_mi_parameters):
+    """
+    chart_create_mi_diagram creates the Mutual Information diagram according
+    to the df_input argument where models are placed in columns and rows
+    contain model predictions.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        string_mid_type (str, optional): This string contains the type of the
+        Mutual Information diagram. If it is 'scaled' then it will span both
+        quadrants. If it is 'normalized', it will span only the first
+        quadrant of the circle. Defaults to 'scaled'.
+        dict_mi_parameters (dict, optional): This dictionary contains
+        configuration parameters for the calculation of entropy and mutual
+        information. Defaults to
+        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+
+    Raises:
+        ValueError: The error is raised if string_mid_type is not one of
+        the following 'scaled', 'normalized'.
+
+    Returns:
+        plotly.graph_objects.Figure: This chart contains the resulting Mutual
+        Information diagram.
+    """
+
     list_valid_mid_types = ['normalized', 'scaled']
 
     if string_mid_type not in list_valid_mid_types:
@@ -619,6 +669,39 @@ def chart_create_mi_diagram(df_input, string_reference_model,
 def chart_create_all_diagrams(df_input, string_reference_model,
                               string_corr_method, string_mid_type,
                               dict_mi_parameters):
+    """
+    chart_create_all_diagrams creates both the Taylor and the Mutual
+    Information diagrams (side-by-side) according to the df_input argument
+    where models are placed in columns and rows contain model predictions.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        string_corr_method (str, optional): This string contains the name of
+        the method to be used when calculating the correlation. Defaults to
+        'pearson'.
+        string_mid_type (str, optional): This string contains the type of the
+        Mutual Information diagram. If it is 'scaled' then it will span both
+        quadrants. If it is 'normalized', it will span only the first
+        quadrant of the circle. Defaults to 'scaled'.
+        dict_mi_parameters (dict, optional): This dictionary contains
+        configuration parameters for the calculation of entropy and mutual
+        information. Defaults to
+        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+
+    Raises:
+        ValueError: The error is raised if string_mid_type is not one of
+        the following 'scaled', 'normalized'.
+
+    Returns:
+        plotly.graph_objects.Figure: This chart contains the both the Taylor
+        and the Mutual Information diagrams side-by-side.
+    """
 
     list_valid_mid_types = ['normalized', 'scaled']
 
