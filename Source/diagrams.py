@@ -140,8 +140,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information.
+        model prediction in rows. It is used to calculate relevant information
+        theory properties
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -338,7 +338,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
         model prediction in rows. It is used to calculate relevant statistical
-        information.
+        information and information theory properties.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -373,9 +373,8 @@ def chart_create_diagram(df_input, string_reference_model,
     the Mutual Information diagrams according to the passed argument.
 
     Args:
-        df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information.
+        df_input (pandas.DataFrame): This dataframe contains model names as
+        indices and statistical and information theory properties as columns.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -626,8 +625,8 @@ def chart_create_mi_diagram(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information.
+        model prediction in rows. It is used to calculate relevant information
+        theory information.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -677,7 +676,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
         model prediction in rows. It is used to calculate relevant statistical
-        information.
+        information and information theory properties.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
