@@ -33,7 +33,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
     for the Taylor diagram from the input data set.
 
     Args:
-        df_input (pandas DataFrame): This dataframe has models in columns and
+        df_input (pandas.DataFrame): This dataframe has models in columns and
         model prediction in rows. It is used to calculate relevant statistical
         information.
         string_reference_model (str): This string contains the name of the
@@ -49,7 +49,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
         the following 'pearson', 'kendall', 'spearman'.
 
     Returns:
-        pandas DataFrame: This dataframe contains model names as indices and
+        pandas.DataFrame: This dataframe contains model names as indices and
         statistical properties as columns.
     """
 
@@ -141,7 +141,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     properties for the Mutual Information diagram from the input data set.
 
     Args:
-        df_input (pandas DataFrame): This dataframe has models in columns and
+        df_input (pandas.DataFrame): This dataframe has models in columns and
         model prediction in rows. It is used to calculate relevant statistical
         information.
         string_reference_model (str): This string contains the name of the
@@ -160,10 +160,10 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         the following 'vasicek', 'van es', 'ebrahimi', 'correa', 'auto'
 
     Returns:
-        pandas DataFrame: This dataframe contains model names as indices and
+        pandas.DataFrame: This dataframe contains model names as indices and
         information theory properties as columns.
     """
-    
+
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_libraries = ['scipy_sklearn', 'npeet']
@@ -332,6 +332,31 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
 def df_calculate_all_properties(df_input, string_reference_model,
                                 dict_mi_parameters, string_corr_method):
+    """
+    df_calculate_all_properties caclulates all necessary statistical and
+    information theory properties for the Taylor and Mutual Information diagram
+    from the input data set.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        dict_mi_parameters (dict, optional): This dictionary contains
+        configuration parameters for the calculation of entropy and mutual
+        information. Defaults to
+        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+        string_corr_method (str, optional): This string contains the name of
+        the method to be used when calculating the correlation. Defaults to
+        'pearson'.
+
+    Returns:
+        pandas.DataFrame: This dataframe contains model names as indices and
+        statistical and information theory properties as columns.
+    """
 
     df_td = df_calculate_td_properties(
         df_input, string_reference_model, string_corr_method)
@@ -345,6 +370,43 @@ def chart_create_diagram(df_input, string_reference_model,
                          string_mid_type='scaled', bool_flag_as_subplot=False,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
+    """
+    chart_create_diagram is a general function that creates both the Taylor and
+    the Mutual Information diagrams according to the passed argument.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        string_mid_type (str, optional): This string contains the type of the
+        Mutual Information diagram. If it is 'scaled' then it will span both
+        quadrants. If it is 'normalized', it will span only the first
+        quadrant of the circle. Defaults to 'scaled'.
+        bool_flag_as_subplot (bool, optional): This boolean parameter is used
+        to determine if the passed chart is a subplot or not. If it is False,
+        then only one diagram is created. If it is True, both Taylor and Mutual
+        Information diagrams are created and placed side by side.
+        Defaults to False.
+        chart_result_upper (plotly.graph_objects.Figure, optional): This chart
+        is not None only if both diagrams have to be created. It contains the
+        blank canvas (1 row, 2 columns) for both objects. Defaults to None.
+        string_diagram_type (str, optional): This string contains the type of
+        the diagram that has to be created. Defaults to 'taylor'.
+
+    Raises:
+        ValueError: The error is raised if string_diagram_type is not one of
+        the following 'taylor', 'mid'
+        ValueError: The error is raised if string_mid_type is not one of
+        the following 'scaled', 'normalized'
+
+    Returns:
+        plotly.graph_objects.Figure: This chart contains the resulting Taylor
+        or Mutual Information diagram.
+    """
 
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
