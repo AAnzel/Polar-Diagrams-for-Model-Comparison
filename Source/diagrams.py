@@ -28,7 +28,31 @@ STRING_LABEL_TITLE_COLOR = '#404040'
 
 def df_calculate_td_properties(df_input, string_reference_model,
                                string_corr_method='pearson'):
+    """
+    df_calculate_td_properties caclulates all necessary statistical information
+    for the Taylor diagram from the input data set.
 
+    Args:
+        df_input (pandas DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant statistical
+        information.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        string_corr_method (str, optional): This string contains the name of
+        the method to be used when calculating the correlation. Defaults to
+        'pearson'.
+
+    Raises:
+        ValueError: The error is raised if the string_corr_method is not one of
+        the following 'pearson', 'kendall', 'spearman'.
+
+    Returns:
+        pandas DataFrame: This dataframe contains model names as indices and
+        statistical properties as columns.
+    """
+    
     list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
     if string_corr_method not in list_valid_corr_methods:
         raise ValueError('string_corr_method is not one of the following:' +
