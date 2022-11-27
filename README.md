@@ -2,7 +2,7 @@
 
 ## Manuscript
 
-This tool is created for the following paper:
+This library is created for the following paper:
 
 ***"Name of the paper"*** by Aleksandar Anžel, Dominik Heider, and Georges Hattab
 
@@ -17,7 +17,7 @@ Abstract:
 > Abstract placeholder
 
 
-## Dependancy
+## Dependencies
 
 The code is written in Python 3.9.15 and tested on Linux with the following libraries installed:
 
