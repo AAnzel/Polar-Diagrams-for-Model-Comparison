@@ -1,11 +1,3 @@
-![movis_logo_banner](./Source/images/movis_logo_banner.png)
-[![Build status](https://github.com/AAnzel/MOVIS/actions/workflows/main.yml/badge.svg)](https://github.com/AAnzel/MOVIS/actions/workflows/main.yml)
-![Docker Image Version (latest by date)](https://img.shields.io/docker/v/aanzel/movis)
-![Docker Image Size (latest by date)](https://img.shields.io/docker/image-size/aanzel/movis)
-![GitHub issues](https://img.shields.io/github/issues-raw/AAnzel/MOVIS)
-![GitHub](https://img.shields.io/github/license/AAnzel/MOVIS)
-
----
 # Model Comparison Polar Diagrams
 
 ## Manuscript
@@ -54,7 +46,7 @@ Script can be automatically generated and downloaded again from here [https://es
 ## Code
 |Source Code|Description|
 |---|---|
-|[Source/](./Source/)|contains all scripts necessary to run the tool.
+|[Source/](./Source/)|contains all scripts.
 |[Source/main.ipynb](./Source/main.ipynb)|contains the IPython (jupyter) notebook that demonstrates the library using multiple datasets.
 |[Source/diagrams.py](./Source/diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
 
