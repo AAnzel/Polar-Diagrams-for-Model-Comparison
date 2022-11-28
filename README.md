@@ -36,11 +36,11 @@ The dependencies can also be found in [requirements.txt](requirements.txt).
 |---|---|
 |[Data/](./Data/)|contains all datasets used in [Source/main.ipynb](./Source/main.ipynb).
 |[Data/Dataset_0/](./Data/Dataset_0/)|contains the Anscombe's quartet dataset.
-|[Data/Dataset_1/](./Data/Dataset_1/)|contains the official, automatically generated script for downloading the CMIP3 data from the [https://esgf-node.llnl.gov/projects/cmip3/](https://esgf-node.llnl.gov/projects/cmip3/). The user should run the script using `bash Dataset_1_wget-20221011042255.sh --TODO: ADD THE FLAG` after placing itself inside the directory of the script.
+|[Data/Dataset_1/](./Data/Dataset_1/)|contains the official, automatically generated script for downloading the CMIP3 data from the [https://esgf-node.llnl.gov/projects/cmip3/](https://esgf-node.llnl.gov/projects/cmip3/). To generate the whole dataset, the user should first place itself into this directory and then run the following command from the terminal `sh generate_dataset_1.sh`. [1]
 |[Data/Dataset_2/](./Data/Dataset_2/)|contains the dataset from the following paper [Filippone, Maurizio & Masulli, Francesco & Rovetta, Stefano. (2008). An Experimental Comparison of Kernel Clustering Methods.. Frontiers in Artificial Intelligence and Applications. 193. 118-126. 10.3233/978-1-58603-984-4-118.](https://www.researchgate.net/publication/220956693_An_Experimental_Comparison_of_Kernel_Clustering_Methods).
 
 
-The script used for downloading the [Dataset_1/](./Data/Dataset_1/) was generated using the tutorial found here [https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure](https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure).
+**[1]** The script used for downloading the [Dataset_1/](./Data/Dataset_1/) was generated using the tutorial found here [https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure](https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure).
 Script can be automatically generated and downloaded again from here [https://esgf-data.dkrz.de/esg-search/wget?download_structure=model&project=CMIP3&experiment=historical&ensemble=run1&variable=ts](https://esgf-data.dkrz.de/esg-search/wget?download_structure=model&project=CMIP3&experiment=historical&ensemble=run1&variable=ts).
 
 ## Code
