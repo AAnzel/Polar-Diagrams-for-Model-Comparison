@@ -12,6 +12,16 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
 
+__author__ = 'Aleksandar Anžel'
+__copyright__ = ''
+__credits__ = ['Aleksandar Anžel']
+__license__ = 'GNU General Public License v3.0'
+__version__ = '1.0'
+__maintainer__ = 'Aleksandar Anžel'
+__email__ = 'aleksandar.anzel@uni-marburg.de'
+__status__ = 'Dev'
+
+
 # https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_regression.html?highlight=entropy
 # https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.differential_entropy.html
 # https://github.com/paulbrodersen/entropy_estimators/
