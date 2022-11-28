@@ -244,8 +244,13 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         if dict_mi_parameters['string_library'] == 'scipy_sklearn':
             # Calculate entropies
             # 0 in the list
-            dict_result[string_one_model].append(
-                differential_entropy(df_input[string_one_model], base=2))
+            if dict_mi_parameters['bool_discrete_features'] is True:
+                dict_result[string_one_model].append(
+                    float_calculate_discrete_entropy(
+                        df_input[string_one_model], int_base=2))
+            else:
+                dict_result[string_one_model].append(
+                    differential_entropy(df_input[string_one_model], base=2))
             # dict_result[string_one_model].append(
             #    mutual_info_regression(
             #        df_input[string_one_model].to_numpy().reshape(-1, 1),
@@ -263,16 +268,24 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                         'bool_discrete_features'])[0])
 
         else:
-            # Calculate entropies
-            # 0 in the list
-            dict_result[string_one_model].append(
-                entropy_estimators.entropy(list_adapted_npeet_one))
-
-            # Calculate mutual informations against the reference feature
-            # 1 in the liststring_angular_column
-            dict_result[string_one_model].append(
-                entropy_estimators.mi(list_adapted_npeet_reference,
-                                      list_adapted_npeet_one))
+            if dict_mi_parameters['bool_discrete_features'] is True:
+                # Calculate entropies
+                # 0 in the list
+                dict_result[string_one_model].append(
+                    entropy_estimators.entropyd(list_adapted_npeet_one))
+                # Calculate mutual informations against the reference feature
+                # 1 in the liststring_angular_column
+                dict_result[string_one_model].append(
+                    entropy_estimators.midd(list_adapted_npeet_reference,
+                                            list_adapted_npeet_one))
+            else:
+                dict_result[string_one_model].append(
+                    entropy_estimators.entropy(list_adapted_npeet_one))
+                # Calculate mutual informations against the reference feature
+                # 1 in the liststring_angular_column
+                dict_result[string_one_model].append(
+                    entropy_estimators.mi(list_adapted_npeet_reference,
+                                          list_adapted_npeet_one))
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
