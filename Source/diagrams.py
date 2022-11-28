@@ -130,10 +130,48 @@ def list_adapt_to_npeet(list_input):
     return [[i] for i in list_input]
 
 
+def float_calculate_discrete_entropy(list_labels, int_base=2):
+    """
+    float_calculate_discrete_entropy calculates Shannon (discrete) entropy of
+    the passed list of labels.
+
+    Args:
+        list_labels (list): This elements of this list are labels that can be
+        of any type (numerical, characters, etc.).
+        int_base (int, optional): This parameter defines the base of the
+        logarithmic function which is used when the resulting entropy is
+        calculated. Defaults to 2.
+
+    Returns:
+        float: The resulting Shannon (discrete) entropy.
+    """
+
+    int_num_of_labels = len(list_labels)
+
+    if int_num_of_labels <= 1:
+        return 0
+
+    list_value, list_counts = np.unique(list_labels, return_counts=True)
+    list_probabilities = list_counts / int_num_of_labels
+    int_num_of_classes = np.count_nonzero(list_probabilities)
+
+    if int_num_of_classes <= 1:
+        return 0
+
+    float_entropy = 0.0
+
+    for float_one_probability in list_probabilities:
+        float_entropy -= float_one_probability * math.log(
+            float_one_probability, int_base)
+
+    return float_entropy
+
+
 def df_calculate_mid_properties(df_input, string_reference_model,
                                 dict_mi_parameters=dict(
                                     string_library='scipy_sklearn',
-                                    string_entropy_method='auto')):
+                                    string_entropy_method='auto',
+                                    bool_discrete_features=False)):
     """
     df_calculate_mid_properties caclulates all necessary information theory
     properties for the Mutual Information diagram from the input data set.
@@ -149,7 +187,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+             bool_discrete_features=False).
 
     Raises:
         ValueError: The error is raised if string_library is not one of the
@@ -165,9 +204,11 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_libraries = ['scipy_sklearn', 'npeet']
+    list_valid_discrete_features = [True, False]
     # dict_mi_parameters = dict(
     #    string_library='',
-    #    string_entropy_method='')
+    #    string_entropy_method='',
+    #    bool_discrete_features=bool)
 
     if dict_mi_parameters['string_library'] not in list_valid_libraries:
         raise ValueError('string_library is not one of the following:' +
@@ -178,6 +219,10 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             raise ValueError('string_entropy_method is not one of the' +
                              ' following:' +
                              str(list_valid_entropy_methods))
+    if dict_mi_parameters[
+            'bool_discrete_features'] not in list_valid_discrete_features:
+        raise ValueError('bool_discrete_features is not one of the following:'
+                         + str(list_valid_discrete_features))
 
     list_all_features = df_input.columns.to_list()
 
@@ -189,7 +234,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     for string_one_model in list_all_features:
         dict_result[string_one_model] = []
 
-    # TODO: Entropies are negative often when using default parameters
+    # TODO: Entropies are often negative when using default parameters
     # That is causing an error when calculating angles
     # Try to find better default parameters so it doesn't happen
     for string_one_model in list_all_features:
@@ -214,7 +259,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                     df_input[string_reference_model].to_numpy().reshape(
                         -1, 1),
                     df_input[string_one_model],
-                    discrete_features=False)[0])
+                    discrete_features=dict_mi_parameters[
+                        'bool_discrete_features'])[0])
 
         else:
             # Calculate entropies
