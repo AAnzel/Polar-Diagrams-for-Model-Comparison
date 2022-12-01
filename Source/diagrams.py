@@ -415,7 +415,8 @@ def df_calculate_all_properties(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+             bool_discrete_features=False).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
@@ -707,7 +708,8 @@ def chart_create_mi_diagram(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+             bool_discrete_features=False).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -760,7 +762,8 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict( string_library='scipy_sklearn', string_entropy_method='auto').
+        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+             bool_discrete_features=False).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
