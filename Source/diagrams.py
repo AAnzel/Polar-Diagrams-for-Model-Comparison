@@ -31,6 +31,9 @@ __status__ = 'Dev'
 STRING_BACKGROUND_COLOR = '#FFFFFF'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
+STRING_TICK_COLOR = '#000000'
+INT_TICK_WIDTH = 2
+STRING_GRID_STYLE = 'solid'
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -567,10 +570,13 @@ def chart_create_diagram(df_input, string_reference_model,
         bgcolor=STRING_BACKGROUND_COLOR,
         radialaxis=dict(
             range=[0, float_max_r],
-            griddash='solid',
+            griddash=STRING_GRID_STYLE,
             gridcolor=STRING_GRID_COLOR,
-            tickcolor=STRING_LABEL_TITLE_COLOR,
+            ticks='outside',
+            tickwidth=INT_TICK_WIDTH,
+            tickcolor=STRING_TICK_COLOR,
             tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
+            showline=True,
             layer='below traces',
             title=dict(
                 text=string_radial_column,
@@ -578,12 +584,15 @@ def chart_create_diagram(df_input, string_reference_model,
                     color=STRING_LABEL_TITLE_COLOR))),
         angularaxis=dict(
             direction="counterclockwise",
+            ticks='outside',
+            tickwidth=INT_TICK_WIDTH,
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
-            tickcolor=STRING_LABEL_TITLE_COLOR,
+            tickcolor=STRING_TICK_COLOR,
             tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
-            griddash='solid',
+            griddash=STRING_GRID_STYLE,
             gridcolor=STRING_GRID_COLOR,
+            showline=True,
             layer='below traces'))
     dict_legend = dict(
         title=dict(text=string_tooltip_label_0),
