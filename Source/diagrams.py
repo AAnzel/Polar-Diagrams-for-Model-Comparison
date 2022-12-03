@@ -577,6 +577,7 @@ def chart_create_diagram(df_input, string_reference_model,
             tickcolor=STRING_TICK_COLOR,
             tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
             showline=True,
+            linecolor=STRING_TICK_COLOR,
             layer='below traces',
             title=dict(
                 text=string_radial_column,
@@ -593,6 +594,7 @@ def chart_create_diagram(df_input, string_reference_model,
             griddash=STRING_GRID_STYLE,
             gridcolor=STRING_GRID_COLOR,
             showline=True,
+            linecolor=STRING_TICK_COLOR,
             layer='below traces'))
     dict_legend = dict(
         title=dict(text=string_tooltip_label_0),
