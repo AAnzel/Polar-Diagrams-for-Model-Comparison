@@ -7,7 +7,6 @@ from sklearn.metrics import mean_squared_error
 from scipy.stats import differential_entropy
 from sklearn.feature_selection import mutual_info_regression
 
-import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 
@@ -29,9 +28,17 @@ __status__ = 'Dev'
 # https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
 
 
-STRING_BACKGROUND_COLOR = '#F8F8F8'
+STRING_BACKGROUND_COLOR = '#FFFFFF'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
+
+# Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
+LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
+                   '#9467bd', '#bcbd22', '#d62728', '#e377c2', '#ff7f0e']
+LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
+                   '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
+                   '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
+                   '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
 
 
 def df_calculate_td_properties(df_input, string_reference_model,
@@ -490,9 +497,9 @@ def chart_create_diagram(df_input, string_reference_model,
     int_number_of_models = len(df_input[string_tooltip_label_0].to_list())
 
     if int_number_of_models <= 9:
-        list_color_scheme = px.colors.qualitative.Set1
+        list_color_scheme = LIST_TABLEAU_10
     else:
-        list_color_scheme = px.colors.qualitative.Light24
+        list_color_scheme = LIST_TABLEAU_20
 
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
