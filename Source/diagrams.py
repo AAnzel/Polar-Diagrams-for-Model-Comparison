@@ -621,6 +621,11 @@ def chart_create_diagram(df_input, string_reference_model,
                     customdata=[
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
+                    hoverlabel=dict(
+                        bgcolor=STRING_BACKGROUND_COLOR,
+                        bordercolor=list_color_scheme[tmp_model_int],
+                        font=dict(
+                            color=STRING_TICK_COLOR)),
                     marker=dict(
                         color=list_color_scheme[tmp_model_int],
                         size=9)),
@@ -637,6 +642,11 @@ def chart_create_diagram(df_input, string_reference_model,
                     customdata=[
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
+                    hoverlabel=dict(
+                        bgcolor=STRING_BACKGROUND_COLOR,
+                        bordercolor=list_color_scheme[tmp_model_int],
+                        font=dict(
+                            color=STRING_TICK_COLOR)),
                     marker=dict(
                         color=list_color_scheme[tmp_model_int],
                         size=9)))
