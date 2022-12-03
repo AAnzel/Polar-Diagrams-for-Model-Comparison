@@ -505,6 +505,8 @@ def chart_create_diagram(df_input, string_reference_model,
     else:
         list_color_scheme = LIST_TABLEAU_20
 
+    int_num_discrete_colors = len(list_color_scheme)
+
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
 
@@ -623,11 +625,13 @@ def chart_create_diagram(df_input, string_reference_model,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=list_color_scheme[tmp_model_int],
+                        bordercolor=list_color_scheme[
+                            tmp_model_int % int_num_discrete_colors],
                         font=dict(
                             color=STRING_TICK_COLOR)),
                     marker=dict(
-                        color=list_color_scheme[tmp_model_int],
+                        color=list_color_scheme[
+                            tmp_model_int % int_num_discrete_colors],
                         size=9)),
                 row=1,
                 col=int_subplot_column_number)
@@ -644,11 +648,13 @@ def chart_create_diagram(df_input, string_reference_model,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=list_color_scheme[tmp_model_int],
+                        bordercolor=list_color_scheme[
+                            tmp_model_int % int_num_discrete_colors],
                         font=dict(
                             color=STRING_TICK_COLOR)),
                     marker=dict(
-                        color=list_color_scheme[tmp_model_int],
+                        color=list_color_scheme[
+                            tmp_model_int % int_num_discrete_colors],
                         size=9)))
 
     if bool_flag_as_subplot is True:
@@ -657,20 +663,23 @@ def chart_create_diagram(df_input, string_reference_model,
                 polar=dict_polar_chart,
                 legend=dict_legend,
                 height=600,
-                showlegend=True)
+                showlegend=True,
+                margin_pad=20)
 
         else:
             chart_result.update_layout(
                 polar2=dict_polar_chart,
                 legend=dict_legend,
                 height=600,
-                showlegend=True)
+                showlegend=True,
+                margin_pad=20)
 
     else:
         chart_result.update_layout(
             polar=dict_polar_chart,
             height=600,
             legend=dict_legend,
+            margin_pad=20,
             title=dict(
                 text=string_angular_column_label,
                 x=0.5,
