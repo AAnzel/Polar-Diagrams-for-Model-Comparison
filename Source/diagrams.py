@@ -611,7 +611,8 @@ def chart_create_diagram(df_input, string_reference_model,
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
-                        color=list_color_scheme[tmp_model_int])),
+                        color=list_color_scheme[tmp_model_int],
+                        size=9)),
                 row=1,
                 col=int_subplot_column_number)
 
@@ -626,7 +627,8 @@ def chart_create_diagram(df_input, string_reference_model,
                         np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
                     hovertemplate=string_tooltip_hovertemplate,
                     marker=dict(
-                        color=list_color_scheme[tmp_model_int])))
+                        color=list_color_scheme[tmp_model_int],
+                        size=9)))
 
     if bool_flag_as_subplot is True:
         if string_diagram_type == 'taylor':
