@@ -567,7 +567,7 @@ def chart_create_diagram(df_input, string_reference_model,
         bgcolor=STRING_BACKGROUND_COLOR,
         radialaxis=dict(
             range=[0, float_max_r],
-            griddash='dot',
+            griddash='solid',
             gridcolor=STRING_GRID_COLOR,
             tickcolor=STRING_LABEL_TITLE_COLOR,
             tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
@@ -582,7 +582,7 @@ def chart_create_diagram(df_input, string_reference_model,
             ticktext=np_angular_labels,
             tickcolor=STRING_LABEL_TITLE_COLOR,
             tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
-            griddash='dot',
+            griddash='solid',
             gridcolor=STRING_GRID_COLOR,
             layer='below traces'))
     dict_legend = dict(
