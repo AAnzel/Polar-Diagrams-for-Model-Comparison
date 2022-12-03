@@ -122,10 +122,11 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        # columns=['STD', 'Correlation', 'Angle', 'RMS', 'Calculated_Corr',
-        #         'Calculated_Angle', 'Normalized_RMS', 'Normalized_STD']
-        columns=['STD', 'Correlation', 'Angle', 'RMS', 'Normalized_RMS',
-                 'Normalized_STD'])
+        # columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
+        #          'Calculated_Corr', 'Calculated_Angle', 'Normalized_RMS',
+        #          'Normalized_STD']
+        columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
+                 'Normalized_RMS', 'Normalized_STD'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -395,9 +396,9 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        columns=['Entropy', 'Mutual_information', 'Fixed_MI', 'Scaled_entropy',
-                 'Normalized_MI', 'Angle_NMI', 'Joint_entropies', 'Scaled_MI',
-                 'Angle_SMI', 'Root_Entropy'])
+        columns=['Entropy', 'Mutual Information', 'Fixed_MI', 'Scaled_entropy',
+                 'Normalized MI', 'Angle_NMI', 'Joint_entropies', 'Scaled MI',
+                 'Angle_SMI', 'Root Entropy'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -506,7 +507,7 @@ def chart_create_diagram(df_input, string_reference_model,
 
     if string_diagram_type == 'taylor':
         bool_show_legend = True
-        string_radial_column = 'STD'
+        string_radial_column = 'Standard Deviation'
         string_angular_column = 'Angle'
         string_angular_column_label = 'Correlation'
         string_tooltip_label_1 = string_radial_column
@@ -527,7 +528,7 @@ def chart_create_diagram(df_input, string_reference_model,
             string_radial_column = 'Entropy'
             string_angular_column_label = 'Scaled Mutual Information'
             string_tooltip_label_1 = string_radial_column
-            string_tooltip_label_2 = 'Scaled_MI'
+            string_tooltip_label_2 = 'Scaled MI'
             bool_only_half = False
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
@@ -535,10 +536,10 @@ def chart_create_diagram(df_input, string_reference_model,
 
         else:
             string_angular_column = 'Angle_NMI'
-            string_radial_column = 'Root_Entropy'
+            string_radial_column = 'Root Entropy'
             string_angular_column_label = 'Normalized Mutual Information'
             string_tooltip_label_1 = string_radial_column
-            string_tooltip_label_2 = 'Normalized_MI'
+            string_tooltip_label_2 = 'Normalized MI'
             bool_only_half = True
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
