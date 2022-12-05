@@ -582,9 +582,10 @@ def chart_create_diagram(df_input, string_reference_model,
             linecolor=STRING_TICK_COLOR,
             layer='below traces',
             title=dict(
-                text=string_radial_column,
+                text='<br>' + string_radial_column,
                 font=dict(
-                    color=STRING_LABEL_TITLE_COLOR))),
+                    color=STRING_LABEL_TITLE_COLOR,
+                    size=16))),
         angularaxis=dict(
             direction="counterclockwise",
             ticks='outside',
@@ -856,7 +857,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
             xanchor='center',
             yanchor='top',
             font=dict(
-                size=18,
+                size=20,
                 color=STRING_LABEL_TITLE_COLOR)))
 
     return chart_result
