@@ -32,8 +32,9 @@ STRING_BACKGROUND_COLOR = '#FFFFFF'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
 STRING_TICK_COLOR = '#000000'
-INT_TICK_WIDTH = 2
 STRING_GRID_STYLE = 'solid'
+INT_TICK_WIDTH = 2
+INT_RANDOM_SEED = None
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -192,7 +193,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                                 dict_mi_parameters=dict(
                                     string_library='scipy_sklearn',
                                     string_entropy_method='auto',
-                                    bool_discrete_features=False)):
+                                    bool_discrete_features=False,
+                                    int_random_state=INT_RANDOM_SEED)):
     """
     df_calculate_mid_properties caclulates all necessary information theory
     properties for the Mutual Information diagram from the input data set.
@@ -209,7 +211,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(string_library='scipy_sklearn', string_entropy_method='auto',
-             bool_discrete_features=False).
+             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_library is not one of the
@@ -282,9 +284,9 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             # 1 in the liststring_angular_column
             dict_result[string_one_model].append(
                 mutual_info_regression(
-                    df_input[string_reference_model].to_numpy().reshape(
-                        -1, 1),
+                    df_input[string_reference_model].to_numpy().reshape(-1, 1),
                     df_input[string_one_model],
+                    random_state=dict_mi_parameters['int_random_state'],
                     discrete_features=dict_mi_parameters[
                         'bool_discrete_features'])[0])
 
@@ -427,7 +429,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(string_library='scipy_sklearn', string_entropy_method='auto',
-             bool_discrete_features=False).
+             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
@@ -750,7 +752,7 @@ def chart_create_mi_diagram(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(string_library='scipy_sklearn', string_entropy_method='auto',
-             bool_discrete_features=False).
+             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -804,7 +806,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(string_library='scipy_sklearn', string_entropy_method='auto',
-             bool_discrete_features=False).
+             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
