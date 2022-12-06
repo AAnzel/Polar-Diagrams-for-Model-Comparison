@@ -35,7 +35,9 @@ STRING_TICK_COLOR = '#000000'
 STRING_GRID_STYLE = 'solid'
 INT_TICK_WIDTH = 2
 INT_RANDOM_SEED = None
-FLOAT_MARKER_OPACITY = 0.75
+INT_MARKER_SIZE = 10
+INT_MARKER_LINE_WIDTH = 2
+FLOAT_MARKER_OPACITY = 0.60
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -225,14 +227,18 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information theory properties as columns.
     """
 
+    list_valid_parameters = ['string_library', 'string_entropy_method',
+                             'bool_discrete_features', 'int_random_state']
+
+    if not all(string_parameter in dict_mi_parameters
+               for string_parameter in list_valid_parameters):
+        raise ValueError('dict_mi_parameters must contain all of the keys' +
+                         ' from this list ' + str(list_valid_parameters))
+
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_libraries = ['scipy_sklearn', 'npeet']
     list_valid_discrete_features = [True, False]
-    # dict_mi_parameters = dict(
-    #    string_library='',
-    #    string_entropy_method='',
-    #    bool_discrete_features=bool)
 
     if dict_mi_parameters['string_library'] not in list_valid_libraries:
         raise ValueError('string_library is not one of the following:' +
@@ -643,10 +649,11 @@ def chart_create_diagram(df_input, string_reference_model,
 
         dict_marker = dict(
             line=dict(
-                color=string_marker_color),
+                color=string_marker_color,
+                width=INT_MARKER_LINE_WIDTH),
             color='rgba' + str(tuple_hex_to_rgba(
                 string_marker_color, FLOAT_MARKER_OPACITY)),
-            size=9)
+            size=INT_MARKER_SIZE)
 
         if bool_flag_as_subplot is True:
             chart_result.add_trace(
