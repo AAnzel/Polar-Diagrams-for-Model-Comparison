@@ -699,29 +699,27 @@ def chart_create_diagram(df_input, string_reference_model,
                 polar=dict_polar_chart,
                 legend=dict_legend,
                 height=600,
-                showlegend=True,
-                margin_pad=20)
+                showlegend=True)
 
         else:
             chart_result.update_layout(
                 polar2=dict_polar_chart,
                 legend=dict_legend,
                 height=600,
-                showlegend=True,
-                margin_pad=20)
+                showlegend=True)
 
     else:
         chart_result.update_layout(
             polar=dict_polar_chart,
             height=600,
             legend=dict_legend,
-            margin_pad=20,
             title=dict(
                 text=string_angular_column_label,
                 x=0.5,
-                y=0.9,
-                xanchor='center',
-                yanchor='top',
+                xref='paper',
+                yref='paper',
+                xanchor='auto',
+                yanchor='auto',
                 font=dict(
                     size=16,
                     color=STRING_LABEL_TITLE_COLOR)))
@@ -883,7 +881,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
     chart_result.update_annotations(
-        yshift=10, font_color=STRING_LABEL_TITLE_COLOR)
+        yshift=25, font_color=STRING_LABEL_TITLE_COLOR)
     chart_result.update_layout(
         title=dict(
             text=string_combined_chart_title,
