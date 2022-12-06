@@ -447,6 +447,26 @@ def df_calculate_all_properties(df_input, string_reference_model,
     return df_td.merge(df_mid, on='Model', how='inner')
 
 
+def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
+    """
+    tuple_hex_to_rgba converts color value given in hex format to rgba format
+    with float_alpha_opacity opacity (transperancy) value
+
+    Args:
+        string_hex_color (str): This argument contains the hex value of the
+        color.
+        float_alpha_opacity (float): This argument contains the opacity value
+        from 0 to 1, with 0 being fully transparent.
+
+    Returns:
+        tuple: The return value is a tuple (R, G, B, Alpha) where R, G, B are
+        integer values from 0 to 255.
+    """
+    return tuple(
+        [int(string_hex_color.lstrip('#')[i:i+2], 16)
+         for i in (0, 2, 4)] + [float_alpha_opacity])
+
+
 def chart_create_diagram(df_input, string_reference_model,
                          string_mid_type='scaled', bool_flag_as_subplot=False,
                          chart_result_upper=None,
