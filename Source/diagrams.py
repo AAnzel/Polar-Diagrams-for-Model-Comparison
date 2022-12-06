@@ -35,6 +35,7 @@ STRING_TICK_COLOR = '#000000'
 STRING_GRID_STYLE = 'solid'
 INT_TICK_WIDTH = 2
 INT_RANDOM_SEED = None
+FLOAT_MARKER_OPACITY = 0.75
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -634,6 +635,19 @@ def chart_create_diagram(df_input, string_reference_model,
             pd.factorize(df_input[string_tooltip_label_0])[0],
             df_input[string_tooltip_label_0]):
 
+        if tmp_model == string_reference_model:
+            string_marker_color = '#000000'
+        else:
+            string_marker_color = list_color_scheme[
+                tmp_model_int % int_num_discrete_colors]
+
+        dict_marker = dict(
+            line=dict(
+                color=string_marker_color),
+            color='rgba' + str(tuple_hex_to_rgba(
+                string_marker_color, FLOAT_MARKER_OPACITY)),
+            size=9)
+
         if bool_flag_as_subplot is True:
             chart_result.add_trace(
                 go.Scatterpolar(
@@ -648,14 +662,10 @@ def chart_create_diagram(df_input, string_reference_model,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=list_color_scheme[
-                            tmp_model_int % int_num_discrete_colors],
+                        bordercolor=string_marker_color,
                         font=dict(
                             color=STRING_TICK_COLOR)),
-                    marker=dict(
-                        color=list_color_scheme[
-                            tmp_model_int % int_num_discrete_colors],
-                        size=9)),
+                    marker=dict_marker),
                 row=1,
                 col=int_subplot_column_number)
 
@@ -671,14 +681,10 @@ def chart_create_diagram(df_input, string_reference_model,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=list_color_scheme[
-                            tmp_model_int % int_num_discrete_colors],
+                        bordercolor=string_marker_color,
                         font=dict(
                             color=STRING_TICK_COLOR)),
-                    marker=dict(
-                        color=list_color_scheme[
-                            tmp_model_int % int_num_discrete_colors],
-                        size=9)))
+                    marker=dict_marker))
 
     if bool_flag_as_subplot is True:
         if string_diagram_type == 'taylor':
