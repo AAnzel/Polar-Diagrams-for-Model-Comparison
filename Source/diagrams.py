@@ -2,7 +2,6 @@ import math
 import pandas as pd
 import numpy as np
 
-from npeet import entropy_estimators
 from sklearn.metrics import mean_squared_error
 from scipy.stats import differential_entropy
 from sklearn.feature_selection import mutual_info_regression
@@ -140,21 +139,6 @@ def df_calculate_td_properties(df_input, string_reference_model,
     return df_result
 
 
-def list_adapt_to_npeet(list_input):
-    """
-    list_adapt_to_npeet function takes list of values from one model and adapts
-    that list to the npeet functions.
-
-    Args:
-        list_input (list): This list holds values of one model.
-
-    Returns:
-        list: The elements of this list are lists that contain one value from
-        the passed argument.
-    """
-    return [[i] for i in list_input]
-
-
 def float_calculate_discrete_entropy(list_labels, int_base=2):
     """
     float_calculate_discrete_entropy calculates Shannon (discrete) entropy of
@@ -194,8 +178,8 @@ def float_calculate_discrete_entropy(list_labels, int_base=2):
 
 def df_calculate_mid_properties(df_input, string_reference_model,
                                 dict_mi_parameters=dict(
-                                    string_library='scipy_sklearn',
                                     string_entropy_method='auto',
+                                    int_mi_n_neighbors=3,
                                     bool_discrete_features=False,
                                     int_random_state=INT_RANDOM_SEED)):
     """
@@ -213,12 +197,12 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
-        ValueError: The error is raised if string_library is not one of the
-        following 'scipy_sklearn', 'npeet'
+        ValueError: The error is raised if int_mi_n_neighbors is less or equal
+        than zero.
         ValueError: The error is raised if string_entropy_method is not one of
         the following 'vasicek', 'van es', 'ebrahimi', 'correa', 'auto'
 
@@ -227,7 +211,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information theory properties as columns.
     """
 
-    list_valid_parameters = ['string_library', 'string_entropy_method',
+    list_valid_parameters = ['int_mi_n_neighbors', 'string_entropy_method',
                              'bool_discrete_features', 'int_random_state']
 
     if not all(string_parameter in dict_mi_parameters
@@ -237,27 +221,22 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
-    list_valid_libraries = ['scipy_sklearn', 'npeet']
     list_valid_discrete_features = [True, False]
 
-    if dict_mi_parameters['string_library'] not in list_valid_libraries:
-        raise ValueError('string_library is not one of the following:' +
-                         str(list_valid_libraries))
-    if dict_mi_parameters['string_library'] == 'scipy_sklearn':
-        if dict_mi_parameters[
-                'string_entropy_method'] not in list_valid_entropy_methods:
-            raise ValueError('string_entropy_method is not one of the' +
-                             ' following:' +
-                             str(list_valid_entropy_methods))
+    if dict_mi_parameters['int_mi_n_neighbors'] <= 0:
+        raise ValueError('int_mi_n_neighbors has to be greater than 0.')
+
+    if dict_mi_parameters[
+            'string_entropy_method'] not in list_valid_entropy_methods:
+        raise ValueError('string_entropy_method is not one of the' +
+                         ' following:' + str(list_valid_entropy_methods))
+
     if dict_mi_parameters[
             'bool_discrete_features'] not in list_valid_discrete_features:
         raise ValueError('bool_discrete_features is not one of the following:'
                          + str(list_valid_discrete_features))
 
     list_all_features = df_input.columns.to_list()
-
-    list_adapted_npeet_reference = list_adapt_to_npeet(
-        df_input[string_reference_model])
 
     # Initialize dict
     dict_result = {}
@@ -268,54 +247,30 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     # That is causing an error when calculating angles
     # Try to find better default parameters so it doesn't happen
     for string_one_model in list_all_features:
-        list_adapted_npeet_one = list_adapt_to_npeet(
-            df_input[string_one_model])
-
-        if dict_mi_parameters['string_library'] == 'scipy_sklearn':
-            # Calculate entropies
-            # 0 in the list
-            if dict_mi_parameters['bool_discrete_features'] is True:
-                dict_result[string_one_model].append(
-                    float_calculate_discrete_entropy(
-                        df_input[string_one_model], int_base=2))
-            else:
-                dict_result[string_one_model].append(
-                    differential_entropy(df_input[string_one_model], base=2))
-            # dict_result[string_one_model].append(
-            #    mutual_info_regression(
-            #        df_input[string_one_model].to_numpy().reshape(-1, 1),
-            #        df_input[string_one_model],
-            #        discrete_features=False)[0])
-
-            # Calculate mutual informations against the reference feature
-            # 1 in the liststring_angular_column
+        # Calculate entropies
+        # 0 in the list
+        if dict_mi_parameters['bool_discrete_features'] is True:
             dict_result[string_one_model].append(
-                mutual_info_regression(
-                    df_input[string_reference_model].to_numpy().reshape(-1, 1),
-                    df_input[string_one_model],
-                    random_state=dict_mi_parameters['int_random_state'],
-                    discrete_features=dict_mi_parameters[
-                        'bool_discrete_features'])[0])
-
+                float_calculate_discrete_entropy(
+                    df_input[string_one_model], int_base=2))
         else:
-            if dict_mi_parameters['bool_discrete_features'] is True:
-                # Calculate entropies
-                # 0 in the list
-                dict_result[string_one_model].append(
-                    entropy_estimators.entropyd(list_adapted_npeet_one))
-                # Calculate mutual informations against the reference feature
-                # 1 in the liststring_angular_column
-                dict_result[string_one_model].append(
-                    entropy_estimators.midd(list_adapted_npeet_reference,
-                                            list_adapted_npeet_one))
-            else:
-                dict_result[string_one_model].append(
-                    entropy_estimators.entropy(list_adapted_npeet_one))
-                # Calculate mutual informations against the reference feature
-                # 1 in the liststring_angular_column
-                dict_result[string_one_model].append(
-                    entropy_estimators.mi(list_adapted_npeet_reference,
-                                          list_adapted_npeet_one))
+            dict_result[string_one_model].append(
+                differential_entropy(df_input[string_one_model], base=2))
+        # dict_result[string_one_model].append(
+        #    mutual_info_regression(
+        #        df_input[string_one_model].to_numpy().reshape(-1, 1),
+        #        df_input[string_one_model],
+        #        discrete_features=False)[0])
+
+        # Calculate mutual informations against the reference feature
+        # 1 in the liststring_angular_column
+        dict_result[string_one_model].append(
+            mutual_info_regression(
+                df_input[string_reference_model].to_numpy().reshape(-1, 1),
+                df_input[string_one_model],
+                random_state=dict_mi_parameters['int_random_state'],
+                discrete_features=dict_mi_parameters[
+                    'bool_discrete_features'])[0])
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
@@ -435,7 +390,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
@@ -782,7 +737,7 @@ def chart_create_mi_diagram(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
@@ -836,7 +791,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         dict_mi_parameters (dict, optional): This dictionary contains
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
-        dict(string_library='scipy_sklearn', string_entropy_method='auto',
+        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
 
     Raises:
