@@ -5,6 +5,7 @@ import numpy as np
 from sklearn.metrics import mean_squared_error
 from scipy.stats import differential_entropy
 from sklearn.feature_selection import mutual_info_regression
+from sklearn.feature_selection import mutual_info_classif
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
@@ -253,24 +254,32 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model].append(
                 float_calculate_discrete_entropy(
                     df_input[string_one_model], int_base=2))
+
+            # Calculate mutual informations against the reference feature
+            # 1 in the liststring_angular_column
+            dict_result[string_one_model].append(
+                mutual_info_classif(
+                    df_input[string_reference_model].to_numpy().reshape(-1, 1),
+                    df_input[string_one_model],
+                    random_state=dict_mi_parameters['int_random_state'],
+                    discrete_features=dict_mi_parameters[
+                        'bool_discrete_features'])[0])
+
         else:
+            # Calculate entropies
+            # 0 in the list
             dict_result[string_one_model].append(
                 differential_entropy(df_input[string_one_model], base=2))
-        # dict_result[string_one_model].append(
-        #    mutual_info_regression(
-        #        df_input[string_one_model].to_numpy().reshape(-1, 1),
-        #        df_input[string_one_model],
-        #        discrete_features=False)[0])
 
-        # Calculate mutual informations against the reference feature
-        # 1 in the liststring_angular_column
-        dict_result[string_one_model].append(
-            mutual_info_regression(
-                df_input[string_reference_model].to_numpy().reshape(-1, 1),
-                df_input[string_one_model],
-                random_state=dict_mi_parameters['int_random_state'],
-                discrete_features=dict_mi_parameters[
-                    'bool_discrete_features'])[0])
+            # Calculate mutual informations against the reference feature
+            # 1 in the liststring_angular_column
+            dict_result[string_one_model].append(
+                mutual_info_regression(
+                    df_input[string_reference_model].to_numpy().reshape(-1, 1),
+                    df_input[string_one_model],
+                    random_state=dict_mi_parameters['int_random_state'],
+                    discrete_features=dict_mi_parameters[
+                        'bool_discrete_features'])[0])
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
