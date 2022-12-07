@@ -309,17 +309,25 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model][0]
 
         if float_product < 0:
-            dict_result[string_one_model].append(1)
+            float_product = 1
 
-        else:
-            dict_result[string_one_model].append(
-                dict_result[string_one_model][2] / math.sqrt(float_product))
+        float_divide = dict_result[string_one_model][2] /\
+            math.sqrt(float_product)
+
+        dict_result[string_one_model].append(float_divide)
 
         # Calculate arccos of normalized mutual information according to the
         # paper arccos(NMI(X,Y))
         # 5 in the list
-        dict_result[string_one_model].append(
-            math.degrees(math.acos(dict_result[string_one_model][4])))
+        if float_divide > 1:
+            dict_result[string_one_model].append(
+                math.degrees(math.acos(1)))
+        elif float_divide < -1:
+            dict_result[string_one_model].append(
+                math.degrees(math.acos(-1)))
+        else:
+            dict_result[string_one_model].append(
+                math.degrees(math.acos(float_divide)))
 
     for string_one_model in list_all_features:
         ######################################################################
