@@ -23,13 +23,6 @@ __email__ = 'aleksandar.anzel@uni-marburg.de'
 __status__ = 'Dev'
 
 
-# https://scikit-learn.org/stable/modules/generated/sklearn.feature_selection.mutual_info_regression.html?highlight=entropy
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.differential_entropy.html
-# https://github.com/paulbrodersen/entropy_estimators/
-# https://github.com/gregversteeg/NPEET <- USE THIS ONE FIRST !!!!!!!!!!!!!!!!
-# https://github.com/BiuBiuBiLL/NPEET_LNC <- And this one second (an improvement) # noqa
-
-
 STRING_BACKGROUND_COLOR = '#FFFFFF'
 STRING_GRID_COLOR = '#C0C0C0'
 STRING_LABEL_TITLE_COLOR = '#404040'
