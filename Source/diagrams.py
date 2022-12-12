@@ -2,8 +2,10 @@ import math
 import pandas as pd
 import numpy as np
 
-from sklearn.metrics import mean_squared_error
+from scipy.sparse import issparse
 from scipy.stats import differential_entropy
+from sklearn.utils.validation import check_array, check_X_y
+from sklearn.metrics import mean_squared_error
 from sklearn.feature_selection import mutual_info_regression
 from sklearn.feature_selection import mutual_info_classif
 
@@ -177,16 +179,17 @@ def float_calculate_discrete_entropy(list_labels, int_base=2):
     return float_entropy
 
 
-def df_calculate_mid_properties(df_input, string_reference_model,
-                                dict_mi_parameters=dict(
-                                    string_entropy_method='auto',
-                                    int_mi_n_neighbors=3,
-                                    discrete_features=False,
-                                    bool_discrete_target=False,
-                                    int_random_state=INT_RANDOM_SEED)):
+def dict_check_discrete_features(df_input, string_reference_model,
+                                 dict_mi_parameters=dict(
+                                     string_entropy_method='auto',
+                                     int_mi_n_neighbors=3,
+                                     discrete_features='auto',
+                                     bool_discrete_target=False,
+                                     int_random_state=INT_RANDOM_SEED)):
     """
-    df_calculate_mid_properties caclulates all necessary information theory
-    properties for the Mutual Information diagram from the input data set.
+    dict_check_discrete_features checks if
+    dict_mi_parameters['discrete_features'] is valid argument as defined in
+    scikit-learn library.
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
@@ -200,7 +203,80 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, int_random_state=INT_RANDOM_SEED).
+             bool_discrete_target=False, discrete_features='auto',
+             int_random_state=INT_RANDOM_SEED).
+
+    Raises:
+        ValueError: Raises error if dict_mi_parameters['discrete_features']
+        is not valid.
+
+    Returns:
+        dict: The dictionary where keys are column names that are different
+        than string_reference_model and keys that are boolean and say if that
+        model has discrete or continous values. Those keys are validated using
+        this function.
+    """
+
+    # This check was acquired from https://github.com/scikit-learn/scikit-learn/blob/d949e7f731c99db8a88d16532f5476b52033bf8f/sklearn/feature_selection/_mutual_info.py#L5 # noqa
+
+    X = df_input.drop(string_reference_model, axis=1)
+    y = df_input[string_reference_model]
+    list_X_columns = X.columns
+
+    if dict_mi_parameters['bool_discrete_target'] is False:
+        X, y = check_X_y(
+            X, y, accept_sparse="csc",
+            y_numeric=not dict_mi_parameters['bool_discrete_target'])
+    n_samples, n_features = X.shape
+
+    if isinstance(dict_mi_parameters['discrete_features'], (str, bool)):
+        if isinstance(dict_mi_parameters['discrete_features'], str):
+            if dict_mi_parameters['discrete_features'] == "auto":
+                discrete_features = issparse(X)
+            else:
+                raise ValueError("Invalid string value for discrete_features.")
+        discrete_mask = np.empty(n_features, dtype=bool)
+        # discrete_mask.fill(discrete_features)
+        discrete_mask.fill(dict_mi_parameters['discrete_features'])
+    else:
+        discrete_features = check_array(
+            dict_mi_parameters['discrete_features'], ensure_2d=False)
+        if discrete_features.dtype != "bool":
+            discrete_mask = np.zeros(n_features, dtype=bool)
+            discrete_mask[discrete_features] = True
+        else:
+            discrete_mask = discrete_features
+
+    dict_feature_discrete_mask = dict(zip(list_X_columns, discrete_mask))
+
+    return dict_feature_discrete_mask
+
+
+def df_calculate_mid_properties(df_input, string_reference_model,
+                                dict_mi_parameters=dict(
+                                    string_entropy_method='auto',
+                                    int_mi_n_neighbors=3,
+                                    discrete_features='auto',
+                                    bool_discrete_target=False,
+                                    int_random_state=INT_RANDOM_SEED)):
+    """
+    df_calculate_mid_properties caclulates all necessary information theory
+    properties for the Mutual Information diagram from the input data set.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe has models in columns and
+        model prediction in rows. It is used to calculate relevant information
+        theory propertiesdict_mi_parameters['discrete_features']
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+        dict_mi_parameters (dict, optional): This dictionary contains
+        configuration parameters for the calculation of entropy and mutual
+        information. Defaults to
+        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
+             bool_discrete_target=False, discrete_features='auto',
+             int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if int_mi_n_neighbors is less or equal
@@ -213,11 +289,15 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information theory properties as columns.
     """
 
+    dict_feature_discrete_mask = dict_check_discrete_features(
+        df_input, string_reference_model, dict_mi_parameters)
+
     list_valid_parameters = ['int_mi_n_neighbors', 'string_entropy_method',
                              'bool_discrete_target', 'int_random_state']
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_discrete_target = [True, False]
+    list_valid_float_types = [np.float64, np.float32, np.double]
 
     if not all(string_parameter in dict_mi_parameters
                for string_parameter in list_valid_parameters):
@@ -250,15 +330,19 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     for string_one_model in list_all_features:
         # Calculate entropies
         # 0 in the list
-        if (df_input[string_one_model].dtype == np.float64 or
-                df_input[string_one_model].dtype == np.float32 or
-                df_input[string_one_model].dtype == np.double):
-            dict_result[string_one_model].append(
-                differential_entropy(df_input[string_one_model], base=2))
-        else:
+        if dict_feature_discrete_mask[string_one_model] is False:
             dict_result[string_one_model].append(
                 float_calculate_discrete_entropy(
                     df_input[string_one_model], int_base=2))
+        else:
+            if df_input[string_one_model].dtype in list_valid_float_types:
+                dict_result[string_one_model].append(
+                    differential_entropy(df_input[string_one_model], base=2))
+            else:
+                raise RuntimeError('Model named', string_one_model,
+                                   'is said to be contionus but has values',
+                                   'that are not one of the following type',
+                                   str(list_valid_float_types))
 
         if dict_mi_parameters['bool_discrete_target'] is True:
             # Calculate mutual informations against the reference feature
@@ -289,15 +373,13 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         dict_result[string_one_model].append(
             dict_result[string_one_model][1] *
             (dict_result[string_reference_model][0] /
-             dict_result[string_reference_model][1])
-        )
+             dict_result[string_reference_model][1]))
 
         # Calculate scaled entropies
         # 3 in the list
         dict_result[string_one_model].append(
             dict_result[string_one_model][0] /
-            dict_result[string_reference_model][0]
-        )
+            dict_result[string_reference_model][0])
 
         # Calculate normalized mutual information according to the paper
         # NMI(X,Y) = I(X,Y) / sqrt(H(X) * H(Y))
@@ -407,7 +489,8 @@ def df_calculate_all_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
+             bool_discrete_target=False, discrete_fetures='auto',
+             int_random_state=INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
@@ -754,7 +837,8 @@ def chart_create_mi_diagram(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
+             bool_discrete_target=False, discrete_fetures='auto',
+             int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -808,7 +892,8 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_features=False, int_random_state=INT_RANDOM_SEED).
+             bool_discrete_target=False, discrete_fetures='auto',
+             int_random_state=INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
