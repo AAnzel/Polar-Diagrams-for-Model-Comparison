@@ -179,16 +179,16 @@ def float_calculate_discrete_entropy(list_labels, int_base=2):
     return float_entropy
 
 
-def dict_check_discrete_features(df_input, string_reference_model,
-                                 dict_mi_parameters=dict(
-                                     string_entropy_method='auto',
-                                     int_mi_n_neighbors=3,
-                                     discrete_features='auto',
-                                     bool_discrete_target=False,
-                                     int_random_state=INT_RANDOM_SEED)):
+def dict_check_discrete_models(df_input, string_reference_model,
+                               dict_mi_parameters=dict(
+                                   string_entropy_method='auto',
+                                   int_mi_n_neighbors=3,
+                                   discrete_models='auto',
+                                   bool_discrete_reference_model=False,
+                                   int_random_state=INT_RANDOM_SEED)):
     """
-    dict_check_discrete_features checks if
-    dict_mi_parameters['discrete_features'] is valid argument as defined in
+    dict_check_discrete_models checks if
+    dict_mi_parameters['discrete_models'] is valid argument as defined in
     scikit-learn library.
 
     Args:
@@ -203,11 +203,11 @@ def dict_check_discrete_features(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, discrete_features='auto',
+             bool_discrete_reference_model=False, discrete_models='auto',
              int_random_state=INT_RANDOM_SEED).
 
     Raises:
-        ValueError: Raises error if dict_mi_parameters['discrete_features']
+        ValueError: Raises error if dict_mi_parameters['discrete_models']
         is not valid.
 
     Returns:
@@ -223,31 +223,33 @@ def dict_check_discrete_features(df_input, string_reference_model,
     y = df_input[string_reference_model]
     list_X_columns = X.columns
 
-    if dict_mi_parameters['bool_discrete_target'] is False:
+    if dict_mi_parameters['bool_discrete_reference_model'] is False:
         X, y = check_X_y(
             X, y, accept_sparse="csc",
-            y_numeric=not dict_mi_parameters['bool_discrete_target'])
+            y_numeric=not dict_mi_parameters['bool_discrete_reference_model'])
     n_samples, n_features = X.shape
 
-    if isinstance(dict_mi_parameters['discrete_features'], (str, bool)):
-        if isinstance(dict_mi_parameters['discrete_features'], str):
-            if dict_mi_parameters['discrete_features'] == "auto":
-                discrete_features = issparse(X)
+    if isinstance(dict_mi_parameters['discrete_models'], (str, bool)):
+        if isinstance(dict_mi_parameters['discrete_models'], str):
+            if dict_mi_parameters['discrete_models'] == "auto":
+                discrete_models = issparse(X)
             else:
-                raise ValueError("Invalid string value for discrete_features.")
+                raise ValueError("Invalid string value for discrete_models.")
         discrete_mask = np.empty(n_features, dtype=bool)
-        # discrete_mask.fill(discrete_features)
-        discrete_mask.fill(dict_mi_parameters['discrete_features'])
+        # discrete_mask.fill(discrete_models)
+        discrete_mask.fill(dict_mi_parameters['discrete_models'])
     else:
-        discrete_features = check_array(
-            dict_mi_parameters['discrete_features'], ensure_2d=False)
-        if discrete_features.dtype != "bool":
+        discrete_models = check_array(
+            dict_mi_parameters['discrete_models'], ensure_2d=False)
+        if discrete_models.dtype != "bool":
             discrete_mask = np.zeros(n_features, dtype=bool)
-            discrete_mask[discrete_features] = True
+            discrete_mask[discrete_models] = True
         else:
-            discrete_mask = discrete_features
+            discrete_mask = discrete_models
 
-    dict_feature_discrete_mask = dict(zip(list_X_columns, discrete_mask))
+    dict_feature_discrete_mask = dict()
+    for i, string_one_column_name in enumerate(list_X_columns):
+        dict_feature_discrete_mask[string_one_column_name] = discrete_mask[i]
 
     return dict_feature_discrete_mask
 
@@ -256,8 +258,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                                 dict_mi_parameters=dict(
                                     string_entropy_method='auto',
                                     int_mi_n_neighbors=3,
-                                    discrete_features='auto',
-                                    bool_discrete_target=False,
+                                    discrete_models='auto',
+                                    bool_discrete_reference_model=False,
                                     int_random_state=INT_RANDOM_SEED)):
     """
     df_calculate_mid_properties caclulates all necessary information theory
@@ -266,7 +268,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
         model prediction in rows. It is used to calculate relevant information
-        theory propertiesdict_mi_parameters['discrete_features']
+        theory propertiesdict_mi_parameters['discrete_models']
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -275,7 +277,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, discrete_features='auto',
+             bool_discrete_reference_model=False, discrete_models='auto',
              int_random_state=INT_RANDOM_SEED).
 
     Raises:
@@ -289,11 +291,12 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information theory properties as columns.
     """
 
-    dict_feature_discrete_mask = dict_check_discrete_features(
+    dict_feature_discrete_mask = dict_check_discrete_models(
         df_input, string_reference_model, dict_mi_parameters)
 
     list_valid_parameters = ['int_mi_n_neighbors', 'string_entropy_method',
-                             'bool_discrete_target', 'int_random_state']
+                             'bool_discrete_reference_model',
+                             'int_random_state']
     list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
                                   'auto']
     list_valid_discrete_target = [True, False]
@@ -313,9 +316,9 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                          ' following:' + str(list_valid_entropy_methods))
 
     if dict_mi_parameters[
-            'bool_discrete_target'] not in list_valid_discrete_target:
-        raise ValueError('bool_discrete_target is not one of the following:'
-                         + str(list_valid_discrete_target))
+            'bool_discrete_reference_model'] not in list_valid_discrete_target:
+        raise ValueError('bool_discrete_reference_model is not one of the' +
+                         ' following:' + str(list_valid_discrete_target))
 
     list_all_features = df_input.columns.to_list()
 
@@ -330,21 +333,40 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     for string_one_model in list_all_features:
         # Calculate entropies
         # 0 in the list
-        if dict_feature_discrete_mask[string_one_model] is False:
-            dict_result[string_one_model].append(
-                float_calculate_discrete_entropy(
-                    df_input[string_one_model], int_base=2))
-        else:
-            if df_input[string_one_model].dtype in list_valid_float_types:
+        if string_one_model == string_reference_model:
+            if dict_mi_parameters['bool_discrete_reference_model']:
                 dict_result[string_one_model].append(
-                    differential_entropy(df_input[string_one_model], base=2))
+                    float_calculate_discrete_entropy(
+                        df_input[string_one_model], int_base=2))
             else:
-                raise RuntimeError('Model named', string_one_model,
-                                   'is said to be contionus but has values',
-                                   'that are not one of the following type',
-                                   str(list_valid_float_types))
+                if df_input[string_one_model].dtype in list_valid_float_types:
+                    dict_result[string_one_model].append(
+                        differential_entropy(df_input[string_one_model],
+                                             base=2))
+                else:
+                    raise RuntimeError(
+                        'Model named ' + string_one_model +
+                        ' is said to be contionus but has values' +
+                        ' that are not one of the following type ' +
+                        str(list_valid_float_types))
+        else:
+            if dict_feature_discrete_mask[string_one_model]:
+                dict_result[string_one_model].append(
+                    float_calculate_discrete_entropy(
+                        df_input[string_one_model], int_base=2))
+            else:
+                if df_input[string_one_model].dtype in list_valid_float_types:
+                    dict_result[string_one_model].append(
+                        differential_entropy(df_input[string_one_model],
+                                             base=2))
+                else:
+                    raise RuntimeError(
+                        'Model named ' + string_one_model +
+                        ' is said to be contionus but has values' +
+                        ' that are not one of the following type ' +
+                        str(list_valid_float_types))
 
-        if dict_mi_parameters['bool_discrete_target'] is True:
+        if dict_mi_parameters['bool_discrete_reference_model']:
             # Calculate mutual informations against the reference feature
             # 1 in the list
             dict_result[string_one_model].append(
@@ -352,7 +374,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                     df_input[string_one_model].to_numpy().reshape(-1, 1),
                     df_input[string_reference_model],
                     random_state=dict_mi_parameters['int_random_state'],
-                    discrete_features='auto')[0])
+                    discrete_features=dict_mi_parameters['discrete_models']
+                    )[0])
 
         else:
             # Calculate mutual informations against the reference feature
@@ -362,7 +385,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                     df_input[string_one_model].to_numpy().reshape(-1, 1),
                     df_input[string_reference_model],
                     random_state=dict_mi_parameters['int_random_state'],
-                    discrete_features='auto')[0])
+                    discrete_features=dict_mi_parameters['discrete_models']
+                    )[0])
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
@@ -489,7 +513,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, discrete_fetures='auto',
+             bool_discrete_reference_model=False, discrete_fetures='auto',
              int_random_state=INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
@@ -636,7 +660,7 @@ def chart_create_diagram(df_input, string_reference_model,
     float_max_r = df_input[string_radial_column].max() +\
         df_input[string_radial_column].mean()
 
-    if bool_flag_as_subplot is True:
+    if bool_flag_as_subplot:
         chart_result = chart_result_upper
     else:
         chart_result = go.Figure()
@@ -709,7 +733,7 @@ def chart_create_diagram(df_input, string_reference_model,
                 string_marker_color, FLOAT_MARKER_OPACITY)),
             size=INT_MARKER_SIZE)
 
-        if bool_flag_as_subplot is True:
+        if bool_flag_as_subplot:
             chart_result.add_trace(
                 go.Scatterpolar(
                     name=tmp_model,
@@ -747,7 +771,7 @@ def chart_create_diagram(df_input, string_reference_model,
                             color=STRING_TICK_COLOR)),
                     marker=dict_marker))
 
-    if bool_flag_as_subplot is True:
+    if bool_flag_as_subplot:
         if string_diagram_type == 'taylor':
             chart_result.update_layout(
                 polar=dict_polar_chart,
@@ -837,7 +861,7 @@ def chart_create_mi_diagram(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, discrete_fetures='auto',
+             bool_discrete_reference_model=False, discrete_fetures='auto',
              int_random_state=INT_RANDOM_SEED).
 
     Raises:
@@ -892,7 +916,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         configuration parameters for the calculation of entropy and mutual
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_target=False, discrete_fetures='auto',
+             bool_discrete_reference_model=False, discrete_fetures='auto',
              int_random_state=INT_RANDOM_SEED).
 
     Raises:
