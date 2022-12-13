@@ -941,12 +941,18 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
                for df_input in list_df_input):
         raise ValueError('list_df_input can contain only pandas.DataFrames' +
                          ' elements')
-    
+
     if len(list_df_input) not in list_valid_list_df_input_lenghts:
         raise ValueError('list_df_input can contain only one or two' +
                          ' pandas.DataFrames')
+
+    if len(list_df_input) == 2:
+        if set(list_df_input[0].columns.to_list()) != set(
+                list_df_input[1].columns.to_list()):
+            raise ValueError('list_df_input dataframes need to have the same' +
+                             'set of columns')
     # =========================================================================
-    
+
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
     string_angular_title_td = 'Correlation'
 
@@ -954,23 +960,38 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         string_angular_title_mid = 'Scaled Mutual Information'
     else:
         string_angular_title_mid = 'Normalized Mutual Information'
-    
-    df_all = df_calculate_all_properties(
-        df_input=df_input, string_reference_model=string_reference_model,
-        string_corr_method=string_corr_method,
-        dict_mi_parameters=dict_mi_parameters)
+
+    list_df_all = []
+
+    for i, df_input in enumerate(list_df_input):
+        # We have to check if the secons pandas.DataFrame has one or multiple
+        # rows. If it has one, we encode that property using the size of the
+        # mark of the resulting diagram. If it has multiple rows, we need to
+        # calculate all information for that dataframe and we visualize both
+        # using arrows in the resulting diagram
+        if i == 1 and df_input.shape[1] == 1:
+            # We don't calculate properties when we have one row
+            # We consider that a scalar value which we encode using mark size
+            list_df_all.append(df_input)
+            continue
+
+        df_all = df_calculate_all_properties(
+            df_input=df_input, string_reference_model=string_reference_model,
+            string_corr_method=string_corr_method,
+            dict_mi_parameters=dict_mi_parameters)
+        list_df_all.append(df_all)
 
     chart_result = make_subplots(
         rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
         subplot_titles=(string_angular_title_td,  string_angular_title_mid))
 
     chart_result = chart_create_diagram(
-        df_all, string_reference_model=string_reference_model,
+        list_df_all, string_reference_model=string_reference_model,
         bool_flag_as_subplot=True, chart_result_upper=chart_result,
         string_diagram_type='taylor')
 
     chart_result = chart_create_diagram(
-        df_all, string_reference_model=string_reference_model,
+        list_df_all, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=True,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
