@@ -661,11 +661,17 @@ def chart_create_diagram(list_df_input, string_reference_model,
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
+    string_scalar_column = 'Scalar'
     int_max_angle = 90 if bool_only_half else 180
     float_max_r = list_df_input[0][string_radial_column].max() +\
         list_df_input[0][string_radial_column].mean()
 
-    if len(list_df_input) == 2 and list_df_input[1].shape[1] > 1:
+    if len(list_df_input) == 2 and list_df_input[1].shape[1] != 2:
+        # We check if it is not a scenario where user inputed dataframe with
+        # one row. That dataframe is then modified to look like this
+        # Model    Scalar
+        # 0    y1  0.388677
+        # 1    y2  0.271349
         float_max_r = max(
             float_max_r,
             list_df_input[1][string_radial_column].max() +
@@ -728,16 +734,19 @@ def chart_create_diagram(list_df_input, string_reference_model,
     dict_model_colors = dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0], string_reference_model)
 
-    if len(list_df_input) == 2 and list_df_input[1].shape[1] == 1:
-        np_first_row = list_df_input[1].iloc[:1].to_numpy()
+    if len(list_df_input) == 2 and list_df_input[1].shape[1] == 2:
+        np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
             np.ptp(np_first_row)
 
-        dict_model_marker_sizes = zip(
-            list_df_input[1][string_tooltip_label_0],
-            np_scaled_values + 1)
+        dict_model_marker_sizes = dict(zip(
+            list_df_input[0][string_tooltip_label_0],
+            np_scaled_values + 1))
 
     for i, df_input in enumerate(list_df_input):
+        if i == 1 and df_input.shape[1] == 2:
+            df_input = list_df_input[0]
+
         for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
                 df_input[string_radial_column],
                 df_input[string_angular_column],
@@ -746,7 +755,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
             string_marker_color = dict_model_colors[tmp_model]
 
-            if i == 1 and df_input.shape[1] == 1:
+            if len(list_df_input) == 2 and list_df_input[1].shape[1] == 2:
                 # We change the marker color so that it is gradient and size
                 # depending on the value in the df_input
                 dict_marker = dict(
@@ -885,10 +894,12 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[1] == 1:
+        if i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
-            list_df_td.append(df_input)
+            list_df_td.append(
+                df_input.melt().rename(
+                    columns={'variable': 'Model', 'value': 'Scalar'}))
             continue
 
         df_td = df_calculate_td_properties(
@@ -960,10 +971,12 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[1] == 1:
+        if i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
-            list_df_mid.append(df_input)
+            list_df_mid.append(
+                df_input.melt().rename(
+                    columns={'variable': 'Model', 'value': 'Scalar'}))
             continue
 
         df_mid = df_calculate_mid_properties(
@@ -1077,10 +1090,11 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[1] == 1:
+        if i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
-            list_df_all.append(df_input)
+            list_df_all.append(df_input.melt().rename(
+                    columns={'variable': 'Model', 'value': 'Scalar'}))
             continue
 
         df_all = df_calculate_all_properties(
