@@ -533,7 +533,28 @@ def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
          for i in (0, 2, 4)] + [float_alpha_opacity])
 
 
-def chart_create_diagram(df_input, string_reference_model,
+def dict_calculate_model_colors(list_model_names, string_reference_model):
+
+    int_number_of_models = len(list_model_names)
+
+    if int_number_of_models <= 9:
+        list_color_scheme = LIST_TABLEAU_10
+    else:
+        list_color_scheme = LIST_TABLEAU_20
+    int_num_discrete_colors = len(list_color_scheme)
+
+    dict_result = dict()
+    for i, string_model_name in enumerate(list_model_names):
+        if string_model_name == string_reference_model:
+            dict_result[string_model_name] = '#000000'
+        else:
+            dict_result[string_model_name] = list_color_scheme[
+                i % int_num_discrete_colors]
+
+    return dict_result
+
+
+def chart_create_diagram(list_df_input, string_reference_model,
                          string_mid_type='scaled', bool_flag_as_subplot=False,
                          chart_result_upper=None,
                          string_diagram_type='taylor'):
@@ -542,8 +563,18 @@ def chart_create_diagram(df_input, string_reference_model,
     the Mutual Information diagrams according to the passed argument.
 
     Args:
-        df_input (pandas.DataFrame): This dataframe contains model names as
-        indices and statistical and information theory properties as columns.
+        list_df_input (list): This list contains one or two dataframes which
+        have models in columns and model prediction in rows. If parsed as a
+        pd.DataFrame() object, it is considered as a first and only element of
+        the list. Each one of these dataframes is used to calculate relevant
+        statistical information and information theory properties. If the list
+        contains two elements, both dataframes need to have the same set of
+        columns. If the second dataframe contains only one row, then this
+        dataframe is considered to contain a property that is encoded as using
+        size of the marker of the resulting diagrams. If the second dataframe
+        contains multiple rows, it is then considered to be a second time point
+        of the first dataframe in the list. This is then encoded using arrows
+        in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -584,16 +615,9 @@ def chart_create_diagram(df_input, string_reference_model,
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
     # General properties
-    list_color_scheme = None
     string_tooltip_label_0 = 'Model'
-    int_number_of_models = len(df_input[string_tooltip_label_0].to_list())
-
-    if int_number_of_models <= 9:
-        list_color_scheme = LIST_TABLEAU_10
-    else:
-        list_color_scheme = LIST_TABLEAU_20
-
-    int_num_discrete_colors = len(list_color_scheme)
+    int_number_of_models = len(
+        list_df_input[0][string_tooltip_label_0].to_list())
 
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
@@ -606,7 +630,7 @@ def chart_create_diagram(df_input, string_reference_model,
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
         bool_only_half = True if (
-            df_input[string_angular_column] <= 90).all() else False
+            list_df_input[0][string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
         np_angular_labels = np_tmp if bool_only_half else np.concatenate(
             (-np_tmp[:0:-1], np_tmp))
@@ -638,8 +662,14 @@ def chart_create_diagram(df_input, string_reference_model,
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
     int_max_angle = 90 if bool_only_half else 180
-    float_max_r = df_input[string_radial_column].max() +\
-        df_input[string_radial_column].mean()
+    float_max_r = list_df_input[0][string_radial_column].max() +\
+        list_df_input[0][string_radial_column].mean()
+
+    if len(list_df_input) == 2 and list_df_input[1].shape[1] > 1:
+        float_max_r = max(
+            float_max_r,
+            list_df_input[1][string_radial_column].max() +
+            list_df_input[1][string_radial_column].mean())
 
     if bool_flag_as_subplot:
         chart_result = chart_result_upper
@@ -647,8 +677,8 @@ def chart_create_diagram(df_input, string_reference_model,
         chart_result = go.Figure()
 
     np_tooltip_data = list(
-        df_input[[string_tooltip_label_0, string_tooltip_label_1,
-                  string_tooltip_label_2]].to_numpy())
+        list_df_input[0][[string_tooltip_label_0, string_tooltip_label_1,
+                          string_tooltip_label_2]].to_numpy())
     string_tooltip_hovertemplate = (
         string_tooltip_label_0 + ': %{customdata[0]}<br>' +
         string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
@@ -695,66 +725,90 @@ def chart_create_diagram(df_input, string_reference_model,
         bordercolor=STRING_GRID_COLOR,
         borderwidth=0.2)
 
-    for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
-            df_input[string_radial_column], df_input[string_angular_column],
-            pd.factorize(df_input[string_tooltip_label_0])[0],
-            df_input[string_tooltip_label_0]):
+    dict_model_colors = dict_calculate_model_colors(
+        list_df_input[0][string_tooltip_label_0], string_reference_model)
 
-        if tmp_model == string_reference_model:
-            string_marker_color = '#000000'
-        else:
-            string_marker_color = list_color_scheme[
-                tmp_model_int % int_num_discrete_colors]
+    if len(list_df_input) == 2 and list_df_input[1].shape[1] == 1:
+        np_first_row = list_df_input[1].iloc[:1].to_numpy()
+        np_scaled_values = (np_first_row - np.min(np_first_row)) /\
+            np.ptp(np_first_row)
 
-        dict_marker = dict(
-            line=dict(
-                color=string_marker_color,
-                width=INT_MARKER_LINE_WIDTH),
-            color='rgba' + str(tuple_hex_to_rgba(
-                string_marker_color, FLOAT_MARKER_OPACITY)),
-            size=INT_MARKER_SIZE)
+        dict_model_marker_sizes = zip(
+            list_df_input[1][string_tooltip_label_0],
+            np_scaled_values + 1)
 
-        if bool_flag_as_subplot:
-            chart_result.add_trace(
-                go.Scatterpolar(
-                    name=tmp_model,
-                    r=[tmp_r],
-                    theta=[tmp_angle],
-                    mode='markers',
-                    legendgroup=tmp_model,
-                    showlegend=bool_show_legend,
-                    # This below has to be done like this, since we add traces
-                    # one by one
-                    customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
-                    hovertemplate=string_tooltip_hovertemplate,
-                    hoverlabel=dict(
-                        bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=string_marker_color,
-                        font=dict(
-                            color=STRING_TICK_COLOR)),
-                    marker=dict_marker),
-                row=1,
-                col=int_subplot_column_number)
+    for i, df_input in enumerate(list_df_input):
+        for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
+                df_input[string_radial_column],
+                df_input[string_angular_column],
+                pd.factorize(df_input[string_tooltip_label_0])[0],
+                df_input[string_tooltip_label_0]):
 
-        else:
-            chart_result.add_trace(
-                go.Scatterpolar(
-                    name=tmp_model,
-                    r=[tmp_r],
-                    theta=[tmp_angle],
-                    mode='markers',
-                    # This below has to be done like this, since we add traces
-                    # one by one
-                    customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
-                    hovertemplate=string_tooltip_hovertemplate,
-                    hoverlabel=dict(
-                        bgcolor=STRING_BACKGROUND_COLOR,
-                        bordercolor=string_marker_color,
-                        font=dict(
-                            color=STRING_TICK_COLOR)),
-                    marker=dict_marker))
+            string_marker_color = dict_model_colors[tmp_model]
+
+            if i == 1 and df_input.shape[1] == 1:
+                # We change the marker color so that it is gradient and size
+                # depending on the value in the df_input
+                dict_marker = dict(
+                    gradient=dict(
+                        color=string_marker_color,
+                        type='radial'),
+                    size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
+                bool_show_legend = False
+
+            else:
+                # Marker doesn't change, we just have to add arows at the end
+                dict_marker = dict(
+                    line=dict(
+                        color=string_marker_color,
+                        width=INT_MARKER_LINE_WIDTH),
+                    color='rgba' + str(tuple_hex_to_rgba(
+                        string_marker_color, FLOAT_MARKER_OPACITY)),
+                    size=INT_MARKER_SIZE)
+
+            if bool_flag_as_subplot:
+                chart_result.add_trace(
+                    go.Scatterpolar(
+                        name=tmp_model,
+                        r=[tmp_r],
+                        theta=[tmp_angle],
+                        mode='markers',
+                        legendgroup=tmp_model,
+                        showlegend=bool_show_legend,
+                        # This below has to be done like this, since we add
+                        # traces one by one
+                        customdata=[np_tooltip_data[tmp_model_int]] *\
+                        int_number_of_models,
+
+                        hovertemplate=string_tooltip_hovertemplate,
+                        hoverlabel=dict(
+                            bgcolor=STRING_BACKGROUND_COLOR,
+                            bordercolor=string_marker_color,
+                            font=dict(
+                                color=STRING_TICK_COLOR)),
+                        marker=dict_marker),
+                    row=1,
+                    col=int_subplot_column_number)
+
+            else:
+                chart_result.add_trace(
+                    go.Scatterpolar(
+                        name=tmp_model,
+                        r=[tmp_r],
+                        theta=[tmp_angle],
+                        mode='markers',
+                        # This below has to be done like this, since we add
+                        # traces one by one
+                        customdata=[np_tooltip_data[tmp_model_int]] *\
+                        int_number_of_models,
+
+                        hovertemplate=string_tooltip_hovertemplate,
+                        hoverlabel=dict(
+                            bgcolor=STRING_BACKGROUND_COLOR,
+                            bordercolor=string_marker_color,
+                            font=dict(
+                                color=STRING_TICK_COLOR)),
+                        marker=dict_marker))
 
     if bool_flag_as_subplot:
         if string_diagram_type == 'taylor':
@@ -822,6 +876,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
        diagram.
     """
+    list_df_input = list_check_list_df_input(list_df_input)
     list_df_td = []
 
     for i, df_input in enumerate(list_df_input):
@@ -896,6 +951,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
+    list_df_input = list_check_list_df_input(list_df_input)
     list_df_mid = []
 
     for i, df_input in enumerate(list_df_input):
@@ -920,6 +976,34 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         string_diagram_type='mid')
 
     return chart_result
+
+
+def list_check_list_df_input(list_df_input):
+
+    list_valid_list_df_input_types = (list, pd.DataFrame)
+    list_valid_list_df_input_lenghts = [1, 2]
+
+    if isinstance(list_df_input, list_valid_list_df_input_types):
+        if isinstance(list_df_input, pd.DataFrame):
+            list_df_input = [list_df_input]
+    else:
+        raise ValueError('list_df_input is not a list nor a pandas.DataFrame')
+
+    if not all(isinstance(df_input, pd.DataFrame)
+               for df_input in list_df_input):
+        raise ValueError('list_df_input can contain only pandas.DataFrames' +
+                         ' elements')
+
+    if len(list_df_input) not in list_valid_list_df_input_lenghts:
+        raise ValueError('list_df_input can contain only one or two' +
+                         ' pandas.DataFrames')
+
+    if len(list_df_input) == 2:
+        if set(list_df_input[0].columns.to_list()) != set(
+                list_df_input[1].columns.to_list()):
+            raise ValueError('list_df_input dataframes need to have the same' +
+                             'set of columns')
+    return list_df_input
 
 
 def chart_create_all_diagrams(list_df_input, string_reference_model,
@@ -971,35 +1055,11 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
-    list_valid_list_df_input_types = [list, pd.DataFrame]
-    list_valid_list_df_input_lenghts = [1, 2]
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
-    # =========================================================================
-    # Check list_df_input
-    if isinstance(list_df_input, list_valid_list_df_input_types):
-        if isinstance(list_df_input, pd.DataFrame):
-            list_df_input = [list_df_input]
-    else:
-        raise ValueError('list_df_input is not a list nor a pandas.DataFrame')
-
-    if not all(isinstance(df_input, pd.DataFrame)
-               for df_input in list_df_input):
-        raise ValueError('list_df_input can contain only pandas.DataFrames' +
-                         ' elements')
-
-    if len(list_df_input) not in list_valid_list_df_input_lenghts:
-        raise ValueError('list_df_input can contain only one or two' +
-                         ' pandas.DataFrames')
-
-    if len(list_df_input) == 2:
-        if set(list_df_input[0].columns.to_list()) != set(
-                list_df_input[1].columns.to_list()):
-            raise ValueError('list_df_input dataframes need to have the same' +
-                             'set of columns')
-    # =========================================================================
+    list_df_input = list_check_list_df_input(list_df_input)
 
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
     string_angular_title_td = 'Correlation'
