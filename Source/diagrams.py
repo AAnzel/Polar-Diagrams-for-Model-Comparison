@@ -874,22 +874,31 @@ def chart_create_mi_diagram(df_input, string_reference_model,
     return chart_result
 
 
-def chart_create_all_diagrams(df_input, string_reference_model,
+def chart_create_all_diagrams(list_df_input, string_reference_model,
                               string_corr_method, string_mid_type,
                               dict_mi_parameters):
     """
     chart_create_all_diagrams creates both the Taylor and the Mutual
-    Information diagrams (side-by-side) according to the df_input argument
+    Information diagrams (side-by-side) according to the list_df_input argument
     where models are placed in columns and rows contain model predictions.
 
     Args:
-        df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information and information theory properties.
+        list_df_input (list): This list contains one or two dataframes which
+        have models in columns and model prediction in rows. If parsed as a
+        pd.DataFrame() object, it is considered as a first and only element of
+        the list. Each one of these dataframes is used to calculate relevant
+        statistical information and information theory properties. If the list
+        contains two elements, both dataframes need to have the same set of
+        columns. If the second dataframe contains only one row, then this
+        dataframe is considered to contain a property that is encoded as using
+        size of the marker of the resulting diagrams. If the second dataframe
+        contains multiple rows, it is then considered to be a second time point
+        of the first dataframe in the list. This is then encoded using arrows
+        in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+        model present in one or both elements of the list_df_input argument
+        (as a column) which can be considered as a reference point in the final
+        diagram. This is often the ground truth.
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
@@ -914,10 +923,30 @@ def chart_create_all_diagrams(df_input, string_reference_model,
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
+    list_valid_list_df_input_types = [list, pd.DataFrame]
+    list_valid_list_df_input_lenghts = [1, 2]
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
+    # =========================================================================
+    # Check list_df_input
+    if isinstance(list_df_input, list_valid_list_df_input_types):
+        if isinstance(list_df_input, pd.DataFrame):
+            list_df_input = [list_df_input]
+    else:
+        raise ValueError('list_df_input is not a list nor a pandas.DataFrame')
+
+    if not all(isinstance(df_input, pd.DataFrame)
+               for df_input in list_df_input):
+        raise ValueError('list_df_input can contain only pandas.DataFrames' +
+                         ' elements')
+    
+    if len(list_df_input) not in list_valid_list_df_input_lenghts:
+        raise ValueError('list_df_input can contain only one or two' +
+                         ' pandas.DataFrames')
+    # =========================================================================
+    
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
     string_angular_title_td = 'Correlation'
 
@@ -925,7 +954,7 @@ def chart_create_all_diagrams(df_input, string_reference_model,
         string_angular_title_mid = 'Scaled Mutual Information'
     else:
         string_angular_title_mid = 'Normalized Mutual Information'
-
+    
     df_all = df_calculate_all_properties(
         df_input=df_input, string_reference_model=string_reference_model,
         string_corr_method=string_corr_method,
