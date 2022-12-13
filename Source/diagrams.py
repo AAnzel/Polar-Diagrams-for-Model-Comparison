@@ -103,15 +103,6 @@ def df_calculate_td_properties(df_input, string_reference_model,
                 df_input[string_one_model], squared=False))
 
     for string_one_model in list_all_features:
-        # Calculating correlation using RMS formula
-        # dict_result[string_one_model].append(
-        #    (dict_result[string_one_model][0]**2 + dict_result[string_reference_model][0]**2 - dict_result[string_one_model][3]**2) / (2 * dict_result[string_one_model][0] * dict_result[string_reference_model][0]) # noqa
-        # )
-
-        # Calculating the angle using calculated correlation
-        # dict_result[string_one_model].append(math.degrees(
-        #    math.acos(dict_result[string_one_model][-1])))
-
         # Normalizing the RMS as in the paper
         dict_result[string_one_model].append(
             dict_result[string_one_model][3] /
@@ -124,9 +115,6 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        # columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
-        #          'Calculated_Corr', 'Calculated_Angle', 'Normalized_RMS',
-        #          'Normalized_STD']
         columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
                  'Normalized_RMS', 'Normalized_STD'])
 
@@ -735,8 +723,10 @@ def chart_create_diagram(df_input, string_reference_model,
                     mode='markers',
                     legendgroup=tmp_model,
                     showlegend=bool_show_legend,
+                    # This below has to be done like this, since we add traces
+                    # one by one
                     customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
@@ -754,8 +744,10 @@ def chart_create_diagram(df_input, string_reference_model,
                     r=[tmp_r],
                     theta=[tmp_angle],
                     mode='markers',
+                    # This below has to be done like this, since we add traces
+                    # one by one
                     customdata=[
-                        np_tooltip_data[tmp_model_int]] * int_number_of_models,  # This has to be done like this, since we add traces one by one # noqa
+                        np_tooltip_data[tmp_model_int]] * int_number_of_models,
                     hovertemplate=string_tooltip_hovertemplate,
                     hoverlabel=dict(
                         bgcolor=STRING_BACKGROUND_COLOR,
