@@ -790,17 +790,26 @@ def chart_create_diagram(df_input, string_reference_model,
     return chart_result
 
 
-def chart_create_taylor_diagram(df_input, string_reference_model,
+def chart_create_taylor_diagram(list_df_input, string_reference_model,
                                 string_corr_method):
     """
     chart_create_taylor_diagram creates the Taylor diagram according to the
-    df_input argument where models are placed in columns and rows contain
+    list_df_input argument where models are placed in columns and rows contain
     model predictions.
 
     Args:
-        df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information.
+        list_df_input (list): This list contains one or two dataframes which
+        have models in columns and model prediction in rows. If parsed as a
+        pd.DataFrame() object, it is considered as a first and only element of
+        the list. Each one of these dataframes is used to calculate relevant
+        statistical information and information theory properties. If the list
+        contains two elements, both dataframes need to have the same set of
+        columns. If the second dataframe contains only one row, then this
+        dataframe is considered to contain a property that is encoded as using
+        size of the marker of the resulting diagrams. If the second dataframe
+        contains multiple rows, it is then considered to be a second time point
+        of the first dataframe in the list. This is then encoded using arrows
+        in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -813,27 +822,51 @@ def chart_create_taylor_diagram(df_input, string_reference_model,
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
        diagram.
     """
+    list_df_td = []
 
-    df_td = df_calculate_td_properties(
-        df_input, string_reference_model, string_corr_method)
+    for i, df_input in enumerate(list_df_input):
+        # We have to check if the secons pandas.DataFrame has one or multiple
+        # rows. If it has one, we encode that property using the size of the
+        # mark of the resulting diagram. If it has multiple rows, we need to
+        # calculate all information for that dataframe and we visualize both
+        # using arrows in the resulting diagram
+        if i == 1 and df_input.shape[1] == 1:
+            # We don't calculate properties when we have one row
+            # We consider that a scalar value which we encode using mark size
+            list_df_td.append(df_input)
+            continue
+
+        df_td = df_calculate_td_properties(
+            df_input, string_reference_model, string_corr_method)
+        list_df_td.append(df_td)
+
     chart_result = chart_create_diagram(
-        df_td, string_reference_model=string_reference_model,
+        list_df_td, string_reference_model=string_reference_model,
         bool_flag_as_subplot=False, string_diagram_type='taylor')
 
     return chart_result
 
 
-def chart_create_mi_diagram(df_input, string_reference_model,
+def chart_create_mi_diagram(list_df_input, string_reference_model,
                             string_mid_type, dict_mi_parameters):
     """
     chart_create_mi_diagram creates the Mutual Information diagram according
-    to the df_input argument where models are placed in columns and rows
+    to the list_df_input argument where models are placed in columns and rows
     contain model predictions.
 
     Args:
-        df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant information
-        theory information.
+        list_df_input (list): This list contains one or two dataframes which
+        have models in columns and model prediction in rows. If parsed as a
+        pd.DataFrame() object, it is considered as a first and only element of
+        the list. Each one of these dataframes is used to calculate relevant
+        statistical information and information theory properties. If the list
+        contains two elements, both dataframes need to have the same set of
+        columns. If the second dataframe contains only one row, then this
+        dataframe is considered to contain a property that is encoded as using
+        size of the marker of the resulting diagrams. If the second dataframe
+        contains multiple rows, it is then considered to be a second time point
+        of the first dataframe in the list. This is then encoded using arrows
+        in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -863,11 +896,26 @@ def chart_create_mi_diagram(df_input, string_reference_model,
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
-    df_mid = df_calculate_mid_properties(
-        df_input, string_reference_model, dict_mi_parameters)
+    list_df_mid = []
+
+    for i, df_input in enumerate(list_df_input):
+        # We have to check if the secons pandas.DataFrame has one or multiple
+        # rows. If it has one, we encode that property using the size of the
+        # mark of the resulting diagram. If it has multiple rows, we need to
+        # calculate all information for that dataframe and we visualize both
+        # using arrows in the resulting diagram
+        if i == 1 and df_input.shape[1] == 1:
+            # We don't calculate properties when we have one row
+            # We consider that a scalar value which we encode using mark size
+            list_df_mid.append(df_input)
+            continue
+
+        df_mid = df_calculate_mid_properties(
+            df_input, string_reference_model, dict_mi_parameters)
+        list_df_mid.append(df_mid)
 
     chart_result = chart_create_diagram(
-        df_mid, string_reference_model=string_reference_model,
+        list_df_mid, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=False,
         string_diagram_type='mid')
 
