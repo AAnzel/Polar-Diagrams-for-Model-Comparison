@@ -763,7 +763,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         color=string_marker_color,
                         type='radial'),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
-                bool_show_legend = False
 
             else:
                 # Marker doesn't change, we just have to add arows at the end
@@ -774,6 +773,9 @@ def chart_create_diagram(list_df_input, string_reference_model,
                     color='rgba' + str(tuple_hex_to_rgba(
                         string_marker_color, FLOAT_MARKER_OPACITY)),
                     size=INT_MARKER_SIZE)
+
+                # Do not show the legend for the second timepoint
+                bool_show_legend = False if i == 1 else bool_show_legend
 
             if bool_flag_as_subplot:
                 chart_result.add_trace(
