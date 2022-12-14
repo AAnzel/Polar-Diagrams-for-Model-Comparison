@@ -535,7 +535,21 @@ def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
 
 
 def dict_calculate_model_colors(list_model_names, string_reference_model):
+    """
+    dict_calculate_model_colors defines a hex color for each model parsed in
+    the list_model_names. The reference model is always black.
 
+    Args:
+        list_model_names (list): This list contains the strings of model names.
+        string_reference_model (str): This string contains the name of the
+        model present in the df_input argument (as a column) which can be
+        considered as a reference point in the final diagram. This is often
+        the ground truth.
+
+    Returns:
+        dict: The function returns a dictionary where model strings are keys,
+        and values are hex color strings.
+    """
     int_number_of_models = len(list_model_names)
 
     if int_number_of_models <= 9:
@@ -545,12 +559,12 @@ def dict_calculate_model_colors(list_model_names, string_reference_model):
     int_num_discrete_colors = len(list_color_scheme)
 
     dict_result = dict()
+    dict_result[string_reference_model] = '#000000'
+    list_model_names.remove(string_reference_model)
+
     for i, string_model_name in enumerate(list_model_names):
-        if string_model_name == string_reference_model:
-            dict_result[string_model_name] = '#000000'
-        else:
-            dict_result[string_model_name] = list_color_scheme[
-                i % int_num_discrete_colors]
+        dict_result[string_model_name] = list_color_scheme[
+            i % int_num_discrete_colors]
 
     return dict_result
 
