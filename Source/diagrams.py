@@ -765,8 +765,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
             bool_show_legend = False if i == 1 else bool_show_legend
 
             if i == 1 and list_df_input[1].shape[1] == 2:
-                # We change the marker color so that it is gradient and size
-                # depending on the value in the df_input
+                # The marker type for the scalar second dataset
+                # We add aditional marker with only border
                 dict_marker = dict(
                     line=dict(
                         color=string_marker_color,
