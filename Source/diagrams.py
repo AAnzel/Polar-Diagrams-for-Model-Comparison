@@ -1025,7 +1025,40 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
 
 
 def list_check_list_df_input(list_df_input):
+    """
+    list_check_list_df_input performs a sanity checks on the list_df_input
+    argument.
 
+    Args:
+        list_df_input (list): This list contains one or two dataframes which
+        have models in columns and model prediction in rows. If parsed as a
+        pd.DataFrame() object, it is considered as a first and only element of
+        the list. Each one of these dataframes is used to calculate relevant
+        statistical information and information theory properties. If the list
+        contains two elements, both dataframes need to have the same set of
+        columns. If the second dataframe contains only one row, then this
+        dataframe is considered to contain a property that is encoded as using
+        size of the marker of the resulting diagrams. If the second dataframe
+        contains multiple rows, it is then considered to be a second time point
+        of the first dataframe in the list. This is then encoded using arrows
+        in the resulting diagrams.
+
+    Raises:
+        ValueError: This error is raised if the argument is neither a list nor
+        a pandas.DataFrame object.
+        ValueError: This error is raised if the argument contains elements that
+        are not a pandas.DataFrame object.
+        ValueError: This error is raised if the argument contains more than 2
+        elements.
+        ValueError: This error is raised if the pandas.DataFrame elements don't
+        contain the same set of columns. This happens if the column names are
+        different between two pandas.DataFrame elements.
+
+    Returns:
+        list: This function returns a validated list. If the parsed argument
+        was a pandas.DataFrame object, it is now the only element of the
+        resulting list.
+    """
     list_valid_list_df_input_types = (list, pd.DataFrame)
     list_valid_list_df_input_lenghts = [1, 2]
 
