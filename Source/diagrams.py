@@ -755,14 +755,19 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
             string_marker_color = dict_model_colors[tmp_model]
 
-            if len(list_df_input) == 2 and list_df_input[1].shape[1] == 2:
+            if i == 1 and list_df_input[1].shape[1] == 2:
                 # We change the marker color so that it is gradient and size
                 # depending on the value in the df_input
                 dict_marker = dict(
-                    gradient=dict(
+                    line=dict(
                         color=string_marker_color,
-                        type='radial'),
+                        width=INT_MARKER_LINE_WIDTH),
+                    color='rgba' + str(tuple_hex_to_rgba(
+                        string_marker_color, 0)),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
+
+                # Do not show the legend for the scalar values
+                bool_show_legend = False if i == 1 else bool_show_legend
 
             else:
                 # Marker doesn't change, we just have to add arows at the end
