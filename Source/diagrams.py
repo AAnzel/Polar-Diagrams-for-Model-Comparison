@@ -33,6 +33,7 @@ INT_RANDOM_SEED = None
 INT_MARKER_SIZE = 10
 INT_MARKER_LINE_WIDTH = 2
 FLOAT_MARKER_OPACITY = 0.60
+STRING_SECOND_SYMBOL = "diamond"
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -667,8 +668,9 @@ def chart_create_diagram(list_df_input, string_reference_model,
         list_df_input[0][string_radial_column].mean()
 
     if len(list_df_input) == 2 and list_df_input[1].shape[1] != 2:
-        # We check if it is not a scenario where user inputed dataframe with
-        # one row. That dataframe is then modified to look like this
+        # We check if it is NOT a scenario where user inputed dataframe with
+        # one row (with scalar information). That dataframe is then modified to
+        # look like this:
         # Model    Scalar
         # 0    y1  0.388677
         # 1    y2  0.271349
@@ -682,9 +684,14 @@ def chart_create_diagram(list_df_input, string_reference_model,
     else:
         chart_result = go.Figure()
 
+    # TODO: Add tootip information of the scalar value if two datasets were
+    # TODO: parsed, and the second one has only two columns (one row
+    # TODO: originally)
+
     np_tooltip_data = list(
         list_df_input[0][[string_tooltip_label_0, string_tooltip_label_1,
                           string_tooltip_label_2]].to_numpy())
+
     string_tooltip_hovertemplate = (
         string_tooltip_label_0 + ': %{customdata[0]}<br>' +
         string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
@@ -754,6 +761,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 df_input[string_tooltip_label_0]):
 
             string_marker_color = dict_model_colors[tmp_model]
+            # Do not show the legend for the scalar values
+            bool_show_legend = False if i == 1 else bool_show_legend
 
             if i == 1 and list_df_input[1].shape[1] == 2:
                 # We change the marker color so that it is gradient and size
@@ -766,11 +775,17 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         string_marker_color, 0)),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
 
-                # Do not show the legend for the scalar values
-                bool_show_legend = False if i == 1 else bool_show_legend
-
+            elif i == 1 and list_df_input[1].shape[1] != 2:
+                dict_marker = dict(
+                    line=dict(
+                        color=string_marker_color,
+                        width=INT_MARKER_LINE_WIDTH),
+                    color='rgba' + str(tuple_hex_to_rgba(
+                        string_marker_color, FLOAT_MARKER_OPACITY)),
+                    size=INT_MARKER_SIZE,
+                    symbol=STRING_SECOND_SYMBOL)
             else:
-                # Marker doesn't change, we just have to add arows at the end
+                # The marker type for the first dataset only
                 dict_marker = dict(
                     line=dict(
                         color=string_marker_color,
@@ -778,9 +793,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
                     color='rgba' + str(tuple_hex_to_rgba(
                         string_marker_color, FLOAT_MARKER_OPACITY)),
                     size=INT_MARKER_SIZE)
-
-                # Do not show the legend for the second timepoint
-                bool_show_legend = False if i == 1 else bool_show_legend
 
             if bool_flag_as_subplot:
                 chart_result.add_trace(
