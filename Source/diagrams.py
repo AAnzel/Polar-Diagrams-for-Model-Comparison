@@ -754,7 +754,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
         borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
 
     dict_two_timepoints_symbol_annotation = dict(
-        text='⬤  First time point<br>◆  Second time point<br>',
+        text='⬤  First time point<br>⯁  Second time point<br>',
         align='left',
         showarrow=False,
         xref='paper',
