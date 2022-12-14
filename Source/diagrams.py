@@ -34,6 +34,7 @@ INT_MARKER_SIZE = 10
 INT_MARKER_LINE_WIDTH = 2
 FLOAT_MARKER_OPACITY = 0.60
 STRING_SECOND_SYMBOL = "diamond"
+FLOAT_LEGEND_BORDER_WIDTH = 0.2
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
 LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
@@ -750,10 +751,23 @@ def chart_create_diagram(list_df_input, string_reference_model,
             color=STRING_LABEL_TITLE_COLOR),
         bgcolor=STRING_BACKGROUND_COLOR,
         bordercolor=STRING_GRID_COLOR,
-        borderwidth=0.2)
+        borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
+
+    dict_two_timepoints_symbol_annotation = dict(
+        text='⬤  First time point<br>◆  Second time point<br>',
+        align='left',
+        showarrow=False,
+        xref='paper',
+        yref='paper',
+        yanchor='top',
+        x=1,
+        y=1,
+        bordercolor=STRING_GRID_COLOR,
+        borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
 
     dict_model_colors = dict_calculate_model_colors(
-        list_df_input[0][string_tooltip_label_0], string_reference_model)
+        list_df_input[0][string_tooltip_label_0].to_list(),
+        string_reference_model)
 
     if len(list_df_input) == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
@@ -882,6 +896,10 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 font=dict(
                     size=16,
                     color=STRING_LABEL_TITLE_COLOR)))
+
+    if len(list_df_input) == 2 and list_df_input[1].shape[1] != 2:
+        chart_result.add_annotation(
+            dict_two_timepoints_symbol_annotation)
 
     return chart_result
 
