@@ -1,4 +1,5 @@
 import math
+import colorsys
 import pandas as pd
 import numpy as np
 
@@ -513,6 +514,31 @@ def df_calculate_all_properties(df_input, string_reference_model,
         df_input, string_reference_model, dict_mi_parameters)
 
     return df_td.merge(df_mid, on='Model', how='inner')
+
+
+def tuple_adjust_lightness(tuple_rgb_color, float_amount=0.5):
+    """
+    tuple_adjust_lightness changes the saturation of the passed RGBA color
+    according to the float_amount parameter.
+
+    Args:
+        tuple_rgb_color (tuple): RGBA color. 'A' in RGBA is the transparency
+        parameter.
+        float_amount (float, optional): The amount of saturating the parsed
+        RGBA color. If the argument is less than 1, the RGBA color is converted
+        to the lighter variant. If the argument is greater than 1, the parsed
+        RGBA color is darkened.. Defaults to 0.5.
+
+    Returns:
+        tuple: Parsed RGBA color with changed saturation.
+    """
+
+    # https://stackoverflow.com/questions/37765197/darken-or-lighten-a-color-in-matplotlib # noqa
+    tuple_hls_color = colorsys.rgb_to_hls(tuple_rgb_color)
+    return colorsys.hls_to_rgb(
+        tuple_hls_color[0],
+        max(0, min(1, float_amount * tuple_hls_color[1])),
+        tuple_hls_color[2])
 
 
 def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
