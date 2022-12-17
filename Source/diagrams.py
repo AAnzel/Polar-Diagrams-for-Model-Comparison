@@ -753,18 +753,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
         bordercolor=STRING_GRID_COLOR,
         borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
 
-    dict_two_timepoints_symbol_annotation = dict(
-        text='⬤  First time point<br>⯁  Second time point<br>',
-        align='left',
-        showarrow=False,
-        xref='paper',
-        yref='paper',
-        yanchor='top',
-        x=1,
-        y=1,
-        bordercolor=STRING_GRID_COLOR,
-        borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
-
     dict_model_colors = dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
         string_reference_model)
@@ -811,7 +799,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
                     color='rgba' + str(tuple_hex_to_rgba(
                         string_marker_color, FLOAT_MARKER_OPACITY)),
                     size=INT_MARKER_SIZE,
-                    symbol=STRING_SECOND_SYMBOL)
+                    )
             else:
                 # The marker type for the first dataset only
                 dict_marker = dict(
@@ -896,10 +884,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 font=dict(
                     size=16,
                     color=STRING_LABEL_TITLE_COLOR)))
-
-    if len(list_df_input) == 2 and list_df_input[1].shape[1] != 2:
-        chart_result.add_annotation(
-            dict_two_timepoints_symbol_annotation)
 
     return chart_result
 
