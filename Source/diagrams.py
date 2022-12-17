@@ -232,8 +232,9 @@ def dict_check_discrete_models(df_input, string_reference_model,
             discrete_mask = discrete_models
 
     dict_feature_discrete_mask = dict()
-    for i, string_one_column_name in enumerate(list_X_columns):
-        dict_feature_discrete_mask[string_one_column_name] = discrete_mask[i]
+    for int_i, string_one_column_name in enumerate(list_X_columns):
+        dict_feature_discrete_mask[
+            string_one_column_name] = discrete_mask[int_i]
 
     return dict_feature_discrete_mask
 
@@ -541,7 +542,7 @@ def tuple_adjust_lightness(tuple_rgb_color, float_amount=0.5):
         tuple_hls_color[2])
 
 
-def tuple_hex_to_rgba(string_hex_color):
+def tuple_hex_to_rgb(string_hex_color):
     """
     tuple_hex_to_rgba converts color value given in hex format to rgba format
     with float_alpha_opacity opacity (transperancy) value
@@ -555,7 +556,8 @@ def tuple_hex_to_rgba(string_hex_color):
         integer values from 0 to 255.
     """
     return tuple(
-        [int(string_hex_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)])
+        [int(string_hex_color.lstrip('#')[int_i:int_i+2], 16)
+         for int_i in (0, 2, 4)])
 
 
 def dict_calculate_model_colors(list_model_names, string_reference_model,
@@ -593,10 +595,15 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
         float_saturation = 1
         for int_j, string_model_name in enumerate(list_model_names):
             if string_model_name == string_reference_model:
-                dict_result[string_reference_model][int_i] = '#010101'
+                dict_result[string_reference_model][
+                    int_i] = tuple_adjust_lightness(
+                        tuple_hex_to_rgb('#010101'), float_saturation)
             else:
-                dict_result[string_model_name][int_i] = list_color_scheme[
-                    int_j % int_num_discrete_colors]
+                dict_result[string_reference_model][
+                    int_i] = tuple_adjust_lightness(
+                        tuple_hex_to_rgb(list_color_scheme[
+                            int_j % int_num_discrete_colors]),
+                        float_saturation)
 
         float_saturation *= float_saturation_multiplier
 
@@ -801,8 +808,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
             list_df_input[0][string_tooltip_label_0],
             np_scaled_values + 1))
 
-    for i, df_input in enumerate(list_df_input):
-        if i == 1 and df_input.shape[1] == 2:
+    for int_i, df_input in enumerate(list_df_input):
+        if int_i == 1 and df_input.shape[1] == 2:
             df_input = list_df_input[0]
 
         for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
@@ -811,28 +818,27 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 pd.factorize(df_input[string_tooltip_label_0])[0],
                 df_input[string_tooltip_label_0]):
 
-            string_marker_color = dict_model_colors[tmp_model]
+            string_marker_color = dict_model_colors[tmp_model][int_i]
             # Do not show the legend for the scalar values
-            bool_show_legend = False if i == 1 else bool_show_legend
+            bool_show_legend = False if int_i == 1 else bool_show_legend
 
-            if i == 1 and list_df_input[1].shape[1] == 2:
+            if int_i == 1 and list_df_input[1].shape[1] == 2:
                 # The marker type for the scalar second dataset
                 # We add aditional marker with only border
                 dict_marker = dict(
                     line=dict(
                         color=string_marker_color,
                         width=INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(tuple_hex_to_rgba(
-                        string_marker_color, 0)),
+                    color='rgba' + str(string_marker_color + [0]),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
 
-            elif i == 1 and list_df_input[1].shape[1] != 2:
+            elif int_i == 1 and list_df_input[1].shape[1] != 2:
                 dict_marker = dict(
                     line=dict(
                         color=string_marker_color,
                         width=INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(tuple_hex_to_rgba(
-                        string_marker_color, FLOAT_MARKER_OPACITY)),
+                    color='rgba' + str(
+                        string_marker_color + [FLOAT_MARKER_OPACITY]),
                     size=INT_MARKER_SIZE,
                     )
             else:
@@ -841,8 +847,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
                     line=dict(
                         color=string_marker_color,
                         width=INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(tuple_hex_to_rgba(
-                        string_marker_color, FLOAT_MARKER_OPACITY)),
+                    color='rgba' + str(
+                        string_marker_color + [FLOAT_MARKER_OPACITY]),
                     size=INT_MARKER_SIZE)
 
             if bool_flag_as_subplot:
@@ -958,13 +964,13 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
     list_df_input = list_check_list_df_input(list_df_input)
     list_df_td = []
 
-    for i, df_input in enumerate(list_df_input):
+    for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
         # rows. If it has one, we encode that property using the size of the
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[0] == 1:
+        if int_i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
             list_df_td.append(
@@ -1035,13 +1041,13 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     list_df_input = list_check_list_df_input(list_df_input)
     list_df_mid = []
 
-    for i, df_input in enumerate(list_df_input):
+    for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
         # rows. If it has one, we encode that property using the size of the
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[0] == 1:
+        if int_i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
             list_df_mid.append(
@@ -1187,13 +1193,13 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
 
     list_df_all = []
 
-    for i, df_input in enumerate(list_df_input):
+    for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
         # rows. If it has one, we encode that property using the size of the
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
         # using arrows in the resulting diagram
-        if i == 1 and df_input.shape[0] == 1:
+        if int_i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
             list_df_all.append(df_input.melt().rename(
