@@ -519,27 +519,29 @@ def df_calculate_all_properties(df_input, string_reference_model,
 
 def tuple_adjust_lightness(tuple_rgb_color, float_amount=0.5):
     """
-    tuple_adjust_lightness changes the saturation of the passed RGBA color
+    tuple_adjust_lightness changes the saturation of the passed RGB color
     according to the float_amount parameter.
 
     Args:
-        tuple_rgb_color (tuple): RGBA color. 'A' in RGBA is the transparency
-        parameter.
+        tuple_rgb_color (tuple): RGB color.
         float_amount (float, optional): The amount of saturating the parsed
-        RGBA color. If the argument is less than 1, the RGBA color is converted
+        RGB color. If the argument is less than 1, the RGB color is converted
         to the lighter variant. If the argument is greater than 1, the parsed
-        RGBA color is darkened.. Defaults to 0.5.
+        RGB color is darkened.. Defaults to 0.5.
 
     Returns:
-        tuple: Parsed RGBA color with changed saturation.
+        tuple: Parsed RGB color with changed saturation.
     """
-
     # https://stackoverflow.com/questions/37765197/darken-or-lighten-a-color-in-matplotlib # noqa
-    tuple_hls_color = colorsys.rgb_to_hls(tuple_rgb_color)
-    return colorsys.hls_to_rgb(
-        tuple_hls_color[0],
-        max(0, min(1, float_amount * tuple_hls_color[1])),
+    tuple_hls_color = colorsys.rgb_to_hls(
+        tuple_rgb_color[0]/255, tuple_rgb_color[1]/255, tuple_rgb_color[2]/255)
+
+    tuple_result = colorsys.hls_to_rgb(
+        tuple_hls_color[0], min(1, float_amount * tuple_hls_color[1]),
         tuple_hls_color[2])
+
+    return tuple([int(tuple_result[0]*255), int(tuple_result[1]*255),
+                 int(tuple_result[2]*255)])
 
 
 def tuple_hex_to_rgb(string_hex_color):
@@ -590,20 +592,24 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
 
     dict_result = dict()
     float_saturation_multiplier = 0.5
+    float_saturation = 1.2
 
     for int_i in range(int_number_of_datasets):
-        float_saturation = 1
         for int_j, string_model_name in enumerate(list_model_names):
             if string_model_name == string_reference_model:
-                dict_result[string_reference_model][
-                    int_i] = tuple_adjust_lightness(
-                        tuple_hex_to_rgb('#010101'), float_saturation)
+                string_hex_color = '#000000'
             else:
-                dict_result[string_reference_model][
-                    int_i] = tuple_adjust_lightness(
-                        tuple_hex_to_rgb(list_color_scheme[
-                            int_j % int_num_discrete_colors]),
-                        float_saturation)
+                string_hex_color = list_color_scheme[
+                    int_j % int_num_discrete_colors]
+
+            if string_model_name not in dict_result:
+                dict_result[string_model_name] = dict()
+
+            tuple_rgb_color = tuple_adjust_lightness(
+                tuple_hex_to_rgb(string_hex_color), float_saturation)
+            dict_result[string_model_name][int_i] = (
+                int(tuple_rgb_color[0]), int(tuple_rgb_color[1]),
+                int(tuple_rgb_color[2]))
 
         float_saturation *= float_saturation_multiplier
 
@@ -825,32 +831,24 @@ def chart_create_diagram(list_df_input, string_reference_model,
             if int_i == 1 and list_df_input[1].shape[1] == 2:
                 # The marker type for the scalar second dataset
                 # We add aditional marker with only border
+                string_marker_color = dict_model_colors[tmp_model][0]
                 dict_marker = dict(
                     line=dict(
-                        color=string_marker_color,
+                        color='rgba' + str(string_marker_color + (1,)),
                         width=INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(string_marker_color + [0]),
+                    color='rgba' + str(string_marker_color + (0,)),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
-
-            elif int_i == 1 and list_df_input[1].shape[1] != 2:
-                dict_marker = dict(
-                    line=dict(
-                        color=string_marker_color,
-                        width=INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(
-                        string_marker_color + [FLOAT_MARKER_OPACITY]),
-                    size=INT_MARKER_SIZE,
-                    )
             else:
                 # The marker type for the first dataset only
                 dict_marker = dict(
                     line=dict(
-                        color=string_marker_color,
+                        color='rgba' + str(string_marker_color + (1,)),
                         width=INT_MARKER_LINE_WIDTH),
                     color='rgba' + str(
-                        string_marker_color + [FLOAT_MARKER_OPACITY]),
+                        string_marker_color + (FLOAT_MARKER_OPACITY,)),
                     size=INT_MARKER_SIZE)
 
+            # TODO: Add lines as well
             if bool_flag_as_subplot:
                 chart_result.add_trace(
                     go.Scatterpolar(
@@ -868,7 +866,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
                             bgcolor=STRING_BACKGROUND_COLOR,
-                            bordercolor=string_marker_color,
+                            bordercolor='rgba' + str(
+                                string_marker_color + (1,)),
                             font=dict(
                                 color=STRING_TICK_COLOR)),
                         marker=dict_marker),
@@ -890,7 +889,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
                             bgcolor=STRING_BACKGROUND_COLOR,
-                            bordercolor=string_marker_color,
+                            bordercolor='rgba' + str(
+                                string_marker_color + (1,)),
                             font=dict(
                                 color=STRING_TICK_COLOR)),
                         marker=dict_marker))
