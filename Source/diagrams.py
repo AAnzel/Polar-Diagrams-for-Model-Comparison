@@ -541,7 +541,7 @@ def tuple_adjust_lightness(tuple_rgb_color, float_amount=0.5):
         tuple_hls_color[2])
 
 
-def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
+def tuple_hex_to_rgba(string_hex_color):
     """
     tuple_hex_to_rgba converts color value given in hex format to rgba format
     with float_alpha_opacity opacity (transperancy) value
@@ -549,21 +549,19 @@ def tuple_hex_to_rgba(string_hex_color, float_alpha_opacity):
     Args:
         string_hex_color (str): This argument contains the hex value of the
         color.
-        float_alpha_opacity (float): This argument contains the opacity value
-        from 0 to 1, with 0 being fully transparent.
 
     Returns:
-        tuple: The return value is a tuple (R, G, B, Alpha) where R, G, B are
+        tuple: The return value is a tuple (R, G, B) where R, G, B are
         integer values from 0 to 255.
     """
     return tuple(
-        [int(string_hex_color.lstrip('#')[i:i+2], 16)
-         for i in (0, 2, 4)] + [float_alpha_opacity])
+        [int(string_hex_color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4)])
 
 
-def dict_calculate_model_colors(list_model_names, string_reference_model):
+def dict_calculate_model_colors(list_model_names, string_reference_model,
+                                int_number_of_datasets):
     """
-    dict_calculate_model_colors defines a hex color for each model parsed in
+    dict_calculate_model_colors defines an RGBA color for each model parsed in
     the list_model_names. The reference model is always black.
 
     Args:
@@ -572,10 +570,13 @@ def dict_calculate_model_colors(list_model_names, string_reference_model):
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
         the ground truth.
+        int_number_of_datasets (int): This argument contains the number of
+        datasets. This argument is important if we have two datasets where the
+        second one is at another time point.
 
     Returns:
         dict: The function returns a dictionary where model strings are keys,
-        and values are hex color strings.
+        and values are RGBA tuples.
     """
     int_number_of_models = len(list_model_names)
 
@@ -586,12 +587,18 @@ def dict_calculate_model_colors(list_model_names, string_reference_model):
     int_num_discrete_colors = len(list_color_scheme)
 
     dict_result = dict()
-    dict_result[string_reference_model] = '#000000'
-    list_model_names.remove(string_reference_model)
+    float_saturation_multiplier = 0.5
 
-    for i, string_model_name in enumerate(list_model_names):
-        dict_result[string_model_name] = list_color_scheme[
-            i % int_num_discrete_colors]
+    for int_i in range(int_number_of_datasets):
+        float_saturation = 1
+        for int_j, string_model_name in enumerate(list_model_names):
+            if string_model_name == string_reference_model:
+                dict_result[string_reference_model][int_i] = '#010101'
+            else:
+                dict_result[string_model_name][int_i] = list_color_scheme[
+                    int_j % int_num_discrete_colors]
+
+        float_saturation *= float_saturation_multiplier
 
     return dict_result
 
@@ -660,6 +667,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
     string_tooltip_label_0 = 'Model'
     int_number_of_models = len(
         list_df_input[0][string_tooltip_label_0].to_list())
+    int_number_of_datasets = len(list_df_input)
 
     np_tmp = np.array(
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
@@ -708,7 +716,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
     float_max_r = list_df_input[0][string_radial_column].max() +\
         list_df_input[0][string_radial_column].mean()
 
-    if len(list_df_input) == 2 and list_df_input[1].shape[1] != 2:
+    if int_number_of_datasets == 2 and list_df_input[1].shape[1] != 2:
         # We check if it is NOT a scenario where user inputed dataframe with
         # one row (with scalar information). That dataframe is then modified to
         # look like this:
@@ -781,9 +789,10 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
     dict_model_colors = dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
-        string_reference_model)
+        string_reference_model,
+        int_number_of_datasets)
 
-    if len(list_df_input) == 2 and list_df_input[1].shape[1] == 2:
+    if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
             np.ptp(np_first_row)
