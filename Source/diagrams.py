@@ -591,8 +591,8 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
     int_num_discrete_colors = len(list_color_scheme)
 
     dict_result = dict()
-    float_saturation_multiplier = 0.5
-    float_saturation = 1.2
+    float_saturation_multiplier = 0.7
+    float_saturation = 1.3
 
     for int_i in range(int_number_of_datasets):
         for int_j, string_model_name in enumerate(list_model_names):
@@ -746,19 +746,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
     else:
         chart_result = go.Figure()
 
-    # TODO: Add tootip information of the scalar value if two datasets were
-    # TODO: parsed, and the second one has only two columns (one row
-    # TODO: originally)
-
-    np_tooltip_data = list(
-        list_df_input[0][[string_tooltip_label_0, string_tooltip_label_1,
-                          string_tooltip_label_2]].to_numpy())
-
-    string_tooltip_hovertemplate = (
-        string_tooltip_label_0 + ': %{customdata[0]}<br>' +
-        string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
-        string_tooltip_label_2 + ': %{customdata[2]:.3f}<br>' +
-        '<extra></extra>')
+    string_tooltip_suffix = ''
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
@@ -805,6 +793,9 @@ def chart_create_diagram(list_df_input, string_reference_model,
         string_reference_model,
         int_number_of_datasets)
 
+    # Calculate marker sizes if we have a scalar dataset
+    # And also check if we have a second timepoint dataset so that we have a
+    # nicer tooltip information
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
@@ -814,9 +805,33 @@ def chart_create_diagram(list_df_input, string_reference_model,
             list_df_input[0][string_tooltip_label_0],
             np_scaled_values + 1))
 
+        bool_tooltip_suffix = False
+
+    elif int_number_of_datasets == 1:
+        bool_tooltip_suffix = False
+
+    else:
+        bool_tooltip_suffix = True
+
     for int_i, df_input in enumerate(list_df_input):
         if int_i == 1 and df_input.shape[1] == 2:
             df_input = list_df_input[0]
+
+        np_tooltip_data = list(
+            df_input[[string_tooltip_label_0, string_tooltip_label_1,
+                      string_tooltip_label_2]].to_numpy())
+
+        if bool_tooltip_suffix:
+            string_tooltip_suffix = ' - Timepoint ' + str(int_i) + '<br>'
+        else:
+            string_tooltip_suffix = '<br>'
+
+        string_tooltip_hovertemplate = (
+            string_tooltip_label_0 + ': %{customdata[0]}' +
+            string_tooltip_suffix +
+            string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
+            string_tooltip_label_2 + ': %{customdata[2]:.3f}<br>' +
+            '<extra></extra>')
 
         for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
                 df_input[string_radial_column],
