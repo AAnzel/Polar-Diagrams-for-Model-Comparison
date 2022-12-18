@@ -592,7 +592,7 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
 
     dict_result = dict()
     float_saturation_multiplier = 0.7
-    float_saturation = 1.3
+    float_saturation = 1.0
 
     for int_i in range(int_number_of_datasets):
         for int_j, string_model_name in enumerate(list_model_names):
@@ -793,6 +793,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
         string_reference_model,
         int_number_of_datasets)
 
+    # TODO: Add scalar information into the tooltip box
     # Calculate marker sizes if we have a scalar dataset
     # And also check if we have a second timepoint dataset so that we have a
     # nicer tooltip information
