@@ -793,10 +793,13 @@ def chart_create_diagram(list_df_input, string_reference_model,
         string_reference_model,
         int_number_of_datasets)
 
-    # TODO: Add scalar information into the tooltip box
     # Calculate marker sizes if we have a scalar dataset
     # And also check if we have a second timepoint dataset so that we have a
     # nicer tooltip information
+    # int_dataset_option can be one of [0, 1, 2] where:
+    # 0 = we have one dataset, 1 = two datasets with the second one holding
+    # scalar values, 2 = two datasets with the second one being the second
+    # time point dataset
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
@@ -806,26 +809,36 @@ def chart_create_diagram(list_df_input, string_reference_model,
             list_df_input[0][string_tooltip_label_0],
             np_scaled_values + 1))
 
-        bool_tooltip_suffix = False
+        int_dataset_option = 1
 
     elif int_number_of_datasets == 1:
-        bool_tooltip_suffix = False
-
+        int_dataset_option = 0
     else:
-        bool_tooltip_suffix = True
+        int_dataset_option = 2
 
     for int_i, df_input in enumerate(list_df_input):
-        if int_i == 1 and df_input.shape[1] == 2:
-            df_input = list_df_input[0]
+        if int_dataset_option == 0:
+            list_tooltip_columns = [
+                string_tooltip_label_0, string_tooltip_label_1,
+                string_tooltip_label_2]
+            string_tooltip_suffix = '<br>'
+        elif int_dataset_option == 1:
+            df_input = list_df_input[0].merge(
+                list_df_input[1], on=string_tooltip_label_0, how='inner')
+            list_tooltip_columns = [
+                string_tooltip_label_0, string_tooltip_label_1,
+                string_tooltip_label_2, string_scalar_column]
+            string_tooltip_suffix = '<br>' + string_scalar_column +\
+                ': %{customdata[3]:.3f}<br>'
+        else:
+            list_tooltip_columns = [
+                string_tooltip_label_0, string_tooltip_label_1,
+                string_tooltip_label_2]
+            string_tooltip_suffix = ' - <b>Timepoint ' + str(int_i) +\
+                '</b><br>'
 
         np_tooltip_data = list(
-            df_input[[string_tooltip_label_0, string_tooltip_label_1,
-                      string_tooltip_label_2]].to_numpy())
-
-        if bool_tooltip_suffix:
-            string_tooltip_suffix = ' - Timepoint ' + str(int_i) + '<br>'
-        else:
-            string_tooltip_suffix = '<br>'
+            df_input[list_tooltip_columns].to_numpy())
 
         string_tooltip_hovertemplate = (
             string_tooltip_label_0 + ': %{customdata[0]}' +
@@ -844,7 +857,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
             # Do not show the legend for the scalar values
             bool_show_legend = False if int_i == 1 else bool_show_legend
 
-            if int_i == 1 and list_df_input[1].shape[1] == 2:
+            if int_i == 1 and int_dataset_option == 1:
                 # The marker type for the scalar second dataset
                 # We add aditional marker with only border
                 string_marker_color = dict_model_colors[tmp_model][0]
