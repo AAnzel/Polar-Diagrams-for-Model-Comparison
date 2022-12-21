@@ -867,8 +867,12 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         width=INT_MARKER_LINE_WIDTH),
                     color='rgba' + str(string_marker_color + (0,)),
                     size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
+            elif int_i == 0 and int_dataset_option == 2:
+                dict_marker = dict(
+                    color='rgba' + str(
+                        string_marker_color + (FLOAT_MARKER_OPACITY,)),
+                    size=INT_MARKER_SIZE)
             else:
-                # The marker type for the first dataset only
                 dict_marker = dict(
                     line=dict(
                         color='rgba' + str(string_marker_color + (1,)),
@@ -877,7 +881,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
                         string_marker_color + (FLOAT_MARKER_OPACITY,)),
                     size=INT_MARKER_SIZE)
 
-            # TODO: Add lines as well
             if bool_flag_as_subplot:
                 chart_result.add_trace(
                     go.Scatterpolar(
