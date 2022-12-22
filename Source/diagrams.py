@@ -669,6 +669,9 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
     # TODO: Raise a warning if points have the same value. This should inform
     # TODO: the users that cirles overlap
+
+    # TODO: Increase circle size when circles do not have a border
+    # TODO: Don't change saturation, use only border for the second time point
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
 
