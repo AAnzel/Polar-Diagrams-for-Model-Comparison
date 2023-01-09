@@ -1,5 +1,4 @@
 import math
-import colorsys
 import pandas as pd
 import numpy as np
 
@@ -517,33 +516,6 @@ def df_calculate_all_properties(df_input, string_reference_model,
     return df_td.merge(df_mid, on='Model', how='inner')
 
 
-def tuple_adjust_lightness(tuple_rgb_color, float_amount=0.5):
-    """
-    tuple_adjust_lightness changes the saturation of the passed RGB color
-    according to the float_amount parameter.
-
-    Args:
-        tuple_rgb_color (tuple): RGB color.
-        float_amount (float, optional): The amount of saturating the parsed
-        RGB color. If the argument is less than 1, the RGB color is converted
-        to the lighter variant. If the argument is greater than 1, the parsed
-        RGB color is darkened.. Defaults to 0.5.
-
-    Returns:
-        tuple: Parsed RGB color with changed saturation.
-    """
-    # https://stackoverflow.com/questions/37765197/darken-or-lighten-a-color-in-matplotlib # noqa
-    tuple_hls_color = colorsys.rgb_to_hls(
-        tuple_rgb_color[0]/255, tuple_rgb_color[1]/255, tuple_rgb_color[2]/255)
-
-    tuple_result = colorsys.hls_to_rgb(
-        tuple_hls_color[0], min(1, float_amount * tuple_hls_color[1]),
-        tuple_hls_color[2])
-
-    return tuple([int(tuple_result[0]*255), int(tuple_result[1]*255),
-                 int(tuple_result[2]*255)])
-
-
 def tuple_hex_to_rgb(string_hex_color):
     """
     tuple_hex_to_rgba converts color value given in hex format to rgba format
@@ -591,8 +563,6 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
     int_num_discrete_colors = len(list_color_scheme)
 
     dict_result = dict()
-    float_saturation_multiplier = 0.7
-    float_saturation = 1.0
 
     for int_i in range(int_number_of_datasets):
         for int_j, string_model_name in enumerate(list_model_names):
@@ -605,13 +575,10 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
             if string_model_name not in dict_result:
                 dict_result[string_model_name] = dict()
 
-            tuple_rgb_color = tuple_adjust_lightness(
-                tuple_hex_to_rgb(string_hex_color), float_saturation)
+            tuple_rgb_color = tuple_hex_to_rgb(string_hex_color)
             dict_result[string_model_name][int_i] = (
                 int(tuple_rgb_color[0]), int(tuple_rgb_color[1]),
                 int(tuple_rgb_color[2]))
-
-        float_saturation *= float_saturation_multiplier
 
     return dict_result
 
@@ -669,9 +636,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
     # TODO: Raise a warning if points have the same value. This should inform
     # TODO: the users that cirles overlap
-
-    # TODO: Increase circle size when circles do not have a border
-    # TODO: Don't change saturation, use only border for the second time point
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
 
