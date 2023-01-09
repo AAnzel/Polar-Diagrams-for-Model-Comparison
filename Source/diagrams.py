@@ -876,7 +876,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 dict_marker = dict(
                     color='rgba' + str(
                         string_marker_color + (FLOAT_MARKER_OPACITY,)),
-                    size=INT_MARKER_SIZE)
+                    size=INT_MARKER_SIZE + INT_MARKER_LINE_WIDTH)
             else:
                 dict_marker = dict(
                     line=dict(
