@@ -312,7 +312,6 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     for string_one_model in list_all_features:
         dict_result[string_one_model] = []
 
-    # TODO: Entropies are often negative when using default parameters
     # That is causing an error when calculating angles
     # Try to find better default parameters so it doesn't happen
     for string_one_model in list_all_features:
@@ -679,8 +678,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
         or Mutual Information diagram.
     """
 
-    # TODO: Raise a warning if points have the same value. This should inform
-    # TODO: the users that cirles overlap
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
 
