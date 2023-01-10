@@ -1,4 +1,5 @@
 import math
+import warnings
 import pandas as pd
 import numpy as np
 
@@ -513,7 +514,11 @@ def df_calculate_all_properties(df_input, string_reference_model,
     df_mid = df_calculate_mid_properties(
         df_input, string_reference_model, dict_mi_parameters)
 
-    return df_td.merge(df_mid, on='Model', how='inner')
+    df_result = df_td.merge(df_mid, on='Model', how='inner')
+
+    warning_check_identical_model_values(df_result)
+
+    return df_result
 
 
 def tuple_hex_to_rgb(string_hex_color):
@@ -581,6 +586,46 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
                 int(tuple_rgb_color[2]))
 
     return dict_result
+
+
+def warning_check_identical_model_values(df_input):
+    """
+    warning_check_identical_model_values checks if there are models that have
+    identical statistical or information theory properties. This check is
+    performed so that the user is warned if the diagrams contain circles that
+    fully overlap.
+
+    Args:
+        df_input (pandas.DataFrame): This dataframe contains both statistical
+        and information theory properties as calculated in
+        df_calculate_all_properties. The dataframe contains columns like:
+        Model, Entropy, Standard Deviation, etc.
+
+    Returns:
+        None: None
+    """
+
+    df_taylor_result = df_input[
+        df_input.duplicated(
+            subset=['Standard Deviation', 'Correlation'], keep=False)]
+
+    df_mi_result = df_input[
+        df_input.duplicated(subset=['Entropy', 'Scaled MI'], keep=False)]
+
+    if df_taylor_result.shape[0] != 0:
+        warnings.warn('WARNING: The following models have the same Standard' +
+                      ' Deviation and Correlation: ' +
+                      str(df_taylor_result['Model'].to_list()) +
+                      '.\nThe resulting Taylor diagram will have overlapping' +
+                      ' marks (circles).', RuntimeWarning)
+    if df_mi_result.shape[0] != 0:
+        warnings.warn('WARNING: The following models have the same Entropy' +
+                      ' and Scaled Mutual Information: ' +
+                      str(df_mi_result['Model'].to_list()) +
+                      '.\nThe resulting Mutual Information diagram will have' +
+                      ' overlapping marks (circles).', RuntimeWarning)
+
+    return None
 
 
 def chart_create_diagram(list_df_input, string_reference_model,
@@ -1196,10 +1241,10 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
 
     for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
-        # rows. If it has one, we encode that property using the size of the
-        # mark of the resulting diagram. If it has multiple rows, we need to
-        # calculate all information for that dataframe and we visualize both
-        # using arrows in the resulting diagram
+        # rows. If it has one, we encode that property using the concentric
+        # circle around mark of the resulting diagram. If it has multiple rows,
+        # we need to calculate all information for that dataframe and we
+        # visualize both using circles with and without the border
         if int_i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
