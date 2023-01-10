@@ -814,7 +814,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
-            np.ptp(np_first_row)
+            (np.max(np_first_row) - np.min(np_first_row))
 
         dict_model_marker_sizes = dict(zip(
             list_df_input[0][string_tooltip_label_0],
