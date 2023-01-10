@@ -552,7 +552,7 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
         the ground truth.
         int_number_of_datasets (int): This argument contains the number of
         datasets. This argument is important if we have two datasets where the
-        second one is at another time point.
+        second one is another version of the first dataset.
 
     Returns:
         dict: The function returns a dictionary where model strings are keys,
@@ -645,9 +645,9 @@ def chart_create_diagram(list_df_input, string_reference_model,
         columns. If the second dataframe contains only one row, then this
         dataframe is considered to contain a property that is encoded as using
         size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second time point
-        of the first dataframe in the list. This is then encoded using arrows
-        in the resulting diagrams.
+        contains multiple rows, it is then considered to be a second version
+        of the first dataframe in the list. This is then encoded using solid
+        borders around circle marks in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -805,12 +805,12 @@ def chart_create_diagram(list_df_input, string_reference_model,
         int_number_of_datasets)
 
     # Calculate marker sizes if we have a scalar dataset
-    # And also check if we have a second timepoint dataset so that we have a
+    # And also check if we have a second version dataset so that we have a
     # nicer tooltip information
     # int_dataset_option can be one of [0, 1, 2] where:
     # 0 = we have one dataset, 1 = two datasets with the second one holding
     # scalar values, 2 = two datasets with the second one being the second
-    # time point dataset
+    # version dataset
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
         np_scaled_values = (np_first_row - np.min(np_first_row)) /\
@@ -845,7 +845,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
             list_tooltip_columns = [
                 string_tooltip_label_0, string_tooltip_label_1,
                 string_tooltip_label_2]
-            string_tooltip_suffix = ' - <b>Timepoint ' + str(int_i) +\
+            string_tooltip_suffix = ' - <b>Version ' + str(int_i) +\
                 '</b><br>'
 
         np_tooltip_data = list(
@@ -989,9 +989,9 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         columns. If the second dataframe contains only one row, then this
         dataframe is considered to contain a property that is encoded as using
         size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second time point
-        of the first dataframe in the list. This is then encoded using arrows
-        in the resulting diagrams.
+        contains multiple rows, it is then considered to be a second version
+        of the first dataframe in the list. This is then encoded using solid
+        borders around circle marks in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -1049,9 +1049,9 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         columns. If the second dataframe contains only one row, then this
         dataframe is considered to contain a property that is encoded as using
         size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second time point
-        of the first dataframe in the list. This is then encoded using arrows
-        in the resulting diagrams.
+        contains multiple rows, it is then considered to be a second version
+        of the first dataframe in the list. This is then encoded using solid
+        borders around circle marks in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in the df_input argument (as a column) which can be
         considered as a reference point in the final diagram. This is often
@@ -1125,9 +1125,9 @@ def list_check_list_df_input(list_df_input):
         columns. If the second dataframe contains only one row, then this
         dataframe is considered to contain a property that is encoded as using
         size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second time point
-        of the first dataframe in the list. This is then encoded using arrows
-        in the resulting diagrams.
+        contains multiple rows, it is then considered to be a second version
+        of the first dataframe in the list. This is then encoded using solid
+        borders around circle marks in the resulting diagrams.
 
     Raises:
         ValueError: This error is raised if the argument is neither a list nor
@@ -1189,9 +1189,9 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         columns. If the second dataframe contains only one row, then this
         dataframe is considered to contain a property that is encoded as using
         size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second time point
-        of the first dataframe in the list. This is then encoded using arrows
-        in the resulting diagrams.
+        contains multiple rows, it is then considered to be a second version
+        of the first dataframe in the list. This is then encoded using solid
+        borders around circle marks in the resulting diagrams.
         string_reference_model (str): This string contains the name of the
         model present in one or both elements of the list_df_input argument
         (as a column) which can be considered as a reference point in the final
