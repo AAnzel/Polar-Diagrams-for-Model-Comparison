@@ -429,8 +429,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         dict_result[string_one_model].append(
             dict_result[string_reference_model][0] +
             dict_result[string_one_model][0] -
-            dict_result[string_one_model][2]
-        )
+            dict_result[string_one_model][2])
 
         # Calculate scaled mutual information according to the paper
         # SMI(X,Y) = I(X,Y) * ((H(X,Y) / (H(X)*H(Y)))) (equation 15)
@@ -467,11 +466,22 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         dict_result[string_one_model].append(float_root_entropy)
         ######################################################################
 
+        # Calculate the variation of information (VI) using the equation 11
+        # from the paper: VI(X,Y) = H(X) + H(Y) - 2I(X;Y)
+        dict_result[string_one_model].append(
+            dict_result[string_reference_model][0] +
+            dict_result[string_one_model][0] -
+            2 * dict_result[string_one_model][2])
+
+        # Calculate the root variation of information (RVI)
+        dict_result[string_one_model].append(
+            math.sqrt(dict_result[string_one_model][-1]))
+
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
         columns=['Entropy', 'Mutual Information', 'Fixed_MI', 'Scaled_entropy',
                  'Normalized MI', 'Angle_NMI', 'Joint_entropies', 'Scaled MI',
-                 'Angle_SMI', 'Root Entropy'])
+                 'Angle_SMI', 'Root Entropy', 'VI', 'RVI'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
