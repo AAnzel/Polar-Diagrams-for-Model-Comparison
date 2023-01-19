@@ -474,8 +474,11 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             2 * dict_result[string_one_model][2])
 
         # Calculate the root variation of information (RVI)
-        dict_result[string_one_model].append(
-            math.sqrt(dict_result[string_one_model][-1]))
+        if dict_result[string_one_model][-1] < 0:
+            dict_result[string_one_model].append(-1)
+        else:
+            dict_result[string_one_model].append(
+                math.sqrt(dict_result[string_one_model][-1]))
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
@@ -713,6 +716,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
         string_angular_column_label = 'Correlation'
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
+        string_tooltip_label_3 = 'RMS'
         bool_only_half = True if (
             list_df_input[0][string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
@@ -730,6 +734,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
             string_angular_column_label = 'Scaled Mutual Information'
             string_tooltip_label_1 = string_radial_column
             string_tooltip_label_2 = 'Scaled MI'
+            string_tooltip_label_3 = 'VI'
             bool_only_half = False
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
@@ -741,6 +746,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
             string_angular_column_label = 'Normalized Mutual Information'
             string_tooltip_label_1 = string_radial_column
             string_tooltip_label_2 = 'Normalized MI'
+            string_tooltip_label_3 = 'RVI'
             bool_only_half = True
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
@@ -838,23 +844,19 @@ def chart_create_diagram(list_df_input, string_reference_model,
         int_dataset_option = 2
 
     for int_i, df_input in enumerate(list_df_input):
+        list_tooltip_columns = [
+            string_tooltip_label_0, string_tooltip_label_1,
+            string_tooltip_label_2, string_tooltip_label_3]
+
         if int_dataset_option == 0:
-            list_tooltip_columns = [
-                string_tooltip_label_0, string_tooltip_label_1,
-                string_tooltip_label_2]
             string_tooltip_suffix = '<br>'
         elif int_dataset_option == 1:
             df_input = list_df_input[0].merge(
                 list_df_input[1], on=string_tooltip_label_0, how='inner')
-            list_tooltip_columns = [
-                string_tooltip_label_0, string_tooltip_label_1,
-                string_tooltip_label_2, string_scalar_column]
+            list_tooltip_columns.append(string_scalar_column)
             string_tooltip_suffix = '<br>' + string_scalar_column +\
-                ': %{customdata[3]:.3f}<br>'
+                ': %{customdata[4]:.3f}<br>'
         else:
-            list_tooltip_columns = [
-                string_tooltip_label_0, string_tooltip_label_1,
-                string_tooltip_label_2]
             string_tooltip_suffix = ' - <b>Version ' + str(int_i) +\
                 '</b><br>'
 
@@ -866,7 +868,8 @@ def chart_create_diagram(list_df_input, string_reference_model,
             string_tooltip_suffix +
             string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
             string_tooltip_label_2 + ': %{customdata[2]:.3f}<br>' +
-            '<extra></extra>')
+            'Reference distance (' + string_tooltip_label_3 +
+            '): %{customdata[3]:.3f}<br>' + '<extra></extra>')
 
         for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
                 df_input[string_radial_column],
