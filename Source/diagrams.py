@@ -692,6 +692,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
     """
 
     # TODO: Implement 'normalized' parameter for both diagrams
+    # TODO: Test the library using a python script and not a notebook
 
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
