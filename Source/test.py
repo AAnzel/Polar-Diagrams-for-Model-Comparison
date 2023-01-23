@@ -4,7 +4,7 @@ import pandas as pd
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
 
-import diagrams as diag
+import polar_diagrams as diag
 
 __author__ = 'Aleksandar Anžel'
 __copyright__ = ''
