@@ -81,6 +81,13 @@ def main():
     if not os.path.exists(path_root_data_results):
         os.mkdir(path_root_data_results)
 
+    dict_mi_parameters_features_continous_target_continous = dict(
+        string_entropy_method='auto',
+        int_mi_n_neighbors=3,
+        bool_discrete_reference_model=False,
+        discrete_models=False,
+        int_random_state=INT_RANDOM_SEED)
+
     # The original dataset comes from the following paper
     # F. J. Anscombe (1973) Graphs in Statistical Analysis,
     # The American Statistician, 27:1, 17-21,
@@ -96,8 +103,21 @@ def main():
         ['x1', 'x2', 'x3', 'x4'], axis=1)
 
     chart_taylor_res = diag.chart_create_taylor_diagram(
-        df_anscombes_quartet_modified, string_reference_model='y4')
+        df_anscombes_quartet_modified, string_reference_model='y4',
+        bool_normalized_measures=True)
     chart_taylor_res.show()
+
+    chart_mid_res = diag.chart_create_mi_diagram(
+        df_anscombes_quartet_modified, string_reference_model='y4',
+        bool_normalized_measures=True,
+        dict_mi_parameters=dict_mi_parameters_features_continous_target_continous) # noqa
+    chart_mid_res.show()
+
+    chart_both_res = diag.chart_create_all_diagrams(
+        df_anscombes_quartet_modified, string_reference_model='y4',
+        bool_normalized_measures=True,
+        dict_mi_parameters=dict_mi_parameters_features_continous_target_continous) # noqa
+    chart_both_res.show()
 
     return None
 

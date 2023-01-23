@@ -119,7 +119,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
         columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
-                 'Normalized_RMS', 'Normalized_STD'])
+                 'Normalized RMS', 'Normalized Standard Deviation'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -374,7 +374,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             (dict_result[string_reference_model][0] /
              dict_result[string_reference_model][1]))
 
-        # Calculate scaled entropies
+        # Calculate normalized (centered) entropies
         # 3 in the list
         dict_result[string_one_model].append(
             dict_result[string_one_model][0] /
@@ -410,13 +410,22 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model].append(
                 math.degrees(math.acos(float_divide)))
 
+        # Calculate root entropy
+        # 6 in the list
+        if dict_result[string_one_model][0] >= 0:
+            float_root_entropy = math.sqrt(dict_result[string_one_model][0])
+        else:
+            float_root_entropy = -1
+
+        dict_result[string_one_model].append(float_root_entropy)
+
     for string_one_model in list_all_features:
         ######################################################################
         # This part is for the chart that spans two quadrants
 
         # First calculate joint entropies by using equation 10 from the paper
         # I(X,Y) = H(X) + H(Y) - H(X,Y) => H(X,Y) = H(X) + H(Y) - I(X,Y)
-        # 6 in the list
+        # 7 in the list
         dict_result[string_one_model].append(
             dict_result[string_reference_model][0] +
             dict_result[string_one_model][0] -
@@ -424,9 +433,9 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
         # Calculate scaled mutual information according to the paper
         # SMI(X,Y) = I(X,Y) * ((H(X,Y) / (H(X)*H(Y)))) (equation 15)
-        # 7 in the list
+        # 8 in the list
         smi_x_y = dict_result[string_one_model][2] * (
-            dict_result[string_one_model][6] /
+            dict_result[string_one_model][-1] /
             (dict_result[string_reference_model][0]
              * dict_result[string_one_model][0]))
 
@@ -434,7 +443,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
         # Calculate arccos of biased scaled mutual information according to the
         # paper arccos(c(X,Y)) where c(X,Y) = 2*SMI(X,Y) - 1
-        # 8 in the list
+        # 9 in the list
         float_c_x_y = 2*smi_x_y - 1
 
         if float_c_x_y > 1:
@@ -447,24 +456,24 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model].append(
                 math.degrees(math.acos(float_c_x_y)))
 
-        # Calculate root entropy
-        # 9 in the list
-        if dict_result[string_one_model][0] >= 0:
-            float_root_entropy = math.sqrt(dict_result[string_one_model][0])
-        else:
-            float_root_entropy = -1
+        # Calculate normalized root entropy
+        # 10 in the list
+        dict_result[string_one_model].append(
+            dict_result[string_one_model][6] /
+            dict_result[string_reference_model][6])
 
-        dict_result[string_one_model].append(float_root_entropy)
         ######################################################################
 
         # Calculate the variation of information (VI) using the equation 11
         # from the paper: VI(X,Y) = H(X) + H(Y) - 2I(X;Y)
+        # 11 in the list
         dict_result[string_one_model].append(
             dict_result[string_reference_model][0] +
             dict_result[string_one_model][0] -
             2 * dict_result[string_one_model][2])
 
         # Calculate the root variation of information (RVI)
+        # 12 in the list
         if dict_result[string_one_model][-1] < 0:
             dict_result[string_one_model].append(-1)
         else:
@@ -473,9 +482,10 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        columns=['Entropy', 'Mutual Information', 'Fixed_MI', 'Scaled_entropy',
-                 'Normalized MI', 'Angle_NMI', 'Joint_entropies', 'Scaled MI',
-                 'Angle_SMI', 'Root Entropy', 'VI', 'RVI'])
+        columns=['Entropy', 'Mutual Information', 'Fixed_MI',
+                 'Normalized Entropy', 'Normalized MI', 'Angle_NMI',
+                 'Root Entropy', 'Joint_entropies', 'Scaled MI',
+                 'Angle_SMI', 'Normalized Root Entropy', 'VI', 'RVI'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -639,7 +649,8 @@ def _warning_check_identical_model_values(df_input):
 
 def _chart_create_diagram(list_df_input, string_reference_model,
                           string_mid_type, string_diagram_type,
-                          bool_flag_as_subplot=False, chart_result_upper=None):
+                          bool_normalized_measures, bool_flag_as_subplot=False,
+                          chart_result_upper=None):
     """
     _chart_create_diagram is a general function that creates both the Taylor
     and the Mutual Information diagrams according to the passed argument.
@@ -667,6 +678,11 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         quadrant of the circle.
         string_diagram_type (str): This string contains the type of the diagram
         that has to be created.
+        bool_normalized_measures (bool, optional): This boolean parameter is
+        used to determine if the passed chart should have normalized entropy
+        and STD values or not. If it is False, then real entropy and STD values
+        are used for the radial axis. If it is True, normalized values are
+        used. Defaults to False.
         bool_flag_as_subplot (bool, optional): This boolean parameter is used
         to determine if the passed chart is a subplot or not. If it is False,
         then only one diagram is created. If it is True, both Taylor and Mutual
@@ -687,10 +703,11 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         or Mutual Information diagram.
     """
 
-    # TODO: Implement 'bool_scaled_measures' parameter for both diagrams
-
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized', None]
+
+    if not isinstance(bool_normalized_measures, bool):
+        raise ValueError('bool_normalized_measures must be of bool type')
 
     if string_diagram_type not in list_valid_diagram_types:
         raise ValueError('string_diagram_type not in ' +
@@ -709,7 +726,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
     if string_diagram_type == 'taylor':
         bool_show_legend = True
-        string_radial_column = 'Standard Deviation'
+        if bool_normalized_measures:
+            string_radial_column = 'Normalized Standard Deviation'
+        else:
+            string_radial_column = 'Standard Deviation'
         string_angular_column = 'Angle'
         string_angular_column_label = 'Correlation'
         string_tooltip_label_1 = string_radial_column
@@ -728,7 +748,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
         if string_mid_type == 'scaled':
             string_angular_column = 'Angle_SMI'
-            string_radial_column = 'Entropy'
+            if bool_normalized_measures:
+                string_radial_column = 'Normalized Entropy'
+            else:
+                string_radial_column = 'Entropy'
             string_angular_column_label = 'Scaled Mutual Information'
             string_tooltip_label_1 = string_radial_column
             string_tooltip_label_2 = 'Scaled MI'
@@ -740,7 +763,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
         else:
             string_angular_column = 'Angle_NMI'
-            string_radial_column = 'Root Entropy'
+            if bool_normalized_measures:
+                string_radial_column = 'Normalized Root Entropy'
+            else:
+                string_radial_column = 'Root Entropy'
             string_angular_column_label = 'Normalized Mutual Information'
             string_tooltip_label_1 = string_radial_column
             string_tooltip_label_2 = 'Normalized MI'
@@ -984,7 +1010,8 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
 
 def chart_create_taylor_diagram(list_df_input, string_reference_model,
-                                string_corr_method='pearson'):
+                                string_corr_method='pearson',
+                                bool_normalized_measures=False):
     """
     chart_create_taylor_diagram creates the Taylor diagram according to the
     list_df_input argument where models are placed in columns and rows contain
@@ -1010,6 +1037,11 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
+        bool_normalized_measures (bool, optional): This boolean parameter is
+        used to determine if the passed chart should have normalized entropy
+        and STD values or not. If it is False, then real entropy and STD values
+        are used for the radial axis. If it is True, normalized values are
+        used. Defaults to False.
 
     Returns:
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
@@ -1017,6 +1049,14 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
     """
     list_df_input = _list_check_list_df_input(list_df_input)
     list_df_td = []
+    list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
+
+    if string_corr_method not in list_valid_corr_methods:
+        raise ValueError('string_corr_method is not one of the following:' +
+                         str(list_valid_corr_methods))
+
+    if not isinstance(bool_normalized_measures, bool):
+        raise ValueError('bool_normalized_measures must be of bool type')
 
     for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
@@ -1039,7 +1079,8 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
     chart_result = _chart_create_diagram(
         list_df_td, string_reference_model=string_reference_model,
         string_mid_type=None, bool_flag_as_subplot=False,
-        string_diagram_type='taylor')
+        string_diagram_type='taylor',
+        bool_normalized_measures=bool_normalized_measures)
 
     return chart_result
 
@@ -1051,7 +1092,8 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
                                 int_mi_n_neighbors=3,
                                 discrete_models='auto',
                                 bool_discrete_reference_model=False,
-                                int_random_state=_INT_RANDOM_SEED)):
+                                int_random_state=_INT_RANDOM_SEED),
+                            bool_normalized_measures=False):
     """
     chart_create_mi_diagram creates the Mutual Information diagram according
     to the list_df_input argument where models are placed in columns and rows
@@ -1084,6 +1126,11 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_fetures='auto',
              int_random_state=_INT_RANDOM_SEED).
+        bool_normalized_measures (bool, optional): This boolean parameter is
+        used to determine if the passed chart should have normalized entropy
+        and STD values or not. If it is False, then real entropy and STD values
+        are used for the radial axis. If it is True, normalized values are
+        used. Defaults to False.
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -1095,6 +1142,9 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
+
+    if not isinstance(bool_normalized_measures, bool):
+        raise ValueError('bool_normalized_measures must be of bool type')
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
@@ -1123,7 +1173,8 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     chart_result = _chart_create_diagram(
         list_df_mid, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=False,
-        string_diagram_type='mid')
+        string_diagram_type='mid',
+        bool_normalized_measures=bool_normalized_measures)
 
     return chart_result
 
@@ -1197,7 +1248,8 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
                                   int_mi_n_neighbors=3,
                                   discrete_models='auto',
                                   bool_discrete_reference_model=False,
-                                  int_random_state=_INT_RANDOM_SEED)):
+                                  int_random_state=_INT_RANDOM_SEED),
+                              bool_normalized_measures=False):
     """
     chart_create_all_diagrams creates both the Taylor and the Mutual
     Information diagrams (side-by-side) according to the list_df_input argument
@@ -1233,6 +1285,11 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_fetures='auto',
              int_random_state=_INT_RANDOM_SEED).
+        bool_normalized_measures (bool, optional): This boolean parameter is
+        used to determine if the passed chart should have normalized entropy
+        and STD values or not. If it is False, then real entropy and STD values
+        are used for the radial axis. If it is True, normalized values are
+        used. Defaults to False.
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -1244,6 +1301,9 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
+
+    if not isinstance(bool_normalized_measures, bool):
+        raise ValueError('bool_normalized_measures must be of bool type')
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
@@ -1286,12 +1346,14 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
     chart_result = _chart_create_diagram(
         list_df_all, string_reference_model=string_reference_model,
         bool_flag_as_subplot=True, chart_result_upper=chart_result,
-        string_diagram_type='taylor', string_mid_type=None)
+        string_diagram_type='taylor', string_mid_type=None,
+        bool_normalized_measures=bool_normalized_measures)
 
     chart_result = _chart_create_diagram(
         list_df_all, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=True,
-        chart_result_upper=chart_result, string_diagram_type='mid')
+        chart_result_upper=chart_result, string_diagram_type='mid',
+        bool_normalized_measures=bool_normalized_measures)
 
     chart_result.update_annotations(
         yshift=25, font_color=_STRING_LABEL_TITLE_COLOR)
