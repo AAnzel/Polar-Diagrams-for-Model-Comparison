@@ -24,26 +24,26 @@ __email__ = 'aleksandar.anzel@uni-marburg.de'
 __status__ = 'Dev'
 
 
-STRING_BACKGROUND_COLOR = '#FFFFFF'
-STRING_GRID_COLOR = '#C0C0C0'
-STRING_LABEL_TITLE_COLOR = '#404040'
-STRING_TICK_COLOR = '#000000'
-STRING_GRID_STYLE = 'solid'
-INT_TICK_WIDTH = 2
-INT_RANDOM_SEED = None
-INT_MARKER_SIZE = 10
-INT_MARKER_LINE_WIDTH = 2
-FLOAT_MARKER_OPACITY = 0.60
-STRING_SECOND_SYMBOL = "diamond"
-FLOAT_LEGEND_BORDER_WIDTH = 0.2
+_STRING_BACKGROUND_COLOR = '#FFFFFF'
+_STRING_GRID_COLOR = '#C0C0C0'
+_STRING_LABEL_TITLE_COLOR = '#404040'
+_STRING_TICK_COLOR = '#000000'
+_STRING_GRID_STYLE = 'solid'
+_INT_TICK_WIDTH = 2
+_INT_RANDOM_SEED = None
+_INT_MARKER_SIZE = 10
+_INT_MARKER_LINE_WIDTH = 2
+_FLOAT_MARKER_OPACITY = 0.60
+_STRING_SECOND_SYMBOL = "diamond"
+_FLOAT_LEGEND_BORDER_WIDTH = 0.2
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
-LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
-                   '#9467bd', '#bcbd22', '#d62728', '#e377c2', '#ff7f0e']
-LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
-                   '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
-                   '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
-                   '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+_LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
+                    '#9467bd', '#bcbd22', '#d62728', '#e377c2', '#ff7f0e']
+_LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
+                    '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
+                    '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
+                    '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
 
 
 def df_calculate_td_properties(df_input, string_reference_model,
@@ -126,9 +126,9 @@ def df_calculate_td_properties(df_input, string_reference_model,
     return df_result
 
 
-def float_calculate_discrete_entropy(list_labels, int_base=2):
+def _float_calculate_discrete_entropy(list_labels, int_base=2):
     """
-    float_calculate_discrete_entropy calculates Shannon (discrete) entropy of
+    _float_calculate_discrete_entropy calculates Shannon (discrete) entropy of
     the passed list of labels.
 
     Args:
@@ -163,15 +163,15 @@ def float_calculate_discrete_entropy(list_labels, int_base=2):
     return float_entropy
 
 
-def dict_check_discrete_models(df_input, string_reference_model,
-                               dict_mi_parameters=dict(
-                                   string_entropy_method='auto',
-                                   int_mi_n_neighbors=3,
-                                   discrete_models='auto',
-                                   bool_discrete_reference_model=False,
-                                   int_random_state=INT_RANDOM_SEED)):
+def _dict_check_discrete_models(df_input, string_reference_model,
+                                dict_mi_parameters=dict(
+                                    string_entropy_method='auto',
+                                    int_mi_n_neighbors=3,
+                                    discrete_models='auto',
+                                    bool_discrete_reference_model=False,
+                                    int_random_state=_INT_RANDOM_SEED)):
     """
-    dict_check_discrete_models checks if
+    _dict_check_discrete_models checks if
     dict_mi_parameters['discrete_models'] is valid argument as defined in
     scikit-learn library.
 
@@ -188,7 +188,7 @@ def dict_check_discrete_models(df_input, string_reference_model,
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_models='auto',
-             int_random_state=INT_RANDOM_SEED).
+             int_random_state=_INT_RANDOM_SEED).
 
     Raises:
         ValueError: Raises error if dict_mi_parameters['discrete_models']
@@ -245,7 +245,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                                     int_mi_n_neighbors=3,
                                     discrete_models='auto',
                                     bool_discrete_reference_model=False,
-                                    int_random_state=INT_RANDOM_SEED)):
+                                    int_random_state=_INT_RANDOM_SEED)):
     """
     df_calculate_mid_properties caclulates all necessary information theory
     properties for the Mutual Information diagram from the input data set.
@@ -263,7 +263,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_models='auto',
-             int_random_state=INT_RANDOM_SEED).
+             int_random_state=_INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if int_mi_n_neighbors is less or equal
@@ -276,7 +276,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         information theory properties as columns.
     """
 
-    dict_feature_discrete_mask = dict_check_discrete_models(
+    dict_feature_discrete_mask = _dict_check_discrete_models(
         df_input, string_reference_model, dict_mi_parameters)
 
     list_valid_parameters = ['int_mi_n_neighbors', 'string_entropy_method',
@@ -320,7 +320,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         if string_one_model == string_reference_model:
             if dict_mi_parameters['bool_discrete_reference_model']:
                 dict_result[string_one_model].append(
-                    float_calculate_discrete_entropy(
+                    _float_calculate_discrete_entropy(
                         df_input[string_one_model], int_base=2))
             else:
                 if df_input[string_one_model].dtype in list_valid_float_types:
@@ -336,7 +336,7 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         else:
             if dict_feature_discrete_mask[string_one_model]:
                 dict_result[string_one_model].append(
-                    float_calculate_discrete_entropy(
+                    _float_calculate_discrete_entropy(
                         df_input[string_one_model], int_base=2))
             else:
                 if df_input[string_one_model].dtype in list_valid_float_types:
@@ -511,7 +511,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=INT_RANDOM_SEED).
+             int_random_state=_INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
         the method to be used when calculating the correlation. Defaults to
         'pearson'.
@@ -528,14 +528,14 @@ def df_calculate_all_properties(df_input, string_reference_model,
 
     df_result = df_td.merge(df_mid, on='Model', how='inner')
 
-    warning_check_identical_model_values(df_result)
+    _warning_check_identical_model_values(df_result)
 
     return df_result
 
 
-def tuple_hex_to_rgb(string_hex_color):
+def _tuple_hex_to_rgb(string_hex_color):
     """
-    tuple_hex_to_rgba converts color value given in hex format to rgba format
+    _tuple_hex_to_rgb converts color value given in hex format to rgba format
     with float_alpha_opacity opacity (transperancy) value
 
     Args:
@@ -551,10 +551,10 @@ def tuple_hex_to_rgb(string_hex_color):
          for int_i in (0, 2, 4)])
 
 
-def dict_calculate_model_colors(list_model_names, string_reference_model,
-                                int_number_of_datasets):
+def _dict_calculate_model_colors(list_model_names, string_reference_model,
+                                 int_number_of_datasets):
     """
-    dict_calculate_model_colors defines an RGBA color for each model parsed in
+    _dict_calculate_model_colors defines an RGBA color for each model parsed in
     the list_model_names. The reference model is always black.
 
     Args:
@@ -574,9 +574,9 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
     int_number_of_models = len(list_model_names)
 
     if int_number_of_models <= 9:
-        list_color_scheme = LIST_TABLEAU_10
+        list_color_scheme = _LIST_TABLEAU_10
     else:
-        list_color_scheme = LIST_TABLEAU_20
+        list_color_scheme = _LIST_TABLEAU_20
     int_num_discrete_colors = len(list_color_scheme)
 
     dict_result = dict()
@@ -592,7 +592,7 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
             if string_model_name not in dict_result:
                 dict_result[string_model_name] = dict()
 
-            tuple_rgb_color = tuple_hex_to_rgb(string_hex_color)
+            tuple_rgb_color = _tuple_hex_to_rgb(string_hex_color)
             dict_result[string_model_name][int_i] = (
                 int(tuple_rgb_color[0]), int(tuple_rgb_color[1]),
                 int(tuple_rgb_color[2]))
@@ -600,9 +600,9 @@ def dict_calculate_model_colors(list_model_names, string_reference_model,
     return dict_result
 
 
-def warning_check_identical_model_values(df_input):
+def _warning_check_identical_model_values(df_input):
     """
-    warning_check_identical_model_values checks if there are models that have
+    _warning_check_identical_model_values checks if there are models that have
     identical statistical or information theory properties. This check is
     performed so that the user is warned if the diagrams contain circles that
     fully overlap.
@@ -640,13 +640,13 @@ def warning_check_identical_model_values(df_input):
     return None
 
 
-def chart_create_diagram(list_df_input, string_reference_model,
-                         string_mid_type='scaled', bool_flag_as_subplot=False,
-                         chart_result_upper=None,
-                         string_diagram_type='taylor'):
+def _chart_create_diagram(list_df_input, string_reference_model,
+                          string_mid_type='scaled', bool_flag_as_subplot=False,
+                          chart_result_upper=None,
+                          string_diagram_type='taylor'):
     """
-    chart_create_diagram is a general function that creates both the Taylor and
-    the Mutual Information diagrams according to the passed argument.
+    _chart_create_diagram is a general function that creates both the Taylor
+    and the Mutual Information diagrams according to the passed argument.
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
@@ -693,7 +693,6 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
     # TODO: Implement 'normalized' parameter for both diagrams
     # TODO: Test the library using a python script and not a notebook
-    # TODO: Make some functions private and leave some available to users
 
     list_valid_diagram_types = ['taylor', 'mid']
     list_valid_mid_types = ['scaled', 'normalized']
@@ -781,45 +780,45 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
-        bgcolor=STRING_BACKGROUND_COLOR,
+        bgcolor=_STRING_BACKGROUND_COLOR,
         radialaxis=dict(
             range=[0, float_max_r],
-            griddash=STRING_GRID_STYLE,
-            gridcolor=STRING_GRID_COLOR,
+            griddash=_STRING_GRID_STYLE,
+            gridcolor=_STRING_GRID_COLOR,
             ticks='outside',
-            tickwidth=INT_TICK_WIDTH,
-            tickcolor=STRING_TICK_COLOR,
-            tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
+            tickwidth=_INT_TICK_WIDTH,
+            tickcolor=_STRING_TICK_COLOR,
+            tickfont=dict(color=_STRING_LABEL_TITLE_COLOR),
             showline=True,
-            linecolor=STRING_TICK_COLOR,
+            linecolor=_STRING_TICK_COLOR,
             layer='below traces',
             title=dict(
                 text='<br>' + string_radial_column,
                 font=dict(
-                    color=STRING_LABEL_TITLE_COLOR,
+                    color=_STRING_LABEL_TITLE_COLOR,
                     size=16))),
         angularaxis=dict(
             direction="counterclockwise",
             ticks='outside',
-            tickwidth=INT_TICK_WIDTH,
+            tickwidth=_INT_TICK_WIDTH,
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
-            tickcolor=STRING_TICK_COLOR,
-            tickfont=dict(color=STRING_LABEL_TITLE_COLOR),
-            griddash=STRING_GRID_STYLE,
-            gridcolor=STRING_GRID_COLOR,
+            tickcolor=_STRING_TICK_COLOR,
+            tickfont=dict(color=_STRING_LABEL_TITLE_COLOR),
+            griddash=_STRING_GRID_STYLE,
+            gridcolor=_STRING_GRID_COLOR,
             showline=True,
-            linecolor=STRING_TICK_COLOR,
+            linecolor=_STRING_TICK_COLOR,
             layer='below traces'))
     dict_legend = dict(
         title=dict(text=string_tooltip_label_0),
         font=dict(
-            color=STRING_LABEL_TITLE_COLOR),
-        bgcolor=STRING_BACKGROUND_COLOR,
-        bordercolor=STRING_GRID_COLOR,
-        borderwidth=FLOAT_LEGEND_BORDER_WIDTH)
+            color=_STRING_LABEL_TITLE_COLOR),
+        bgcolor=_STRING_BACKGROUND_COLOR,
+        bordercolor=_STRING_GRID_COLOR,
+        borderwidth=_FLOAT_LEGEND_BORDER_WIDTH)
 
-    dict_model_colors = dict_calculate_model_colors(
+    dict_model_colors = _dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
         string_reference_model,
         int_number_of_datasets)
@@ -892,22 +891,22 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 dict_marker = dict(
                     line=dict(
                         color='rgba' + str(string_marker_color + (1,)),
-                        width=INT_MARKER_LINE_WIDTH),
+                        width=_INT_MARKER_LINE_WIDTH),
                     color='rgba' + str(string_marker_color + (0,)),
-                    size=INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
+                    size=_INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
             elif int_i == 0 and int_dataset_option == 2:
                 dict_marker = dict(
                     color='rgba' + str(
-                        string_marker_color + (FLOAT_MARKER_OPACITY,)),
-                    size=INT_MARKER_SIZE + INT_MARKER_LINE_WIDTH)
+                        string_marker_color + (_FLOAT_MARKER_OPACITY,)),
+                    size=_INT_MARKER_SIZE + _INT_MARKER_LINE_WIDTH)
             else:
                 dict_marker = dict(
                     line=dict(
                         color='rgba' + str(string_marker_color + (1,)),
-                        width=INT_MARKER_LINE_WIDTH),
+                        width=_INT_MARKER_LINE_WIDTH),
                     color='rgba' + str(
-                        string_marker_color + (FLOAT_MARKER_OPACITY,)),
-                    size=INT_MARKER_SIZE)
+                        string_marker_color + (_FLOAT_MARKER_OPACITY,)),
+                    size=_INT_MARKER_SIZE)
 
             if bool_flag_as_subplot:
                 chart_result.add_trace(
@@ -925,11 +924,11 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
-                            bgcolor=STRING_BACKGROUND_COLOR,
+                            bgcolor=_STRING_BACKGROUND_COLOR,
                             bordercolor='rgba' + str(
                                 string_marker_color + (1,)),
                             font=dict(
-                                color=STRING_TICK_COLOR)),
+                                color=_STRING_TICK_COLOR)),
                         marker=dict_marker),
                     row=1,
                     col=int_subplot_column_number)
@@ -948,11 +947,11 @@ def chart_create_diagram(list_df_input, string_reference_model,
 
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
-                            bgcolor=STRING_BACKGROUND_COLOR,
+                            bgcolor=_STRING_BACKGROUND_COLOR,
                             bordercolor='rgba' + str(
                                 string_marker_color + (1,)),
                             font=dict(
-                                color=STRING_TICK_COLOR)),
+                                color=_STRING_TICK_COLOR)),
                         marker=dict_marker))
 
     if bool_flag_as_subplot:
@@ -984,7 +983,7 @@ def chart_create_diagram(list_df_input, string_reference_model,
                 yanchor='auto',
                 font=dict(
                     size=16,
-                    color=STRING_LABEL_TITLE_COLOR)))
+                    color=_STRING_LABEL_TITLE_COLOR)))
 
     return chart_result
 
@@ -1021,7 +1020,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
        diagram.
     """
-    list_df_input = list_check_list_df_input(list_df_input)
+    list_df_input = _list_check_list_df_input(list_df_input)
     list_df_td = []
 
     for int_i, df_input in enumerate(list_df_input):
@@ -1042,7 +1041,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
             df_input, string_reference_model, string_corr_method)
         list_df_td.append(df_td)
 
-    chart_result = chart_create_diagram(
+    chart_result = _chart_create_diagram(
         list_df_td, string_reference_model=string_reference_model,
         bool_flag_as_subplot=False, string_diagram_type='taylor')
 
@@ -1082,7 +1081,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=INT_RANDOM_SEED).
+             int_random_state=_INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -1098,7 +1097,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
-    list_df_input = list_check_list_df_input(list_df_input)
+    list_df_input = _list_check_list_df_input(list_df_input)
     list_df_mid = []
 
     for int_i, df_input in enumerate(list_df_input):
@@ -1119,7 +1118,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
             df_input, string_reference_model, dict_mi_parameters)
         list_df_mid.append(df_mid)
 
-    chart_result = chart_create_diagram(
+    chart_result = _chart_create_diagram(
         list_df_mid, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=False,
         string_diagram_type='mid')
@@ -1127,9 +1126,9 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     return chart_result
 
 
-def list_check_list_df_input(list_df_input):
+def _list_check_list_df_input(list_df_input):
     """
-    list_check_list_df_input performs a sanity checks on the list_df_input
+    _list_check_list_df_input performs a sanity checks on the list_df_input
     argument.
 
     Args:
@@ -1225,7 +1224,7 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         information. Defaults to
         dict(int_mi_n_neighbors=3, string_entropy_method='auto',
              bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=INT_RANDOM_SEED).
+             int_random_state=_INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if string_mid_type is not one of
@@ -1241,7 +1240,7 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
 
-    list_df_input = list_check_list_df_input(list_df_input)
+    list_df_input = _list_check_list_df_input(list_df_input)
 
     string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
     string_angular_title_td = 'Correlation'
@@ -1276,18 +1275,18 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
         subplot_titles=(string_angular_title_td,  string_angular_title_mid))
 
-    chart_result = chart_create_diagram(
+    chart_result = _chart_create_diagram(
         list_df_all, string_reference_model=string_reference_model,
         bool_flag_as_subplot=True, chart_result_upper=chart_result,
         string_diagram_type='taylor')
 
-    chart_result = chart_create_diagram(
+    chart_result = _chart_create_diagram(
         list_df_all, string_reference_model=string_reference_model,
         string_mid_type=string_mid_type, bool_flag_as_subplot=True,
         chart_result_upper=chart_result, string_diagram_type='mid')
 
     chart_result.update_annotations(
-        yshift=25, font_color=STRING_LABEL_TITLE_COLOR)
+        yshift=25, font_color=_STRING_LABEL_TITLE_COLOR)
     chart_result.update_layout(
         title=dict(
             text=string_combined_chart_title,
@@ -1297,6 +1296,6 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
             yanchor='top',
             font=dict(
                 size=20,
-                color=STRING_LABEL_TITLE_COLOR)))
+                color=_STRING_LABEL_TITLE_COLOR)))
 
     return chart_result
