@@ -23,6 +23,16 @@ _INT_RANDOM_SEED = 42
 _STRING_REFERENCE_MODEL = 'Model 0'
 _INT_ROWS_FULL_DATA_SET = 100
 _INT_ROWS_SCALAR_DATA_SET = 1
+_LIST_TAYLOR_COLUMNS = [
+    'Model', 'Standard Deviation', 'Correlation', 'Angle', 'RMS',
+    'Normalized RMS', 'Normalized Standard Deviation']
+_LIST_MI_COLUMNS = [
+    'Model', 'Entropy', 'Mutual Information', 'Fixed_MI', 'Normalized Entropy',
+    'Normalized MI', 'Angle_NMI', 'Root Entropy', 'Joint_entropies',
+    'Scaled MI', 'Angle_SMI', 'Normalized Root Entropy', 'VI', 'RVI']
+_LIST_COMBINED_COLUMNS = ['Model'] + _LIST_TAYLOR_COLUMNS[1:] +\
+    _LIST_MI_COLUMNS[1:]
+
 np.random.seed(_INT_RANDOM_SEED)
 
 dict_mi_parameters_features_continous_target_continous = dict(
@@ -33,66 +43,111 @@ dict_mi_parameters_features_continous_target_continous = dict(
     int_random_state=_INT_RANDOM_SEED)
 
 
-def df_generate(int_number_of_rows):
-    """
-    df_generate_new_timepoint creates a new DataFrame for testing purposes.
+class DiagramData:
+    def __init__(self):
+        self.df_input_all_possibilities = None
 
-    Returns:
-        pandas.DataFrame(): An output DataFrame.
-    """
+    def df_generate(self, int_number_of_rows):
+        """
+        df_generate_new_timepoint creates a new DataFrame for testing purposes.
 
-    df_result = pd.DataFrame()
-    int_row_len = int_number_of_rows
-    int_column_len = 10
-    for int_num_model in range(int_column_len):
-        df_result['Model ' + str(int_num_model)] = np.random.normal(
-            0, 1, int_row_len)
+        Args:
+            int_number_of_rows (int): The number of rows in the data set.
+            int_dataset_option (int): Can be one of [0, 1, 2] where:
+            0 = we have one dataset, 1 = two datasets with the second one
+            holding scalar values, 2 = two datasets with the second one being
+            the second version dataset.
 
-    return df_result
+        Returns:
+            pandas.DataFrame() or list: An output DataFrame or a list whose
+            elements are DataFrames.
+        """
+
+        df_result = pd.DataFrame()
+        int_row_len = int_number_of_rows
+        int_column_len = 10
+
+        for int_num_model in range(int_column_len):
+            df_result['Model ' + str(int_num_model)] = np.random.normal(
+                0, 1, int_row_len)
+
+        df_result_second_scalar = pd.DataFrame().from_dict(
+            {'row_1': np.random.random_sample(df_result.shape[1])},
+            orient='index', columns=df_result.columns)
+
+        df_result_second_version = pd.DataFrame()
+        for string_one_column in df_result.columns:
+            df_result_second_version[string_one_column] = df_result[
+                string_one_column].to_numpy() + np.random.normal(
+                    0, 1, int_row_len)
+
+        self.df_input_all_possibilities = [
+            None,
+            df_result.copy(),
+            [df_result.copy(), df_result_second_version.copy()],
+            [df_result.copy(), df_result_second_scalar.copy()]]
 
 
 class TestDiagrams(unittest.TestCase):
+    # TODO: Check if the parsed argument is None, and deal with it
+
+    def setUp(self):
+        self.diagram_data = DiagramData()
+        self.diagram_data.df_generate(_INT_ROWS_FULL_DATA_SET)
+
     def test_df_calculate_td_properties(self):
-        self.assertIsInstance(
-            diag.df_calculate_td_properties(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            pd.DataFrame)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.df_calculate_td_properties(
+                        df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    pd.DataFrame)
 
     def test_df_calculate_mid_properties(self):
-        self.assertIsInstance(
-            diag.df_calculate_mid_properties(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            pd.DataFrame)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.df_calculate_mid_properties(
+                        df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    pd.DataFrame)
 
     def test_df_calculate_all_properties(self):
-        self.assertIsInstance(
-            diag.df_calculate_all_properties(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            pd.DataFrame)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.df_calculate_all_properties(
+                        df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    pd.DataFrame)
 
     def test_chart_create_taylor_diagram(self):
-        self.assertIsInstance(
-            diag.chart_create_taylor_diagram(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            go.Figure)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.chart_create_taylor_diagram(
+                        list_df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    go.Figure)
 
     def test_chart_create_mi_diagram(self):
-        self.assertIsInstance(
-            diag.chart_create_mi_diagram(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            go.Figure)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.chart_create_mi_diagram(
+                        list_df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    go.Figure)
 
     def test_chart_create_all_diagrams(self):
-        self.assertIsInstance(
-            diag.chart_create_all_diagrams(
-                df_generate(_INT_ROWS_FULL_DATA_SET),
-                string_reference_model=_STRING_REFERENCE_MODEL),
-            go.Figure)
+        for one_input in self.diagram_data.df_input_all_possibilities:
+            with self.subTest():
+                self.assertIsInstance(
+                    diag.chart_create_all_diagrams(
+                        list_df_input=one_input,
+                        string_reference_model=_STRING_REFERENCE_MODEL),
+                    go.Figure)
 
 
 if __name__ == '__main__':
