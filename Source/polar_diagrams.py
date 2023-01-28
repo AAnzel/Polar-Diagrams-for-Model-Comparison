@@ -45,6 +45,8 @@ _LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
                     '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
                     '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
 
+# TODO: Change scoring methods for regression data sets in notebook
+
 
 def df_calculate_td_properties(df_input, string_reference_model,
                                string_corr_method='pearson'):
