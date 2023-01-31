@@ -33,7 +33,8 @@ _INT_TICK_WIDTH = 2
 _INT_RANDOM_SEED = None
 _INT_MARKER_SIZE = 10
 _INT_MARKER_LINE_WIDTH = 2
-_INT_CHART_WIDTH = 400
+_INT_CHART_WIDTH = 1400
+_INT_CHART_HEIGHT = 400
 _FLOAT_MARKER_OPACITY = 0.60
 _STRING_SECOND_SYMBOL = "diamond"
 _FLOAT_LEGEND_BORDER_WIDTH = 0.2
@@ -986,6 +987,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 polar=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
+                height=_INT_CHART_HEIGHT,
                 showlegend=True)
 
         else:
@@ -993,12 +995,15 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 polar2=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
+                height=_INT_CHART_HEIGHT,
                 showlegend=True)
 
     else:
         chart_result.update_layout(
             polar=dict_polar_chart,
             legend=dict_legend,
+            width=_INT_CHART_WIDTH/2 + 100,
+            height=_INT_CHART_HEIGHT,
             title=dict(
                 text=string_angular_column_label,
                 x=0.5,
