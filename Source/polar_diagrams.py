@@ -33,6 +33,7 @@ _INT_TICK_WIDTH = 2
 _INT_RANDOM_SEED = None
 _INT_MARKER_SIZE = 10
 _INT_MARKER_LINE_WIDTH = 2
+_INT_CHART_WIDTH = 400
 _FLOAT_MARKER_OPACITY = 0.60
 _STRING_SECOND_SYMBOL = "diamond"
 _FLOAT_LEGEND_BORDER_WIDTH = 0.2
@@ -44,8 +45,6 @@ _LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
                     '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
                     '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
                     '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
-
-# TODO: Change scoring methods for regression data sets in notebook
 
 
 def df_calculate_td_properties(df_input, string_reference_model,
@@ -758,7 +757,11 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             string_tooltip_label_1 = string_radial_column
             string_tooltip_label_2 = 'Scaled MI'
             string_tooltip_label_3 = 'VI'
-            bool_only_half = False
+            # TODO: Improve this below. We might have to check the second
+            # TODO: version data set as well, since those models might go
+            # TODO: on the other quarter of the circle
+            bool_only_half = bool_only_half = True if (
+                list_df_input[0][string_angular_column] <= 90).all() else False
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
             np_angular_labels = np.round((np_angular_labels + 1) / 2, 3)
@@ -982,20 +985,19 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             chart_result.update_layout(
                 polar=dict_polar_chart,
                 legend=dict_legend,
-                height=600,
+                width=_INT_CHART_WIDTH,
                 showlegend=True)
 
         else:
             chart_result.update_layout(
                 polar2=dict_polar_chart,
                 legend=dict_legend,
-                height=600,
+                width=_INT_CHART_WIDTH,
                 showlegend=True)
 
     else:
         chart_result.update_layout(
             polar=dict_polar_chart,
-            height=600,
             legend=dict_legend,
             title=dict(
                 text=string_angular_column_label,
