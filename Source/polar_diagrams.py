@@ -34,9 +34,10 @@ _INT_RANDOM_SEED = None
 _INT_MARKER_SIZE = 10
 _INT_MARKER_LINE_WIDTH = 2
 _INT_CHART_WIDTH = 1400
-_INT_CHART_HEIGHT = 400
+_INT_CHART_HEIGHT = 500
+_INT_LEGEND_X = 0
+_INT_LEGEND_Y = -0.2
 _FLOAT_MARKER_OPACITY = 0.60
-_STRING_SECOND_SYMBOL = "diamond"
 _FLOAT_LEGEND_BORDER_WIDTH = 0.2
 
 # Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
@@ -843,7 +844,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             color=_STRING_LABEL_TITLE_COLOR),
         bgcolor=_STRING_BACKGROUND_COLOR,
         bordercolor=_STRING_GRID_COLOR,
-        borderwidth=_FLOAT_LEGEND_BORDER_WIDTH)
+        borderwidth=_FLOAT_LEGEND_BORDER_WIDTH,
+        orientation='h',
+        x=_INT_LEGEND_X,
+        y=_INT_LEGEND_Y)
 
     dict_model_colors = _dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
@@ -987,7 +991,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 polar=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
-                height=_INT_CHART_HEIGHT,
+                height=_INT_CHART_HEIGHT + 120*round(int_number_of_models/10),
                 showlegend=True)
 
         else:
@@ -995,7 +999,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 polar2=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
-                height=_INT_CHART_HEIGHT,
+                height=_INT_CHART_HEIGHT + 120*round(int_number_of_models/10),
                 showlegend=True)
 
     else:
@@ -1003,7 +1007,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             polar=dict_polar_chart,
             legend=dict_legend,
             width=_INT_CHART_WIDTH/2 + 100,
-            height=_INT_CHART_HEIGHT,
+            height=_INT_CHART_HEIGHT + 80*round(int_number_of_models/4),
             title=dict(
                 text=string_angular_column_label,
                 x=0.5,
