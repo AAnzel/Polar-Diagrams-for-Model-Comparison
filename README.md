@@ -53,7 +53,7 @@ Script can be automatically generated and downloaded again from here [https://es
 
 ## Getting started
 
-### The scalar Feature
+### The Scalar Feature
 ![Scalar feature](./Data/README_Images/3-2-ml-ecoli-both-with-scalar.png)
 
 ### Interactive aspects
