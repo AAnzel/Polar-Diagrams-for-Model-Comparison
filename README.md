@@ -35,9 +35,9 @@ The dependencies can also be found in [requirements.txt](requirements.txt).
 |Location|Description|
 |---|---|
 |[Data/](./Data/)|contains all datasets used in [Source/main.ipynb](./Source/main.ipynb).
-|[Data/Dataset_0/](./Data/Dataset_0/)|contains the Anscombe's quartet dataset.
-|[Data/Dataset_1/](./Data/Dataset_1/)|contains the official, automatically generated script for downloading the CMIP3 data from the [https://esgf-node.llnl.gov/projects/cmip3/](https://esgf-node.llnl.gov/projects/cmip3/). To generate the whole dataset, the user should first place itself into this directory and then run the following command from the terminal `sh generate_dataset_1.sh`. [1]
-|[Data/Dataset_2/](./Data/Dataset_2/)|contains the dataset from the following paper [Filippone, Maurizio & Masulli, Francesco & Rovetta, Stefano. (2008). An Experimental Comparison of Kernel Clustering Methods.. Frontiers in Artificial Intelligence and Applications. 193. 118-126. 10.3233/978-1-58603-984-4-118.](https://www.researchgate.net/publication/220956693_An_Experimental_Comparison_of_Kernel_Clustering_Methods).
+|[Data/Dataset_0/](./Data/Dataset_0/)|contains the Anscombe's quartet data set.
+|[Data/Dataset_1/](./Data/Dataset_1/)|contains the official, automatically generated script for downloading the CMIP3 data from the [https://esgf-node.llnl.gov/projects/cmip3/](https://esgf-node.llnl.gov/projects/cmip3/). To generate the whole data set, the user should first place itself into this directory and then run the following command from the terminal `sh generate_dataset_1.sh`. [1]
+|[Data/Dataset_2/](./Data/Dataset_2/)|contains the data set from the subsection *3.2 Example 2 — Machine Learning Model Evaluation* of our paper.
 
 
 **[1]** The script used for downloading the [Dataset_1/](./Data/Dataset_1/) was generated using the tutorial found here [https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure](https://esgf.github.io/esgf-user-support/faq.html#how-to-preserve-the-directory-structure).
@@ -49,8 +49,15 @@ Script can be automatically generated and downloaded again from here [https://es
 |[Source/](./Source/)|contains all scripts.
 |[Source/main.ipynb](./Source/main.ipynb)|contains the IPython (jupyter) notebook that demonstrates the library using multiple datasets.
 |[Source/diagrams.py](./Source/diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
+|[Source/test.py](./Source/test.py)|contains the source code for all unit tests.
 
 ## Getting started
+
+### The scalar Feature
+![Scalar feature](./Data/README_Images/3-2-ml-ecoli-both-with-scalar.png)
+
+### Interactive aspects
+![Tooltip](./Data/README_Images/General_navigation.gif)
 
 
 ## Installation & Running
