@@ -45,22 +45,17 @@ dict_mi_parameters_features_continous_target_continous = dict(
 
 class DiagramData:
     def __init__(self):
-        self.df_input_all_possibilities = None
+        self.list_input_all_possibilities = None
 
-    def df_generate(self, int_number_of_rows):
+    def list_generate(self, int_number_of_rows):
         """
-        df_generate_new_timepoint creates a new DataFrame for testing purposes.
+        list_generate creates a list of possible inputs for testing purposes.
 
         Args:
             int_number_of_rows (int): The number of rows in the data set.
-            int_dataset_option (int): Can be one of [0, 1, 2] where:
-            0 = we have one dataset, 1 = two datasets with the second one
-            holding scalar values, 2 = two datasets with the second one being
-            the second version dataset.
 
         Returns:
-            pandas.DataFrame() or list: An output DataFrame or a list whose
-            elements are DataFrames.
+            list: A list of possible inputs for the polar_diagrams library.
         """
 
         df_result = pd.DataFrame()
@@ -81,7 +76,7 @@ class DiagramData:
                 string_one_column].to_numpy() + np.random.normal(
                     0, 1, int_row_len)
 
-        self.df_input_all_possibilities = [
+        self.list_input_all_possibilities = [
             None,
             df_result.copy(),
             [df_result.copy(), df_result_second_version.copy()],
@@ -93,10 +88,10 @@ class TestDiagrams(unittest.TestCase):
 
     def setUp(self):
         self.diagram_data = DiagramData()
-        self.diagram_data.df_generate(_INT_ROWS_FULL_DATA_SET)
+        self.diagram_data.list_generate(_INT_ROWS_FULL_DATA_SET)
 
     def test_df_calculate_td_properties(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.df_calculate_td_properties(
@@ -105,7 +100,7 @@ class TestDiagrams(unittest.TestCase):
                     pd.DataFrame)
 
     def test_df_calculate_mid_properties(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.df_calculate_mid_properties(
@@ -114,7 +109,7 @@ class TestDiagrams(unittest.TestCase):
                     pd.DataFrame)
 
     def test_df_calculate_all_properties(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.df_calculate_all_properties(
@@ -123,7 +118,7 @@ class TestDiagrams(unittest.TestCase):
                     pd.DataFrame)
 
     def test_chart_create_taylor_diagram(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.chart_create_taylor_diagram(
@@ -132,7 +127,7 @@ class TestDiagrams(unittest.TestCase):
                     go.Figure)
 
     def test_chart_create_mi_diagram(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.chart_create_mi_diagram(
@@ -141,7 +136,7 @@ class TestDiagrams(unittest.TestCase):
                     go.Figure)
 
     def test_chart_create_all_diagrams(self):
-        for one_input in self.diagram_data.df_input_all_possibilities:
+        for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
                 self.assertIsInstance(
                     diag.chart_create_all_diagrams(

@@ -1192,6 +1192,37 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     return chart_result
 
 
+def _df_check_df_raw_input(df_input):
+    """
+    _df_check_df_raw_input performs a sanity checks on the df_input argument.
+
+    Args:
+        df_input (pandas.DataFrame): This DataFrame have models in columns and
+        model prediction in rows. The DataFrames is used to calculate relevant
+        statistical information and information theory properties.
+
+    Raises:
+        ValueError: This error is raised if the argument is neither a list nor
+        a pandas.DataFrame object.
+        ValueError: This error is raised if the argument contains elements that
+        are not a pandas.DataFrame object.
+        ValueError: This error is raised if the argument contains more than 2
+        elements.
+        ValueError: This error is raised if the pandas.DataFrame elements don't
+        contain the same set of columns. This happens if the column names are
+        different between two pandas.DataFrame elements.
+
+    Returns:
+        pandas.DataFrame: This function returns a validated DataFrame.
+    """
+
+    if isinstance(df_input, pd.DataFrame):
+        if not isinstance(df_input, pd.DataFrame):
+            raise ValueError('df_input must be a pandas.DataFrame')
+
+    return df_input
+
+
 def _list_check_list_df_input(list_df_input):
     """
     _list_check_list_df_input performs a sanity checks on the list_df_input
