@@ -76,6 +76,8 @@ def df_calculate_td_properties(df_input, string_reference_model,
         statistical properties as columns.
     """
 
+    df_input = _df_check_df_raw_input(df_input)
+
     list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
     if string_corr_method not in list_valid_corr_methods:
         raise ValueError('string_corr_method is not one of the following:' +
@@ -214,7 +216,6 @@ def _dict_check_discrete_models(df_input, string_reference_model,
             else:
                 raise ValueError("Invalid string value for discrete_models.")
         discrete_mask = np.empty(n_features, dtype=bool)
-        # discrete_mask.fill(discrete_models)
         discrete_mask.fill(dict_mi_parameters['discrete_models'])
     else:
         discrete_models = check_array(
@@ -269,6 +270,8 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         pandas.DataFrame: This dataframe contains model names as indices and
         information theory properties as columns.
     """
+
+    df_input = _df_check_df_raw_input(df_input)
 
     dict_feature_discrete_mask = _dict_check_discrete_models(
         df_input, string_reference_model, dict_mi_parameters)
@@ -530,6 +533,7 @@ def df_calculate_all_properties(df_input, string_reference_model,
         pandas.DataFrame: This dataframe contains model names as indices and
         statistical and information theory properties as columns.
     """
+    df_input = _df_check_df_raw_input(df_input)
 
     df_td = df_calculate_td_properties(
         df_input, string_reference_model, string_corr_method)
@@ -710,7 +714,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
     list_valid_mid_types = ['scaled', 'normalized', None]
 
     if not isinstance(bool_normalized_measures, bool):
-        raise ValueError('bool_normalized_measures must be of bool type')
+        raise TypeError('bool_normalized_measures must be of bool type')
 
     if string_diagram_type not in list_valid_diagram_types:
         raise ValueError('string_diagram_type not in ' +
@@ -1218,7 +1222,7 @@ def _df_check_df_raw_input(df_input):
 
     if isinstance(df_input, pd.DataFrame):
         if not isinstance(df_input, pd.DataFrame):
-            raise ValueError('df_input must be a pandas.DataFrame')
+            raise TypeError('df_input must be a pandas.DataFrame')
 
     return df_input
 
@@ -1265,12 +1269,12 @@ def _list_check_list_df_input(list_df_input):
         if isinstance(list_df_input, pd.DataFrame):
             list_df_input = [list_df_input]
     else:
-        raise ValueError('list_df_input is not a list nor a pandas.DataFrame')
+        raise TypeError('list_df_input is not a list nor a pandas.DataFrame')
 
     if not all(isinstance(df_input, pd.DataFrame)
                for df_input in list_df_input):
-        raise ValueError('list_df_input can contain only pandas.DataFrames' +
-                         ' elements')
+        raise TypeError('list_df_input can contain only pandas.DataFrames' +
+                        ' elements')
 
     if len(list_df_input) not in list_valid_list_df_input_lenghts:
         raise ValueError('list_df_input can contain only one or two' +
@@ -1347,7 +1351,7 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
     list_valid_mid_types = ['normalized', 'scaled']
 
     if not isinstance(bool_normalized_measures, bool):
-        raise ValueError('bool_normalized_measures must be of bool type')
+        raise TypeError('bool_normalized_measures must be of bool type')
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))

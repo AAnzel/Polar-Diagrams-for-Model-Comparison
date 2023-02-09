@@ -91,31 +91,58 @@ class TestDiagrams(unittest.TestCase):
         self.diagram_data.list_generate(_INT_ROWS_FULL_DATA_SET)
 
     def test_df_calculate_td_properties(self):
+        tuple_bad_inputs = (None, list)
+
         for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
-                self.assertIsInstance(
-                    diag.df_calculate_td_properties(
-                        df_input=one_input,
-                        string_reference_model=_STRING_REFERENCE_MODEL),
-                    pd.DataFrame)
+                if isinstance(one_input, tuple_bad_inputs):
+                    self.assertRaises(
+                        TypeError,
+                        diag.df_calculate_td_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL))
+                else:
+                    self.assertIsInstance(
+                        diag.df_calculate_td_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL),
+                        pd.DataFrame)
 
     def test_df_calculate_mid_properties(self):
+        tuple_bad_inputs = (None, list)
+
         for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
-                self.assertIsInstance(
-                    diag.df_calculate_mid_properties(
-                        df_input=one_input,
-                        string_reference_model=_STRING_REFERENCE_MODEL),
-                    pd.DataFrame)
+                if isinstance(one_input, tuple_bad_inputs):
+                    self.assertRaises(
+                        TypeError,
+                        diag.df_calculate_mid_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL))
+                else:
+                    self.assertIsInstance(
+                        diag.df_calculate_mid_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL),
+                        pd.DataFrame)
 
     def test_df_calculate_all_properties(self):
+        tuple_bad_inputs = (None, list)
+
         for one_input in self.diagram_data.list_input_all_possibilities:
             with self.subTest():
-                self.assertIsInstance(
-                    diag.df_calculate_all_properties(
-                        df_input=one_input,
-                        string_reference_model=_STRING_REFERENCE_MODEL),
-                    pd.DataFrame)
+                if isinstance(one_input, tuple_bad_inputs):
+                    self.assertRaises(
+                        TypeError,
+                        diag.df_calculate_all_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL))
+                else:
+                    self.assertIsInstance(
+                        diag.df_calculate_all_properties(
+                            df_input=one_input,
+                            string_reference_model=_STRING_REFERENCE_MODEL),
+                        pd.DataFrame)
 
     def test_chart_create_taylor_diagram(self):
         for one_input in self.diagram_data.list_input_all_possibilities:
