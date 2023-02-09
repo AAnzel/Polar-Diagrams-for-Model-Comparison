@@ -37,4 +37,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with unittest
       run: |
-         python -m unittest discover -s ./Source/polar_diagrams/tests/ -p 'test.py'
+         python -m pip install --editable ./Source/polar_diagrams/
+         python -m unittest discover -s ./Source/polar_diagrams/tests/
