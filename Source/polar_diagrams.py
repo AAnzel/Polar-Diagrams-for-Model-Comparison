@@ -700,6 +700,8 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         blank canvas (1 row, 2 columns) for both objects. Defaults to None.
 
     Raises:
+        TypeError: The error is raised if bool_notmalized_measures is not one
+        of bool type.
         ValueError: The error is raised if string_diagram_type is not one of
         the following 'taylor', 'mid'
         ValueError: The error is raised if string_mid_type is not one of
@@ -1060,6 +1062,12 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         are used for the radial axis. If it is True, normalized values are
         used. Defaults to False.
 
+    Raises:
+        ValueError: The error is raised if the string_corr_method is not one of
+        the following 'pearson', 'kendall', 'spearman'.
+        TypeError: The error is raised if bool_notmalized_measures is not one
+        of bool type.
+
     Returns:
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
        diagram.
@@ -1073,7 +1081,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
                          str(list_valid_corr_methods))
 
     if not isinstance(bool_normalized_measures, bool):
-        raise ValueError('bool_normalized_measures must be of bool type')
+        raise TypeError('bool_normalized_measures must be of bool type')
 
     for int_i, df_input in enumerate(list_df_input):
         # We have to check if the secons pandas.DataFrame has one or multiple
@@ -1150,6 +1158,8 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         used. Defaults to False.
 
     Raises:
+        TypeError: The error is raised if bool_notmalized_measures is not one
+        of bool type.
         ValueError: The error is raised if string_mid_type is not one of
         the following 'scaled', 'normalized'.
 
@@ -1161,7 +1171,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     list_valid_mid_types = ['normalized', 'scaled']
 
     if not isinstance(bool_normalized_measures, bool):
-        raise ValueError('bool_normalized_measures must be of bool type')
+        raise TypeError('bool_normalized_measures must be of bool type')
 
     if string_mid_type not in list_valid_mid_types:
         raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
@@ -1206,23 +1216,15 @@ def _df_check_df_raw_input(df_input):
         statistical information and information theory properties.
 
     Raises:
-        ValueError: This error is raised if the argument is neither a list nor
-        a pandas.DataFrame object.
-        ValueError: This error is raised if the argument contains elements that
-        are not a pandas.DataFrame object.
-        ValueError: This error is raised if the argument contains more than 2
-        elements.
-        ValueError: This error is raised if the pandas.DataFrame elements don't
-        contain the same set of columns. This happens if the column names are
-        different between two pandas.DataFrame elements.
+        TypeError: This error is raised if the argument is not a
+        pandas.DataFrame object.
 
     Returns:
         pandas.DataFrame: This function returns a validated DataFrame.
     """
 
-    if isinstance(df_input, pd.DataFrame):
-        if not isinstance(df_input, pd.DataFrame):
-            raise TypeError('df_input must be a pandas.DataFrame')
+    if not isinstance(df_input, pd.DataFrame):
+        raise TypeError('df_input must be a pandas.DataFrame')
 
     return df_input
 
@@ -1247,15 +1249,15 @@ def _list_check_list_df_input(list_df_input):
         borders around circle marks in the resulting diagrams.
 
     Raises:
-        ValueError: This error is raised if the argument is neither a list nor
+        TypeError: This error is raised if the argument is neither a list nor
         a pandas.DataFrame object.
-        ValueError: This error is raised if the argument contains elements that
+        TypeError: This error is raised if the argument contains elements that
         are not a pandas.DataFrame object.
         ValueError: This error is raised if the argument contains more than 2
         elements.
-        ValueError: This error is raised if the pandas.DataFrame elements don't
-        contain the same set of columns. This happens if the column names are
-        different between two pandas.DataFrame elements.
+        AttributeError: This error is raised if the pandas.DataFrame elements
+        do not contain the same set of columns. This happens if the column
+        names are different between two pandas.DataFrame elements.
 
     Returns:
         list: This function returns a validated list. If the parsed argument
@@ -1283,8 +1285,8 @@ def _list_check_list_df_input(list_df_input):
     if len(list_df_input) == 2:
         if set(list_df_input[0].columns.to_list()) != set(
                 list_df_input[1].columns.to_list()):
-            raise ValueError('list_df_input dataframes need to have the same' +
-                             'set of columns')
+            raise AttributeError('list_df_input dataframes need to have the ' +
+                                 'same set of columns')
     return list_df_input
 
 
@@ -1340,6 +1342,8 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         used. Defaults to False.
 
     Raises:
+        TypeError: The error is raised if bool_notmalized_measures is not one
+        of bool type.
         ValueError: The error is raised if string_mid_type is not one of
         the following 'scaled', 'normalized'.
 
