@@ -57,23 +57,23 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information.
+          model prediction in rows. It is used to calculate relevant
+          statistical information.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         string_corr_method (str, optional): This string contains the name of
-        the method to be used when calculating the correlation. Defaults to
-        'pearson'.
+          the method to be used when calculating the correlation. Defaults to
+          'pearson'.
 
     Raises:
         ValueError: The error is raised if the string_corr_method is not one of
-        the following 'pearson', 'kendall', 'spearman'.
+          the following 'pearson', 'kendall', 'spearman'.
 
     Returns:
         pandas.DataFrame: This dataframe contains model names as indices and
-        statistical properties as columns.
+          statistical properties as columns.
     """
 
     df_input = _df_check_df_raw_input(df_input)
@@ -138,10 +138,10 @@ def _float_calculate_discrete_entropy(list_labels, int_base=2):
 
     Args:
         list_labels (list): This elements of this list are labels that can be
-        of any type (numerical, characters, etc.).
+          of any type (numerical, characters, etc.).
         int_base (int, optional): This parameter defines the base of the
-        logarithmic function which is used when the resulting entropy is
-        calculated. Defaults to 2.
+          logarithmic function which is used when the resulting entropy is
+          calculated. Defaults to 2.
 
     Returns:
         float: The resulting Shannon (discrete) entropy.
@@ -177,14 +177,14 @@ def _dict_check_discrete_models(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant information
-        theory properties
+          model prediction in rows. It is used to calculate relevant
+          information theory properties
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         dict_mi_parameters (dict): This dictionary contains configuration
-        parameters for the calculation of entropy and mutual information.
+          parameters for the calculation of entropy and mutual information.
 
     Raises:
         ValueError: Raises error if dict_mi_parameters['discrete_models']
@@ -192,9 +192,9 @@ def _dict_check_discrete_models(df_input, string_reference_model,
 
     Returns:
         dict: The dictionary where keys are column names that are different
-        than string_reference_model and keys that are boolean and say if that
-        model has discrete or continous values. Those keys are validated using
-        this function.
+          than string_reference_model and keys that are boolean and say if that
+          model has discrete or continous values. Those keys are validated
+          using this function.
     """
 
     # This check was acquired from https://github.com/scikit-learn/scikit-learn/blob/d949e7f731c99db8a88d16532f5476b52033bf8f/sklearn/feature_selection/_mutual_info.py#L5 # noqa
@@ -247,28 +247,28 @@ def df_calculate_mid_properties(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant information
-        theory propertiesdict_mi_parameters['discrete_models']
+          model prediction in rows. It is used to calculate relevan
+          information theory propertiesdict_mi_parameters['discrete_models']
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         dict_mi_parameters (dict, optional): This dictionary contains
-        configuration parameters for the calculation of entropy and mutual
-        information. Defaults to
-        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_reference_model=False, discrete_models='auto',
-             int_random_state=_INT_RANDOM_SEED).
+          configuration parameters for the calculation of entropy and mutual
+          information. Defaults to
+          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
+               bool_discrete_reference_model=False, discrete_models='auto',
+               int_random_state=_INT_RANDOM_SEED).
 
     Raises:
         ValueError: The error is raised if int_mi_n_neighbors is less or equal
-        than zero.
+          than zero.
         ValueError: The error is raised if string_entropy_method is not one of
-        the following 'vasicek', 'van es', 'ebrahimi', 'correa', 'auto'
+          the following 'vasicek', 'van es', 'ebrahimi', 'correa', 'auto'
 
     Returns:
         pandas.DataFrame: This dataframe contains model names as indices and
-        information theory properties as columns.
+          information theory properties as columns.
     """
 
     df_input = _df_check_df_raw_input(df_input)
@@ -513,25 +513,25 @@ def df_calculate_all_properties(df_input, string_reference_model,
 
     Args:
         df_input (pandas.DataFrame): This dataframe has models in columns and
-        model prediction in rows. It is used to calculate relevant statistical
-        information and information theory properties.
+          model prediction in rows. It is used to calculate relevant
+          statistical information and information theory properties.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         dict_mi_parameters (dict, optional): This dictionary contains
-        configuration parameters for the calculation of entropy and mutual
-        information. Defaults to
-        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=_INT_RANDOM_SEED).
+          configuration parameters for the calculation of entropy and mutual
+          information. Defaults to
+          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
+               bool_discrete_reference_model=False, discrete_fetures='auto',
+               int_random_state=_INT_RANDOM_SEED).
         string_corr_method (str, optional): This string contains the name of
-        the method to be used when calculating the correlation. Defaults to
-        'pearson'.
+          the method to be used when calculating the correlation. Defaults to
+          'pearson'.
 
     Returns:
         pandas.DataFrame: This dataframe contains model names as indices and
-        statistical and information theory properties as columns.
+          statistical and information theory properties as columns.
     """
     df_input = _df_check_df_raw_input(df_input)
 
@@ -554,11 +554,11 @@ def _tuple_hex_to_rgb(string_hex_color):
 
     Args:
         string_hex_color (str): This argument contains the hex value of the
-        color.
+          color.
 
     Returns:
         tuple: The return value is a tuple (R, G, B) where R, G, B are
-        integer values from 0 to 255.
+          integer values from 0 to 255.
     """
     return tuple(
         [int(string_hex_color.lstrip('#')[int_i:int_i+2], 16)
@@ -574,16 +574,16 @@ def _dict_calculate_model_colors(list_model_names, string_reference_model,
     Args:
         list_model_names (list): This list contains the strings of model names.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         int_number_of_datasets (int): This argument contains the number of
-        datasets. This argument is important if we have two datasets where the
-        second one is another version of the first dataset.
+          datasets. This argument is important if we have two datasets where
+          the second one is another version of the first dataset.
 
     Returns:
         dict: The function returns a dictionary where model strings are keys,
-        and values are RGBA tuples.
+          and values are RGBA tuples.
     """
     int_number_of_models = len(list_model_names)
 
@@ -623,9 +623,9 @@ def _warning_check_identical_model_values(df_input):
 
     Args:
         df_input (pandas.DataFrame): This dataframe contains both statistical
-        and information theory properties as calculated in
-        df_calculate_all_properties. The dataframe contains columns like:
-        Model, Entropy, Standard Deviation, etc.
+          and information theory properties as calculated in
+          df_calculate_all_properties. The dataframe contains columns like:
+          Model, Entropy, Standard Deviation, etc.
 
     Returns:
         None: None
@@ -664,52 +664,53 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
-        have models in columns and model prediction in rows. If parsed as a
-        pd.DataFrame() object, it is considered as a first and only element of
-        the list. Each one of these dataframes is used to calculate relevant
-        statistical information and information theory properties. If the list
-        contains two elements, both dataframes need to have the same set of
-        columns. If the second dataframe contains only one row, then this
-        dataframe is considered to contain a property that is encoded as using
-        size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second version
-        of the first dataframe in the list. This is then encoded using solid
-        borders around circle marks in the resulting diagrams.
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         string_mid_type (str): This string contains the type of the
-        Mutual Information diagram. If it is 'scaled' then it will span both
-        quadrants. If it is 'normalized', it will span only the first
-        quadrant of the circle.
+          Mutual Information diagram. If it is 'scaled' then it will span both
+          quadrants. If it is 'normalized', it will span only the first
+          quadrant of the circle.
         string_diagram_type (str): This string contains the type of the diagram
-        that has to be created.
+          that has to be created.
         bool_normalized_measures (bool, optional): This boolean parameter is
-        used to determine if the passed chart should have normalized entropy
-        and STD values or not. If it is False, then real entropy and STD values
-        are used for the radial axis. If it is True, normalized values are
-        used. Defaults to False.
+          used to determine if the passed chart should have normalized entropy
+          and STD values or not. If it is False, then real entropy and STD
+          values are used for the radial axis. If it is True, normalized values
+          are used. Defaults to False.
         bool_flag_as_subplot (bool, optional): This boolean parameter is used
-        to determine if the passed chart is a subplot or not. If it is False,
-        then only one diagram is created. If it is True, both Taylor and Mutual
-        Information diagrams are created and placed side-by-side. Defaults to
-        False.
+          to determine if the passed chart is a subplot or not. If it is False,
+          then only one diagram is created. If it is True, both Taylor and
+          Mutual Information diagrams are created and placed side-by-side.
+          Defaults to False.
         chart_result_upper (plotly.graph_objects.Figure, optional): This chart
-        is not None only if both diagrams have to be created. It contains the
-        blank canvas (1 row, 2 columns) for both objects. Defaults to None.
+          is not None only if both diagrams have to be created. It contains the
+          blank canvas (1 row, 2 columns) for both objects. Defaults to None.
 
     Raises:
         TypeError: The error is raised if bool_notmalized_measures is not one
-        of bool type.
+          of bool type.
         ValueError: The error is raised if string_diagram_type is not one of
-        the following 'taylor', 'mid'
+          the following 'taylor', 'mid'
         ValueError: The error is raised if string_mid_type is not one of
-        the following 'scaled', 'normalized'
+          the following 'scaled', 'normalized'
 
     Returns:
         plotly.graph_objects.Figure: This chart contains the resulting Taylor
-        or Mutual Information diagram.
+          or Mutual Information diagram.
     """
 
     list_valid_diagram_types = ['taylor', 'mid']
@@ -1038,39 +1039,40 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
-        have models in columns and model prediction in rows. If parsed as a
-        pd.DataFrame() object, it is considered as a first and only element of
-        the list. Each one of these dataframes is used to calculate relevant
-        statistical information and information theory properties. If the list
-        contains two elements, both dataframes need to have the same set of
-        columns. If the second dataframe contains only one row, then this
-        dataframe is considered to contain a property that is encoded as using
-        size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second version
-        of the first dataframe in the list. This is then encoded using solid
-        borders around circle marks in the resulting diagrams.
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         string_corr_method (str, optional): This string contains the name of
-        the method to be used when calculating the correlation. Defaults to
-        'pearson'.
+          the method to be used when calculating the correlation. Defaults to
+          'pearson'.
         bool_normalized_measures (bool, optional): This boolean parameter is
-        used to determine if the passed chart should have normalized entropy
-        and STD values or not. If it is False, then real entropy and STD values
-        are used for the radial axis. If it is True, normalized values are
-        used. Defaults to False.
+          used to determine if the passed chart should have normalized entropy
+          and STD values or not. If it is False, then real entropy and STD
+          values are used for the radial axis. If it is True, normalized values
+          are used. Defaults to False.
 
     Raises:
         ValueError: The error is raised if the string_corr_method is not one of
-        the following 'pearson', 'kendall', 'spearman'.
+          the following 'pearson', 'kendall', 'spearman'.
         TypeError: The error is raised if bool_notmalized_measures is not one
-        of bool type.
+          of bool type.
 
     Returns:
        plotly.graph_objects.Figure: This chart contains the resulting Taylor
-       diagram.
+         diagram.
     """
     list_df_input = _list_check_list_df_input(list_df_input)
     list_df_td = []
@@ -1126,46 +1128,47 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
-        have models in columns and model prediction in rows. If parsed as a
-        pd.DataFrame() object, it is considered as a first and only element of
-        the list. Each one of these dataframes is used to calculate relevant
-        statistical information and information theory properties. If the list
-        contains two elements, both dataframes need to have the same set of
-        columns. If the second dataframe contains only one row, then this
-        dataframe is considered to contain a property that is encoded as using
-        size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second version
-        of the first dataframe in the list. This is then encoded using solid
-        borders around circle marks in the resulting diagrams.
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
         string_reference_model (str): This string contains the name of the
-        model present in the df_input argument (as a column) which can be
-        considered as a reference point in the final diagram. This is often
-        the ground truth.
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
         string_mid_type (str, optional): This string contains the type of the
-        Mutual Information diagram. If it is 'scaled' then it will span both
-        quadrants. If it is 'normalized', it will span only the first
-        quadrant of the circle. Defaults to 'scaled'.
+          Mutual Information diagram. If it is 'scaled' then it will span both
+          quadrants. If it is 'normalized', it will span only the first
+          quadrant of the circle. Defaults to 'scaled'.
         dict_mi_parameters (dict, optional): This dictionary contains
-        configuration parameters for the calculation of entropy and mutual
-        information. Defaults to
-        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=_INT_RANDOM_SEED).
+          configuration parameters for the calculation of entropy and mutual
+          information. Defaults to
+          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
+               bool_discrete_reference_model=False, discrete_fetures='auto',
+               int_random_state=_INT_RANDOM_SEED).
         bool_normalized_measures (bool, optional): This boolean parameter is
-        used to determine if the passed chart should have normalized entropy
-        and STD values or not. If it is False, then real entropy and STD values
-        are used for the radial axis. If it is True, normalized values are
-        used. Defaults to False.
+          used to determine if the passed chart should have normalized entropy
+          and STD values or not. If it is False, then real entropy and STD
+          values are used for the radial axis. If it is True, normalized values
+          are used. Defaults to False.
 
     Raises:
         TypeError: The error is raised if bool_notmalized_measures is not one
-        of bool type.
+          of bool type.
         ValueError: The error is raised if string_mid_type is not one of
-        the following 'scaled', 'normalized'.
+          the following 'scaled', 'normalized'.
 
     Returns:
         plotly.graph_objects.Figure: This chart contains the resulting Mutual
-        Information diagram.
+          Information diagram.
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
@@ -1212,12 +1215,12 @@ def _df_check_df_raw_input(df_input):
 
     Args:
         df_input (pandas.DataFrame): This DataFrame have models in columns and
-        model prediction in rows. The DataFrames is used to calculate relevant
-        statistical information and information theory properties.
+          model prediction in rows. The DataFrames is used to calculate
+          relevant statistical information and information theory properties.
 
     Raises:
         TypeError: This error is raised if the argument is not a
-        pandas.DataFrame object.
+          pandas.DataFrame object.
 
     Returns:
         pandas.DataFrame: This function returns a validated DataFrame.
@@ -1236,33 +1239,34 @@ def _list_check_list_df_input(list_df_input):
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
-        have models in columns and model prediction in rows. If parsed as a
-        pd.DataFrame() object, it is considered as a first and only element of
-        the list. Each one of these dataframes is used to calculate relevant
-        statistical information and information theory properties. If the list
-        contains two elements, both dataframes need to have the same set of
-        columns. If the second dataframe contains only one row, then this
-        dataframe is considered to contain a property that is encoded as using
-        size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second version
-        of the first dataframe in the list. This is then encoded using solid
-        borders around circle marks in the resulting diagrams.
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
 
     Raises:
         TypeError: This error is raised if the argument is neither a list nor
-        a pandas.DataFrame object.
+          a pandas.DataFrame object.
         TypeError: This error is raised if the argument contains elements that
-        are not a pandas.DataFrame object.
+          are not a pandas.DataFrame object.
         ValueError: This error is raised if the argument contains more than 2
-        elements.
+          elements.
         AttributeError: This error is raised if the pandas.DataFrame elements
-        do not contain the same set of columns. This happens if the column
-        names are different between two pandas.DataFrame elements.
+          do not contain the same set of columns. This happens if the column
+          names are different between two pandas.DataFrame elements.
 
     Returns:
         list: This function returns a validated list. If the parsed argument
-        was a pandas.DataFrame object, it is now the only element of the
-        resulting list.
+          was a pandas.DataFrame object, it is now the only element of the
+          resulting list.
     """
     list_valid_list_df_input_types = (list, pd.DataFrame)
     list_valid_list_df_input_lenghts = [1, 2]
@@ -1307,49 +1311,50 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
 
     Args:
         list_df_input (list): This list contains one or two dataframes which
-        have models in columns and model prediction in rows. If parsed as a
-        pd.DataFrame() object, it is considered as a first and only element of
-        the list. Each one of these dataframes is used to calculate relevant
-        statistical information and information theory properties. If the list
-        contains two elements, both dataframes need to have the same set of
-        columns. If the second dataframe contains only one row, then this
-        dataframe is considered to contain a property that is encoded as using
-        size of the marker of the resulting diagrams. If the second dataframe
-        contains multiple rows, it is then considered to be a second version
-        of the first dataframe in the list. This is then encoded using solid
-        borders around circle marks in the resulting diagrams.
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
         string_reference_model (str): This string contains the name of the
-        model present in one or both elements of the list_df_input argument
-        (as a column) which can be considered as a reference point in the final
-        diagram. This is often the ground truth.
+          model present in one or both elements of the list_df_input argument
+          (as a column) which can be considered as a reference point in the
+          final diagram. This is often the ground truth.
         string_corr_method (str, optional): This string contains the name of
-        the method to be used when calculating the correlation. Defaults to
-        'pearson'.
+          the method to be used when calculating the correlation. Defaults to
+          'pearson'.
         string_mid_type (str, optional): This string contains the type of the
-        Mutual Information diagram. If it is 'scaled' then it will span both
-        quadrants. If it is 'normalized', it will span only the first
-        quadrant of the circle. Defaults to 'scaled'.
+          Mutual Information diagram. If it is 'scaled' then it will span both
+          quadrants. If it is 'normalized', it will span only the first
+          quadrant of the circle. Defaults to 'scaled'.
         dict_mi_parameters (dict, optional): This dictionary contains
-        configuration parameters for the calculation of entropy and mutual
-        information. Defaults to
-        dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-             bool_discrete_reference_model=False, discrete_fetures='auto',
-             int_random_state=_INT_RANDOM_SEED).
+          configuration parameters for the calculation of entropy and mutual
+          information. Defaults to
+          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
+               bool_discrete_reference_model=False, discrete_fetures='auto',
+               int_random_state=_INT_RANDOM_SEED).
         bool_normalized_measures (bool, optional): This boolean parameter is
-        used to determine if the passed chart should have normalized entropy
-        and STD values or not. If it is False, then real entropy and STD values
-        are used for the radial axis. If it is True, normalized values are
-        used. Defaults to False.
+          used to determine if the passed chart should have normalized entropy
+          and STD values or not. If it is False, then real entropy and STD
+          values are used for the radial axis. If it is True, normalized values
+          are used. Defaults to False.
 
     Raises:
         TypeError: The error is raised if bool_notmalized_measures is not one
-        of bool type.
+          of bool type.
         ValueError: The error is raised if string_mid_type is not one of
-        the following 'scaled', 'normalized'.
+          the following 'scaled', 'normalized'.
 
     Returns:
         plotly.graph_objects.Figure: This chart contains the both the Taylor
-        and the Mutual Information diagrams side-by-side.
+          and the Mutual Information diagrams side-by-side.
     """
 
     list_valid_mid_types = ['normalized', 'scaled']
