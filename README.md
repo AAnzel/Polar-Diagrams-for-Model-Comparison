@@ -1,4 +1,4 @@
-# Model Comparison Polar Diagrams
+# Polar Diagrams for Model Comparison
 
 ## Manuscript
 
@@ -23,11 +23,12 @@ The code is written in Python 3.9.15 and tested on Linux with the following libr
 
 |Library|Version|
 |---|---|
-|numpy|1.23.4|
-|pandas|1.5.1|
-|scikit-learn|1.1.3|
+|numpy|1.23.5|
+|pandas|1.5.2|
+|scikit-learn|1.2.0|
 |scipy|1.9.3|
 |plotly|5.9.0|
+|kaleido|0.2.1|
 
 The dependencies can also be found in [requirements.txt](requirements.txt).
 
