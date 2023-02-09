@@ -49,7 +49,7 @@ Script can be automatically generated and downloaded again from here [https://es
 |---|---|
 |[Source/](./Source/)|contains all scripts.
 |[Source/main.ipynb](./Source/main.ipynb)|contains the IPython (jupyter) notebook that demonstrates the library using multiple datasets.
-|[Source/diagrams.py](./Source/diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
+|[Source/polar_diagrams/diagrams.py](./Source/polar_diagrams/diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
 |[Source/test.py](./Source/test.py)|contains the source code for all unit tests.
 
 ## Getting started
