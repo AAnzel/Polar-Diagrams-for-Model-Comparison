@@ -42,7 +42,7 @@ The dependencies can also be found in [requirements.txt](https://github.com/AAnz
 ## Data
 |Location|Description|
 |---|---|
-|[Data/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data)|contains all datasets used in [Source/main.ipynb](./Source/main.ipynb).
+|[Data/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data)|contains all datasets used in [Source/main.ipynb](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/main.ipynb).
 |[Data/Dataset_0/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data/Dataset_0/)|contains the Anscombe's quartet data set and the Datasaurus data set.
 |[Data/Dataset_1/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data/Dataset_1/)|contains the official, automatically generated script for downloading the CMIP3 data from the [https://esgf-node.llnl.gov/projects/cmip3/](https://esgf-node.llnl.gov/projects/cmip3/). To generate the whole data set, the user should first place itself into this directory and then run the following command from the terminal `sh generate_dataset_1.sh`. [1]
 |[Data/Dataset_2/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data/Dataset_2/)|contains the data set from the subsection *3.2 Example 2 — Machine Learning Model Evaluation* of our paper.
@@ -61,14 +61,6 @@ Script can be automatically generated and downloaded again from here [https://es
 |[Source/polar_diagrams/src/polar_diagrams.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/src/polar_diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
 |[Source/polar_diagrams/tests/test.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/tests/test.py)|contains the source code for all unit tests.
 
-## Getting started
-
-### The Scalar Feature
-![Scalar feature](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data/README_Images/3-2-ml-ecoli-both-with-scalar.png)
-
-### Interactive aspects
-![Tooltip](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Data/README_Images/General_navigation.gif)
-
 
 ## Installation
 ### Stable
@@ -80,7 +72,8 @@ pip install polar-diagrams
 ### Unstable
 
 ```bash
-cd ./Source/polar_diagrams/
+git clone https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison.git
+cd Polar-Diagrams-for-Model-Comparison/Source/polar_diagrams/
 pip install --editable .
 ```
 
