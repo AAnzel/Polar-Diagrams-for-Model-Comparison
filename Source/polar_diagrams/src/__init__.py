@@ -1,5 +1,6 @@
 """
-.. include:: ../README.md
+.. include:: ..
+/README.md
 """
 
 name = 'polar_diagrams'
