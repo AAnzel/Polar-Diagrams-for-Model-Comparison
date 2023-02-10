@@ -1,7 +1,5 @@
 # Polar Diagrams for Model Comparison
 
-[![Python package](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/actions/workflows/python-package.yml/badge.svg)](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/actions/workflows/python-package.yml)
-
 ![GitHub Test Status](https://img.shields.io/github/actions/workflow/status/AAnzel/Polar-Diagrams-for-Model-Comparison/python-package.yml?label=test&style=flat-square)
 ![GitHub Build Status](https://img.shields.io/github/actions/workflow/status/AAnzel/Polar-Diagrams-for-Model-Comparison/python-package.yml?label=build&style=flat-square)
 ![GitHub Publish](https://img.shields.io/github/actions/workflow/status/AAnzel/Polar-Diagrams-for-Model-Comparison/python-publish.yml?label=publish&style=flat-square)
