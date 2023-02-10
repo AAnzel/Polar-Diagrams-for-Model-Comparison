@@ -57,8 +57,8 @@ Script can be automatically generated and downloaded again from here [https://es
 |---|---|
 |[Source/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source)|contains all source scripts.
 |[Source/main.ipynb](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/main.ipynb)|contains the IPython (jupyter) notebook that demonstrates the library using multiple datasets. This notebook reproduces all of the results we presented in our paper.
-|[Source/polar_diagrams/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/)|contains the source code of our library.
-|[Source/polar_diagrams/src/polar_diagrams.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/src/polar_diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
+|[Source/polar_diagrams/](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/)|contains the root source code directory of our library.
+|[Source/polar_diagrams/src/polar_diagrams/polar_diagrams.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/src/polar_diagrams/polar_diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
 |[Source/polar_diagrams/tests/test.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/tests/test.py)|contains the source code for all unit tests.
 
 ## Getting started
