@@ -63,12 +63,15 @@ Script can be automatically generated and downloaded again from here [https://es
 |[Source/polar_diagrams/src/polar_diagrams/polar_diagrams.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/src/polar_diagrams/polar_diagrams.py)|contains the source code that imports the data, modifies it, calculates statistical and information theory properties, and builds diagrams.
 |[Source/polar_diagrams/tests/test.py](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/Source/polar_diagrams/tests/test.py)|contains the source code for all unit tests.
 
-## Getting started
+## Notable Features
 
-### The Scalar Feature
+### Scalar Feature
 ![Scalar feature](./Data/README_Images/3-2-ml-ecoli-both-with-scalar.png)
 
-### Interactive aspects
+### Two-version Model Feature
+![Two-versions feature](./Data/README_Images/3-2-ml-ecoli-both-two-versions.png)
+
+### Interactive Aspects
 ![Tooltip](./Data/README_Images/General_navigation.gif)
 
 
