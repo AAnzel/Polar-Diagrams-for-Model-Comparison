@@ -6,6 +6,8 @@
 ![GitHub Issues](https://img.shields.io/github/issues-raw/AAnzel/Polar-Diagrams-for-Model-Comparison?style=flat-square)
 ![PyPI - License](https://img.shields.io/pypi/l/polar-diagrams?style=flat-square)
 ![PyPI](https://img.shields.io/pypi/v/polar-diagrams?style=flat-square)
+![PyPI - Status](https://img.shields.io/pypi/status/polar-diagrams?style=flat-square)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/polar-diagrams)
 
 ## Manuscript
 
