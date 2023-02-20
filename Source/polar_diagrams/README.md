@@ -7,7 +7,7 @@
 ![PyPI - License](https://img.shields.io/pypi/l/polar-diagrams?style=flat-square)
 ![PyPI](https://img.shields.io/pypi/v/polar-diagrams?style=flat-square)
 ![PyPI - Status](https://img.shields.io/pypi/status/polar-diagrams?style=flat-square)
-![PyPI - Downloads](https://img.shields.io/pypi/dm/polar-diagrams)
+![PyPI - Downloads](https://img.shields.io/pypi/dm/polar-diagrams?style=flat-square)
 
 ## Manuscript
 
