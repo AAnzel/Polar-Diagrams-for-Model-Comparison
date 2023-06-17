@@ -104,14 +104,16 @@ def df_calculate_td_properties(df_input, string_reference_model,
         dict_result[string_one_model].append(math.degrees(
             math.acos(dict_result[string_one_model][-1])))
 
-        # Calculating RMS
-        dict_result[string_one_model].append(
-            mean_squared_error(
-                df_input[string_reference_model],
-                df_input[string_one_model], squared=False))
-
     for string_one_model in list_all_features:
-        # Normalizing the RMS as in the paper
+        # Calculating CRMS
+        dict_result[string_one_model].append(
+            math.sqrt(mean_squared_error(
+                df_input[string_reference_model],
+                df_input[string_one_model], squared=True) -
+                      (np.mean(df_input[string_reference_model]) -
+                       np.mean(df_input[string_one_model]))**2))
+
+        # Normalizing the CRMS as in the paper
         dict_result[string_one_model].append(
             dict_result[string_one_model][3] /
             dict_result[string_reference_model][0])
@@ -123,8 +125,8 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        columns=['Standard Deviation', 'Correlation', 'Angle', 'RMS',
-                 'Normalized RMS', 'Normalized Standard Deviation'])
+        columns=['Standard Deviation', 'Correlation', 'Angle', 'CRMS',
+                 'Normalized CRMS', 'Normalized Standard Deviation'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -744,7 +746,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         string_angular_column_label = 'Correlation'
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
-        string_tooltip_label_3 = 'RMS'
+        string_tooltip_label_3 = 'CRMS'
         bool_only_half = True if (
             list_df_input[0][string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
