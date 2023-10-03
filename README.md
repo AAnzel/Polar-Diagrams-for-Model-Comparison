@@ -23,7 +23,19 @@ Bibtex citation placeholder
 ---
 Abstract:
 
-> Abstract placeholder
+> __Objective__: 
+Evaluating the performance of multiple complex models, such as those found in biology, medicine, climatology, and machine learning, using conventional approaches is often challenging when using various evaluation metrics simultaneously. The traditional approach, which relies on presenting multi-model evaluation scores in the table, presents an obstacle when determining the similarities between the models and the order of performance.
+
+> __Methods__:
+By combining statistics, information theory, and data visualization, juxtaposed Taylor and Mutual Information Diagrams permit users to track and summarize the performance of one model or a collection of different models. To uncover linear and nonlinear relationships between models, users may visualize one or both charts.
+
+>__Results__:
+Our library presents the first publicly available implementation of the Mutual Information Diagram and its new interactive capabilities, as well as the first publicly available implementation of an interactive Taylor Diagram. 
+Extensions have been implemented so that both diagrams can display temporality, multimodality, and multivariate data sets, and feature one scalar model property such as uncertainty.
+Our library, named \emph{polar-diagrams}, supports both continuous and categorical attributes.
+
+>__Conclusion__:
+The library can be used to quickly and easily assess the performances of complex models, such as those found in machine learning, climate, or biomedical domains.
 
 
 ## Dependencies
