@@ -17,7 +17,26 @@ This library is created for the following paper:
 
 Please cite the paper as:
 ```latex
-Bibtex citation placeholder
+@article{ANZEL2023107843,
+title = {Interactive polar diagrams for model comparison},
+journal = {Computer Methods and Programs in Biomedicine},
+volume = {242},
+pages = {107843},
+year = {2023},
+issn = {0169-2607},
+doi = {https://doi.org/10.1016/j.cmpb.2023.107843},
+url = {https://www.sciencedirect.com/science/article/pii/S0169260723005096},
+author = {Aleksandar Anžel and Dominik Heider and Georges Hattab},
+keywords = {Bioinformatics, Machine-learning, Visualization, Evaluation, Climate, Comparison, Ai, Data-visualization, Information-visualization, Predictive-analysis, Model-comparison, Climate-model-visualization, Ml-model-evaluation, Taylor-diagram, Mutual-information-diagram, Entropy, Mutual-information, Variation-of-information, Correlation, Medical-data},
+abstract = {Objective
+Evaluating the performance of multiple complex models, such as those found in biology, medicine, climatology, and machine learning, using conventional approaches is often challenging when using various evaluation metrics simultaneously. The traditional approach, which relies on presenting multi-model evaluation scores in the table, presents an obstacle when determining the similarities between the models and the order of performance.
+Methods
+By combining statistics, information theory, and data visualization, juxtaposed Taylor and Mutual Information Diagrams permit users to track and summarize the performance of one model or a collection of different models. To uncover linear and nonlinear relationships between models, users may visualize one or both charts.
+Results
+Our library presents the first publicly available implementation of the Mutual Information Diagram and its new interactive capabilities, as well as the first publicly available implementation of an interactive Taylor Diagram. Extensions have been implemented so that both diagrams can display temporality, multimodality, and multivariate data sets, and feature one scalar model property such as uncertainty. Our library, named polar-diagrams, supports both continuous and categorical attributes.
+Conclusion
+The library can be used to quickly and easily assess the performances of complex models, such as those found in machine learning, climate, or biomedical domains.}
+}
 ```
 
 ---

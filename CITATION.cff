@@ -1,0 +1,38 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Anžel"
+  given-names: "Aleksandar"
+  orcid: "https://orcid.org/0000-0002-0678-2870"
+- family-names: "Heider"
+  given-names: "Dominik"
+  orcid: "https://orcid.org/0000-0002-3108-8311"
+- family-names: "Hattab"
+  given-names: "Georges"
+  orcid: "https://orcid.org/0000-0003-4168-8254"
+title: "Interactive polar diagrams for model comparison"
+version: 1.1.0
+doi: 10.1016/j.cmpb.2023.107843
+date-released: 2023-10-06
+url: "https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Anžel"
+    given-names: "Aleksandar"
+    orcid: "https://orcid.org/0000-0002-0678-2870"
+  - family-names: "Heider"
+    given-names: "Dominik"
+    orcid: "https://orcid.org/0000-0002-3108-8311"
+  - family-names: "Hattab"
+    given-names: "Georges"
+    orcid: "https://orcid.org/0000-0003-4168-8254"
+  doi: "10.1016/j.cmpb.2023.107843"
+  journal: "Computer Methods and Programs in Biomedicine"
+  month: 10
+  start: 107843 # First page number
+  end: 107843 # Last page number
+  title: "Interactive polar diagrams for model comparison"
+  #issue: 1
+  volume: 242
+  year: 2023
