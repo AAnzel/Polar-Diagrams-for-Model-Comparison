@@ -128,6 +128,7 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-# Added by me
+# Added by Aleksandar
 Data/Dataset_1/Files/
 Data/Results/
+.DS_Store

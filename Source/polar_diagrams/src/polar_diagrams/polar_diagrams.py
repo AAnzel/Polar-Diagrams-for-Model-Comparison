@@ -18,10 +18,10 @@ __author__ = 'Aleksandar Anžel'
 __copyright__ = ''
 __credits__ = ['Aleksandar Anžel']
 __license__ = 'GNU General Public License v3.0'
-__version__ = '1.0'
+__version__ = '1.1.1'
 __maintainer__ = 'Aleksandar Anžel'
 __email__ = 'aleksandar.anzel@uni-marburg.de'
-__status__ = 'Dev'
+__status__ = 'Stable'
 
 
 _STRING_BACKGROUND_COLOR = '#FFFFFF'
@@ -598,12 +598,14 @@ def _dict_calculate_model_colors(list_model_names, string_reference_model,
     dict_result = dict()
 
     for int_i in range(int_number_of_datasets):
-        for int_j, string_model_name in enumerate(list_model_names):
+        int_j = 0
+        for string_model_name in list_model_names:
             if string_model_name == string_reference_model:
                 string_hex_color = '#000000'
             else:
                 string_hex_color = list_color_scheme[
                     int_j % int_num_discrete_colors]
+                int_j += 1
 
             if string_model_name not in dict_result:
                 dict_result[string_model_name] = dict()

@@ -38,6 +38,8 @@ Conclusion
 The library can be used to quickly and easily assess the performances of complex models, such as those found in machine learning, climate, or biomedical domains.}
 }
 ```
+[![DOI](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/blob/master/Data/README_Images/polar_doi.svg)](https://doi.org/10.1016/j.cmpb.2023.107843)
+
 
 ---
 Abstract:
@@ -64,12 +66,13 @@ The code is written in Python 3.9.15 and tested on Linux with the following libr
 
 |Library|Version|
 |---|---|
-|numpy|1.23.5|
-|pandas|1.5.2|
-|scikit-learn|1.2.0|
-|scipy|1.9.3|
-|plotly|5.9.0|
+|numpy|1.26.3|
+|pandas|2.1.4|
+|scikit-learn|1.2.2|
+|scipy|1.11.4|
+|plotly|5.18.0|
 |kaleido|0.2.1|
+
 
 The dependencies can also be found in [requirements.txt](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/requirements.txt).
 

@@ -39,7 +39,7 @@ The library can be used to quickly and easily assess the performances of complex
 }
 ```
 
-![DOI](./Data/README_Images/polar_doi.svg)
+[![DOI](./Data/README_Images/polar_doi.svg)](https://doi.org/10.1016/j.cmpb.2023.107843)
 
 
 ---
