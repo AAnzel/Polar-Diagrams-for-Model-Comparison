@@ -1131,8 +1131,6 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
             key=lambda arg_column: arg_column.map(
                 lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
 
-        print(list_df_td[0], '\n', list_df_td[1])
-
     chart_result = _chart_create_diagram(
         list_df_td, string_reference_model=string_reference_model,
         string_mid_type=None, bool_flag_as_subplot=False,
@@ -1229,6 +1227,32 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         df_mid = df_calculate_mid_properties(
             df_input, string_reference_model, dict_mi_parameters)
         list_df_mid.append(df_mid)
+
+    # We sort all pandas.DataFrames starting from the models with the highest
+    # VI or RVI to the lowest. If the we have a situation where we have
+    # two versions of each model, then we sort the second pandas.DataFrame
+    # and use that order for sorting the first. This is because the second one
+    # represents newer data, and we want to use that order. If we have only
+    # one pandas.DataFrame in a list, or two but the second one is with Scalar
+    # column, we just sort the first one (the second one will be automatically
+    # ordered using this order during the chart creation procedure)
+    int_number_of_datasets = len(list_df_mid)
+    string_sorting_column = 'VI' if string_mid_type == 'scaled' else 'RVI'
+
+    if int_number_of_datasets == 1 or (
+            int_number_of_datasets == 2 and
+            list_df_mid[1].columns[1] == 'Scalar'):
+        list_df_mid[0] = list_df_mid[0].sort_values(
+            by=[string_sorting_column], ascending=True).reset_index(drop=True)
+    else:
+        list_df_mid[1] = list_df_mid[1].sort_values(
+            by=[string_sorting_column], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_mid[1]['Model'].to_list()
+        list_df_mid[0] = list_df_mid[0].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
 
     chart_result = _chart_create_diagram(
         list_df_mid, string_reference_model=string_reference_model,
