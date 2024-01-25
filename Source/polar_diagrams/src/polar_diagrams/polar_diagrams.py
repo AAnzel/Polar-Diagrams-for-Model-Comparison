@@ -105,7 +105,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
             math.acos(dict_result[string_one_model][-1])))
 
     for string_one_model in list_all_features:
-        # Calculating CRMS
+        # Calculating CRMSE
         dict_result[string_one_model].append(
             math.sqrt(mean_squared_error(
                 df_input[string_reference_model],
@@ -113,7 +113,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
                       (np.mean(df_input[string_reference_model]) -
                        np.mean(df_input[string_one_model]))**2))
 
-        # Normalizing the CRMS as in the paper
+        # Normalizing the CRMSE as in the paper
         dict_result[string_one_model].append(
             dict_result[string_one_model][3] /
             dict_result[string_reference_model][0])
@@ -125,8 +125,8 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     df_result = pd.DataFrame().from_dict(
         dict_result, orient='index',
-        columns=['Standard Deviation', 'Correlation', 'Angle', 'CRMS',
-                 'Normalized CRMS', 'Normalized Standard Deviation'])
+        columns=['Standard Deviation', 'Correlation', 'Angle', 'CRMSE',
+                 'Normalized CRMSE', 'Normalized Standard Deviation'])
 
     df_result = df_result.reset_index().rename(columns={'index': 'Model'})
 
@@ -748,7 +748,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         string_angular_column_label = 'Correlation'
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
-        string_tooltip_label_3 = 'CRMS'
+        string_tooltip_label_3 = 'CRMSE'
         bool_only_half = True if (
             list_df_input[0][string_angular_column] <= 90).all() else False
         int_subplot_column_number = 1
@@ -1090,7 +1090,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         raise TypeError('bool_normalized_measures must be of bool type')
 
     for int_i, df_input in enumerate(list_df_input):
-        # We have to check if the secons pandas.DataFrame has one or multiple
+        # We have to check if the second pandas.DataFrame has one or multiple
         # rows. If it has one, we encode that property using the size of the
         # mark of the resulting diagram. If it has multiple rows, we need to
         # calculate all information for that dataframe and we visualize both
@@ -1106,6 +1106,32 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         df_td = df_calculate_td_properties(
             df_input, string_reference_model, string_corr_method)
         list_df_td.append(df_td)
+
+    # We sort all pandas.DataFrames starting from the models with the highest
+    # correlation to the lowest. If the we have a situation where we have
+    # two versions of each model, then we sort the second pandas.DataFrame
+    # and use that order for sorting the first. This is because the second one
+    # represents newer data, and we want to use that order. If we have only
+    # one pandas.DataFrame in a list, or two but the second one is with Scalar
+    # column, we just sort the first one (the second one will be automatically
+    # ordered using this order during the chart creation procedure)
+    int_number_of_datasets = len(list_df_td)
+    if int_number_of_datasets == 1 or (
+            int_number_of_datasets == 2 and
+            list_df_td[1].columns[1] == 'Scalar'):
+        list_df_td[0] = list_df_td[0].sort_values(
+            by=['CRMSE'], ascending=True).reset_index(drop=True)
+    else:
+        list_df_td[1] = list_df_td[1].sort_values(
+            by=['CRMSE'], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_td[1]['Model'].to_list()
+        list_df_td[0] = list_df_td[0].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+
+        print(list_df_td[0], '\n', list_df_td[1])
 
     chart_result = _chart_create_diagram(
         list_df_td, string_reference_model=string_reference_model,
