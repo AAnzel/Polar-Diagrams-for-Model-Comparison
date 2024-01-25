@@ -739,7 +739,8 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
 
     if string_diagram_type == 'taylor':
-        bool_show_legend = True
+        int_subplot_column_number = 1
+
         if bool_normalized_measures:
             string_radial_column = 'Normalized Standard Deviation'
         else:
@@ -751,13 +752,11 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         string_tooltip_label_3 = 'CRMSE'
         bool_only_half = True if (
             list_df_input[0][string_angular_column] <= 90).all() else False
-        int_subplot_column_number = 1
         np_angular_labels = np_tmp if bool_only_half else np.concatenate(
             (-np_tmp[:0:-1], np_tmp))
         np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
     else:
-        bool_show_legend = False
         int_subplot_column_number = 2
 
         if string_mid_type == 'scaled':
@@ -923,8 +922,6 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 df_input[string_tooltip_label_0]):
 
             string_marker_color = dict_model_colors[tmp_model][int_i]
-            # Do not show the legend for the scalar values
-            bool_show_legend = False if int_i == 1 else bool_show_legend
 
             if int_i == 1 and int_dataset_option == 1:
                 # The marker type for the scalar second dataset
@@ -951,6 +948,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                     size=_INT_MARKER_SIZE)
 
             if bool_flag_as_subplot:
+                if string_diagram_type == 'taylor' and int_i == 0:
+                    bool_show_legend = True
+                else:
+                    bool_show_legend = False
                 chart_result.add_trace(
                     go.Scatterpolar(
                         name=tmp_model,
@@ -976,12 +977,15 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                     col=int_subplot_column_number)
 
             else:
+                bool_show_legend = True if int_i == 0 else False
                 chart_result.add_trace(
                     go.Scatterpolar(
                         name=tmp_model,
                         r=[tmp_r],
                         theta=[tmp_angle],
                         mode='markers',
+                        legendgroup=tmp_model,
+                        showlegend=bool_show_legend,
                         # This below has to be done like this, since we add
                         # traces one by one
                         customdata=[np_tooltip_data[tmp_model_int]] *\
@@ -1113,14 +1117,21 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
     # and use that order for sorting the first. This is because the second one
     # represents newer data, and we want to use that order. If we have only
     # one pandas.DataFrame in a list, or two but the second one is with Scalar
-    # column, we just sort the first one (the second one will be automatically
-    # ordered using this order during the chart creation procedure)
+    # column, we just sort the first one and then use that order for the second
+    # one if it exists.
     int_number_of_datasets = len(list_df_td)
-    if int_number_of_datasets == 1 or (
-            int_number_of_datasets == 2 and
-            list_df_td[1].columns[1] == 'Scalar'):
+    if int_number_of_datasets == 1:
         list_df_td[0] = list_df_td[0].sort_values(
             by=['CRMSE'], ascending=True).reset_index(drop=True)
+    elif int_number_of_datasets == 2 and list_df_td[1].columns[1] == 'Scalar':
+        list_df_td[0] = list_df_td[0].sort_values(
+            by=['CRMSE'], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_td[0]['Model'].to_list()
+        list_df_td[1] = list_df_td[1].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
     else:
         list_df_td[1] = list_df_td[1].sort_values(
             by=['CRMSE'], ascending=True).reset_index(drop=True)
@@ -1234,16 +1245,23 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
     # and use that order for sorting the first. This is because the second one
     # represents newer data, and we want to use that order. If we have only
     # one pandas.DataFrame in a list, or two but the second one is with Scalar
-    # column, we just sort the first one (the second one will be automatically
-    # ordered using this order during the chart creation procedure)
+    # column, we just sort the first one and then use that order for the second
+    # one if it exists.
     int_number_of_datasets = len(list_df_mid)
     string_sorting_column = 'VI' if string_mid_type == 'scaled' else 'RVI'
 
-    if int_number_of_datasets == 1 or (
-            int_number_of_datasets == 2 and
-            list_df_mid[1].columns[1] == 'Scalar'):
+    if int_number_of_datasets == 1:
         list_df_mid[0] = list_df_mid[0].sort_values(
             by=[string_sorting_column], ascending=True).reset_index(drop=True)
+    elif int_number_of_datasets == 2 and list_df_mid[1].columns[1] == 'Scalar':
+        list_df_mid[0] = list_df_mid[0].sort_values(
+            by=[string_sorting_column], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_mid[0]['Model'].to_list()
+        list_df_mid[1] = list_df_mid[1].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
     else:
         list_df_mid[1] = list_df_mid[1].sort_values(
             by=[string_sorting_column], ascending=True).reset_index(drop=True)
