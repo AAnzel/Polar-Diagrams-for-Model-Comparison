@@ -1111,6 +1111,12 @@ def _df_sort_models_by_measure(list_df_input, string_reference_model,
             key=lambda arg_column: arg_column.map(
                 lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
 
+    # With sorting completed, we now prefix the values of the 'Model' column
+    # by their respective place in a new order
+    for df_tmp in list_df_input:
+        df_tmp['Model'] = df_tmp.index.astype(str) + df_tmp[
+            'Model'].astype(str)
+
     return list_df_input
 
 
