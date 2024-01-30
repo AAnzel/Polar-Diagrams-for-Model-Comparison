@@ -980,7 +980,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 bool_show_legend = True if int_i == 0 else False
                 chart_result.add_trace(
                     go.Scatterpolar(
-                        name=tmp_model,
+                        name=str(tmp_model_int) + '. ' + tmp_model,
                         r=[tmp_r],
                         theta=[tmp_angle],
                         mode='markers',
@@ -1110,12 +1110,6 @@ def _df_sort_models_by_measure(list_df_input, string_reference_model,
             by=['Model'],
             key=lambda arg_column: arg_column.map(
                 lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
-
-    # With sorting completed, we now prefix the values of the 'Model' column
-    # by their respective place in a new order
-    for df_tmp in list_df_input:
-        df_tmp['Model'] = df_tmp.index.astype(str) + df_tmp[
-            'Model'].astype(str)
 
     return list_df_input
 
