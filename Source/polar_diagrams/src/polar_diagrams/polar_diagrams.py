@@ -1037,6 +1037,83 @@ def _chart_create_diagram(list_df_input, string_reference_model,
     return chart_result
 
 
+def _df_sort_models_by_measure(list_df_input, string_reference_model,
+                               string_measure):
+    """
+    _df_sort_models_by_measure sorts all pandas.DataFrames from list_df_input
+    starting from the models with the highest chosen measure to the lowest. If
+    we have a situation where we have two versions of each model, then it sorts
+    the second pandas.DataFrame and uses that order for sorting the first. This
+    is because the second one represents newer data, and we want to use that
+    order in the old one. If we have only one pandas.DataFrame in a list, or
+    two but the second one is with 'Scalar' column, we just sort the first one
+    and then use that order for the second one if it exists. At the end, the
+    function changes the values of the 'Model' column by prefixing each model
+    with its place in the new order.
+
+    Args:
+        list_df_input (list): This list contains one or two dataframes which
+          have models in columns and model prediction in rows. If parsed as a
+          pd.DataFrame() object, it is considered as a first and only element
+          of the list. Each one of these dataframes is used to calculate
+          relevant statistical information and information theory properties.
+          If the list contains two elements, both dataframes need to have the
+          same set of columns. If the second dataframe contains only one row,
+          then this dataframe is considered to contain a property that is
+          encoded as using size of the marker of the resulting diagrams. If the
+          second dataframe contains multiple rows, it is then considered to be
+          a second version of the first dataframe in the list. This is then
+          encoded using solid borders around circle marks in the resulting
+          diagrams.
+        string_reference_model (str): This string contains the name of the
+          model present in the df_input argument (as a column) which can be
+          considered as a reference point in the final diagram. This is often
+          the ground truth.
+        string_measure (str): This string contains the name of the measure used
+        to sort the models. It can be one of the following: 'CRMSE', 'VI', or
+        'RVI'.
+
+    Raises:
+        ValueError: The error is raised if string_measure is not one of
+          the following: 'CRMSE', 'VI', or 'RVI'.
+    Returns:
+        list: This function returns a list of modified pd.DataFrame objects
+        with rows sorted in a descending fashion by the chosen measure. In
+        addition, all the values from the 'Model' column are prefixed by the
+        number of their order.
+    """
+
+    list_valid_measures = ['CRMSE', 'VI', 'RVI']
+    if string_measure not in list_valid_measures:
+        raise ValueError('string_measure not in ' + str(list_valid_measures))
+
+    int_number_of_datasets = len(list_df_input)
+    if int_number_of_datasets == 1:
+        list_df_input[0] = list_df_input[0].sort_values(
+            by=[string_measure], ascending=True).reset_index(drop=True)
+    elif int_number_of_datasets == 2 and (
+            list_df_input[1].columns[1] == 'Scalar'):
+        list_df_input[0] = list_df_input[0].sort_values(
+            by=[string_measure], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_input[0]['Model'].to_list()
+        list_df_input[1] = list_df_input[1].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+    else:
+        list_df_input[1] = list_df_input[1].sort_values(
+            by=[string_measure], ascending=True).reset_index(drop=True)
+
+        list_tmp_sorted = list_df_input[1]['Model'].to_list()
+        list_df_input[0] = list_df_input[0].sort_values(
+            by=['Model'],
+            key=lambda arg_column: arg_column.map(
+                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+
+    return list_df_input
+
+
 def chart_create_taylor_diagram(list_df_input, string_reference_model,
                                 string_corr_method='pearson',
                                 bool_normalized_measures=False):
@@ -1111,36 +1188,8 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
             df_input, string_reference_model, string_corr_method)
         list_df_td.append(df_td)
 
-    # We sort all pandas.DataFrames starting from the models with the highest
-    # correlation to the lowest. If the we have a situation where we have
-    # two versions of each model, then we sort the second pandas.DataFrame
-    # and use that order for sorting the first. This is because the second one
-    # represents newer data, and we want to use that order. If we have only
-    # one pandas.DataFrame in a list, or two but the second one is with Scalar
-    # column, we just sort the first one and then use that order for the second
-    # one if it exists.
-    int_number_of_datasets = len(list_df_td)
-    if int_number_of_datasets == 1:
-        list_df_td[0] = list_df_td[0].sort_values(
-            by=['CRMSE'], ascending=True).reset_index(drop=True)
-    elif int_number_of_datasets == 2 and list_df_td[1].columns[1] == 'Scalar':
-        list_df_td[0] = list_df_td[0].sort_values(
-            by=['CRMSE'], ascending=True).reset_index(drop=True)
-
-        list_tmp_sorted = list_df_td[0]['Model'].to_list()
-        list_df_td[1] = list_df_td[1].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
-    else:
-        list_df_td[1] = list_df_td[1].sort_values(
-            by=['CRMSE'], ascending=True).reset_index(drop=True)
-
-        list_tmp_sorted = list_df_td[1]['Model'].to_list()
-        list_df_td[0] = list_df_td[0].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+    list_df_td = _df_sort_models_by_measure(list_df_td, string_reference_model,
+                                            string_measure='CRMSE')
 
     chart_result = _chart_create_diagram(
         list_df_td, string_reference_model=string_reference_model,
@@ -1239,38 +1288,11 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
             df_input, string_reference_model, dict_mi_parameters)
         list_df_mid.append(df_mid)
 
-    # We sort all pandas.DataFrames starting from the models with the highest
-    # VI or RVI to the lowest. If the we have a situation where we have
-    # two versions of each model, then we sort the second pandas.DataFrame
-    # and use that order for sorting the first. This is because the second one
-    # represents newer data, and we want to use that order. If we have only
-    # one pandas.DataFrame in a list, or two but the second one is with Scalar
-    # column, we just sort the first one and then use that order for the second
-    # one if it exists.
-    int_number_of_datasets = len(list_df_mid)
     string_sorting_column = 'VI' if string_mid_type == 'scaled' else 'RVI'
 
-    if int_number_of_datasets == 1:
-        list_df_mid[0] = list_df_mid[0].sort_values(
-            by=[string_sorting_column], ascending=True).reset_index(drop=True)
-    elif int_number_of_datasets == 2 and list_df_mid[1].columns[1] == 'Scalar':
-        list_df_mid[0] = list_df_mid[0].sort_values(
-            by=[string_sorting_column], ascending=True).reset_index(drop=True)
-
-        list_tmp_sorted = list_df_mid[0]['Model'].to_list()
-        list_df_mid[1] = list_df_mid[1].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
-    else:
-        list_df_mid[1] = list_df_mid[1].sort_values(
-            by=[string_sorting_column], ascending=True).reset_index(drop=True)
-
-        list_tmp_sorted = list_df_mid[1]['Model'].to_list()
-        list_df_mid[0] = list_df_mid[0].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+    list_df_mid = _df_sort_models_by_measure(
+        list_df_mid, string_reference_model,
+        string_measure=string_sorting_column)
 
     chart_result = _chart_create_diagram(
         list_df_mid, string_reference_model=string_reference_model,
