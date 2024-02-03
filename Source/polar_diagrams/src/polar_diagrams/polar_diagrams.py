@@ -544,8 +544,6 @@ def df_calculate_all_properties(df_input, string_reference_model,
 
     df_result = df_td.merge(df_mid, on='Model', how='inner')
 
-    _warning_check_identical_model_values(df_result)
-
     return df_result
 
 
@@ -618,7 +616,8 @@ def _dict_calculate_model_colors(list_model_names, string_reference_model,
     return dict_result
 
 
-def _warning_check_identical_model_values(df_input):
+def _warning_check_identical_model_values(df_input, string_diagram_type,
+                                          string_mid_type='scaled'):
     """
     _warning_check_identical_model_values checks if there are models that have
     identical statistical or information theory properties. This check is
@@ -630,30 +629,51 @@ def _warning_check_identical_model_values(df_input):
           and information theory properties as calculated in
           df_calculate_all_properties. The dataframe contains columns like:
           Model, Entropy, Standard Deviation, etc.
+        string_diagram_type (str): This string contains the type of the diagram
+          that has to be created. It can be one of the following: 'taylor',
+          'mid', or 'both'.
+        string_mid_type (str): This string contains the type of the
+          Mutual Information diagram. If it is 'scaled' then it will span both
+          quadrants. If it is 'normalized', it will span only the first
+          quadrant of the circle.
 
     Returns:
         None: None
     """
 
-    df_taylor_result = df_input[
-        df_input.duplicated(
+    # We first round the results to two decimal places in order to catch
+    # more overlapping models (circles)
+    df_rounded_input = df_input.round(
+        pd.Series([2]*(df_input.shape[1]-1),
+                  index=df_input.columns.to_list()[1:]))
+
+    if string_diagram_type == 'taylor' or string_diagram_type == 'both':
+        df_taylor_result = df_rounded_input[df_rounded_input.duplicated(
             subset=['Standard Deviation', 'Correlation'], keep=False)]
+        if df_taylor_result.shape[0] != 0:
+            warnings.warn('WARNING: The following models have the same' +
+                          ' Standard Deviation and Correlation: ' +
+                          str(df_taylor_result['Model'].to_list()) +
+                          '.\nThe resulting Taylor diagram will have' +
+                          ' overlapping marks (circles).', RuntimeWarning)
 
-    df_mi_result = df_input[
-        df_input.duplicated(subset=['Entropy', 'Scaled MI'], keep=False)]
+    # This is the case where string_diagram_type is either 'mid' or 'both'
+    elif string_diagram_type == 'mid' or string_diagram_type == 'both':
+        if string_mid_type == 'scaled':
+            string_mi_column = ['Entropy', 'Scaled MI']
+            string_text = 'Scaled Mutual Information: '
+        else:
+            string_mi_column = ['Root Entropy', 'Normalized MI']
+            string_text = 'Normalized Mutual Information: '
 
-    if df_taylor_result.shape[0] != 0:
-        warnings.warn('WARNING: The following models have the same Standard' +
-                      ' Deviation and Correlation: ' +
-                      str(df_taylor_result['Model'].to_list()) +
-                      '.\nThe resulting Taylor diagram will have overlapping' +
-                      ' marks (circles).', RuntimeWarning)
-    if df_mi_result.shape[0] != 0:
-        warnings.warn('WARNING: The following models have the same Entropy' +
-                      ' and Scaled Mutual Information: ' +
-                      str(df_mi_result['Model'].to_list()) +
-                      '.\nThe resulting Mutual Information diagram will have' +
-                      ' overlapping marks (circles).', RuntimeWarning)
+        df_mi_result = df_rounded_input[df_rounded_input.duplicated(
+            subset=[string_mi_column[0], string_mi_column[1]], keep=False)]
+        if df_mi_result.shape[0] != 0:
+            warnings.warn('WARNING: The following models have the same' +
+                          ' Entropy and ' + string_text +
+                          str(df_mi_result['Model'].to_list()) +
+                          '.\nThe resulting Mutual Information diagram will' +
+                          ' have overlapping marks (circles).', RuntimeWarning)
 
     return None
 
@@ -1187,6 +1207,7 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
         df_td = df_calculate_td_properties(
             df_input, string_reference_model, string_corr_method)
         list_df_td.append(df_td)
+        _warning_check_identical_model_values(df_td, 'taylor')
 
     list_df_td = _df_sort_models_by_measure(list_df_td, string_reference_model,
                                             string_measure='CRMSE')
@@ -1287,6 +1308,7 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
         df_mid = df_calculate_mid_properties(
             df_input, string_reference_model, dict_mi_parameters)
         list_df_mid.append(df_mid)
+        _warning_check_identical_model_values(df_mid, 'mid', string_mid_type)
 
     string_sorting_column = 'VI' if string_mid_type == 'scaled' else 'RVI'
 
@@ -1489,6 +1511,7 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
             string_corr_method=string_corr_method,
             dict_mi_parameters=dict_mi_parameters)
         list_df_all.append(df_all)
+        _warning_check_identical_model_values(df_all, 'both', string_mid_type)
 
     chart_result = make_subplots(
         rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
