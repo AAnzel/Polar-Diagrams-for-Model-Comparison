@@ -815,7 +815,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
     string_scalar_column = 'Scalar'
     int_max_angle = 90 if bool_only_half else 180
     float_max_r = list_df_input[0][string_radial_column].max() +\
-        list_df_input[0][string_radial_column].mean()
+        list_df_input[0][string_radial_column].std()
 
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] != 2:
         # We check if it is NOT a scenario where user inputed dataframe with
@@ -827,7 +827,7 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         float_max_r = max(
             float_max_r,
             list_df_input[1][string_radial_column].max() +
-            list_df_input[1][string_radial_column].mean())
+            list_df_input[1][string_radial_column].std())
 
     if bool_flag_as_subplot:
         chart_result = chart_result_upper
