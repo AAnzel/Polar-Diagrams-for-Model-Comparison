@@ -814,8 +814,12 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
     string_scalar_column = 'Scalar'
     int_max_angle = 90 if bool_only_half else 180
-    float_max_r = list_df_input[0][string_radial_column].max() +\
-        list_df_input[0][string_radial_column].std()
+
+    if list_df_input[0][string_radial_column].std() <= 0.1:
+        float_max_r = list_df_input[0][string_radial_column].max()*1.5
+    else:
+        float_max_r = list_df_input[0][string_radial_column].max() +\
+            list_df_input[0][string_radial_column].std()
 
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] != 2:
         # We check if it is NOT a scenario where user inputed dataframe with
@@ -827,7 +831,9 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         float_max_r = max(
             float_max_r,
             list_df_input[1][string_radial_column].max() +
-            list_df_input[1][string_radial_column].std())
+            list_df_input[1][string_radial_column].std() if
+            list_df_input[1][string_radial_column].std() > 0.1 else
+            list_df_input[1][string_radial_column].max()*1.5)
 
     if bool_flag_as_subplot:
         chart_result = chart_result_upper
@@ -892,13 +898,11 @@ def _chart_create_diagram(list_df_input, string_reference_model,
     # scalar values, 2 = two datasets with the second one being the second
     # version dataset
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
-        np_first_row = list_df_input[1][string_scalar_column].to_numpy()
-        np_scaled_values = (np_first_row - np.min(np_first_row)) /\
-            (np.max(np_first_row) - np.min(np_first_row))
-
         dict_model_marker_sizes = dict(zip(
             list_df_input[0][string_tooltip_label_0],
-            np_scaled_values + 1))
+            list_df_input[1][string_scalar_column]))
+        float_concentric_sizeref = list_df_input[1][
+            string_scalar_column].max() / (_INT_MARKER_SIZE*2)**2
 
         int_dataset_option = 1
 
@@ -952,7 +956,10 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                         color='rgba' + str(string_marker_color + (1,)),
                         width=_INT_MARKER_LINE_WIDTH),
                     color='rgba' + str(string_marker_color + (0,)),
-                    size=_INT_MARKER_SIZE * dict_model_marker_sizes[tmp_model])
+                    size=[dict_model_marker_sizes[tmp_model]],
+                    sizemin=_INT_MARKER_SIZE,
+                    sizemode='area',
+                    sizeref=float_concentric_sizeref)
             elif int_i == 0 and int_dataset_option == 2:
                 dict_marker = dict(
                     color='rgba' + str(
