@@ -1,32 +1,28 @@
 # Table of Contents
 
-* [\_\_init\_\_](#__init__)
 * [polar\_diagrams](#polar_diagrams)
-  * [df\_calculate\_td\_properties](#polar_diagrams.df_calculate_td_properties)
-  * [df\_calculate\_mid\_properties](#polar_diagrams.df_calculate_mid_properties)
-  * [df\_calculate\_all\_properties](#polar_diagrams.df_calculate_all_properties)
-  * [chart\_create\_taylor\_diagram](#polar_diagrams.chart_create_taylor_diagram)
-  * [chart\_create\_mi\_diagram](#polar_diagrams.chart_create_mi_diagram)
-  * [chart\_create\_all\_diagrams](#polar_diagrams.chart_create_all_diagrams)
-
-<a id="__init__"></a>
-
-# \_\_init\_\_
-
-.. include:: ../README.md
+* [polar\_diagrams.polar\_diagrams](#polar_diagrams.polar_diagrams)
+  * [df\_calculate\_td\_properties](#polar_diagrams.polar_diagrams.df_calculate_td_properties)
+  * [df\_calculate\_mid\_properties](#polar_diagrams.polar_diagrams.df_calculate_mid_properties)
+  * [df\_calculate\_all\_properties](#polar_diagrams.polar_diagrams.df_calculate_all_properties)
+  * [chart\_create\_taylor\_diagram](#polar_diagrams.polar_diagrams.chart_create_taylor_diagram)
+  * [chart\_create\_mi\_diagram](#polar_diagrams.polar_diagrams.chart_create_mi_diagram)
+  * [chart\_create\_all\_diagrams](#polar_diagrams.polar_diagrams.chart_create_all_diagrams)
 
 <a id="polar_diagrams"></a>
 
 # polar\_diagrams
 
-<a id="polar_diagrams.df_calculate_td_properties"></a>
+<a id="polar_diagrams.polar_diagrams"></a>
 
-## df\_calculate\_td\_properties
+# polar\_diagrams.polar\_diagrams
+
+<a id="polar_diagrams.polar_diagrams.df_calculate_td_properties"></a>
+
+#### df\_calculate\_td\_properties
 
 ```python
-def df_calculate_td_properties(df_input,
-                               string_reference_model,
-                               string_corr_method='pearson')
+def df_calculate_td_properties(df_input, string_reference_model, string_corr_method='pearson')
 ```
 
 df_calculate_td_properties caclulates all necessary statistical information
@@ -57,14 +53,12 @@ for the Taylor diagram from the input data set.
 - `pandas.DataFrame` - This dataframe contains model names as indices and
   statistical properties as columns.
 
-<a id="polar_diagrams.df_calculate_mid_properties"></a>
+<a id="polar_diagrams.polar_diagrams.df_calculate_mid_properties"></a>
 
-## df\_calculate\_mid\_properties
+#### df\_calculate\_mid\_properties
 
 ```python
-def df_calculate_mid_properties(df_input,
-                                string_reference_model,
-                                dict_mi_parameters=dict(
+def df_calculate_mid_properties(df_input, string_reference_model, dict_mi_parameters=dict(
                                     string_entropy_method='auto',
                                     int_mi_n_neighbors=3,
                                     discrete_models='auto',
@@ -105,20 +99,17 @@ properties for the Mutual Information diagram from the input data set.
 - `pandas.DataFrame` - This dataframe contains model names as indices and
   information theory properties as columns.
 
-<a id="polar_diagrams.df_calculate_all_properties"></a>
+<a id="polar_diagrams.polar_diagrams.df_calculate_all_properties"></a>
 
-## df\_calculate\_all\_properties
+#### df\_calculate\_all\_properties
 
 ```python
-def df_calculate_all_properties(df_input,
-                                string_reference_model,
-                                dict_mi_parameters=dict(
+def df_calculate_all_properties(df_input, string_reference_model, dict_mi_parameters=dict(
                                     string_entropy_method='auto',
                                     int_mi_n_neighbors=3,
                                     discrete_models='auto',
                                     bool_discrete_reference_model=False,
-                                    int_random_state=_INT_RANDOM_SEED),
-                                string_corr_method='pearson')
+                                    int_random_state=_INT_RANDOM_SEED), string_corr_method='pearson')
 ```
 
 df_calculate_all_properties caclulates all necessary statistical and
@@ -150,15 +141,12 @@ from the input data set.
 - `pandas.DataFrame` - This dataframe contains model names as indices and
   statistical and information theory properties as columns.
 
-<a id="polar_diagrams.chart_create_taylor_diagram"></a>
+<a id="polar_diagrams.polar_diagrams.chart_create_taylor_diagram"></a>
 
-## chart\_create\_taylor\_diagram
+#### chart\_create\_taylor\_diagram
 
 ```python
-def chart_create_taylor_diagram(list_df_input,
-                                string_reference_model,
-                                string_corr_method='pearson',
-                                bool_normalized_measures=False)
+def chart_create_taylor_diagram(list_df_input, string_reference_model, string_corr_method='pearson', bool_normalized_measures=False)
 ```
 
 chart_create_taylor_diagram creates the Taylor diagram according to the
@@ -207,21 +195,17 @@ model predictions.
 - `plotly.graph_objects.Figure` - This chart contains the resulting Taylor
   diagram.
 
-<a id="polar_diagrams.chart_create_mi_diagram"></a>
+<a id="polar_diagrams.polar_diagrams.chart_create_mi_diagram"></a>
 
-## chart\_create\_mi\_diagram
+#### chart\_create\_mi\_diagram
 
 ```python
-def chart_create_mi_diagram(list_df_input,
-                            string_reference_model,
-                            string_mid_type='scaled',
-                            dict_mi_parameters=dict(
+def chart_create_mi_diagram(list_df_input, string_reference_model, string_mid_type='scaled', dict_mi_parameters=dict(
                                 string_entropy_method='auto',
                                 int_mi_n_neighbors=3,
                                 discrete_models='auto',
                                 bool_discrete_reference_model=False,
-                                int_random_state=_INT_RANDOM_SEED),
-                            bool_normalized_measures=False)
+                                int_random_state=_INT_RANDOM_SEED), bool_normalized_measures=False)
 ```
 
 chart_create_mi_diagram creates the Mutual Information diagram according
@@ -277,22 +261,17 @@ contain model predictions.
 - `plotly.graph_objects.Figure` - This chart contains the resulting Mutual
   Information diagram.
 
-<a id="polar_diagrams.chart_create_all_diagrams"></a>
+<a id="polar_diagrams.polar_diagrams.chart_create_all_diagrams"></a>
 
-## chart\_create\_all\_diagrams
+#### chart\_create\_all\_diagrams
 
 ```python
-def chart_create_all_diagrams(list_df_input,
-                              string_reference_model,
-                              string_mid_type='scaled',
-                              string_corr_method='pearson',
-                              dict_mi_parameters=dict(
+def chart_create_all_diagrams(list_df_input, string_reference_model, string_mid_type='scaled', string_corr_method='pearson', dict_mi_parameters=dict(
                                   string_entropy_method='auto',
                                   int_mi_n_neighbors=3,
                                   discrete_models='auto',
                                   bool_discrete_reference_model=False,
-                                  int_random_state=_INT_RANDOM_SEED),
-                              bool_normalized_measures=False)
+                                  int_random_state=_INT_RANDOM_SEED), bool_normalized_measures=False)
 ```
 
 chart_create_all_diagrams creates both the Taylor and the Mutual
