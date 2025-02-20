@@ -10,10 +10,10 @@ __author__ = 'Aleksandar Anžel'
 __copyright__ = ''
 __credits__ = ['Aleksandar Anžel']
 __license__ = 'GNU General Public License v3.0'
-__version__ = '1.0'
+__version__ = '1.3.0'
 __maintainer__ = 'Aleksandar Anžel'
-__email__ = 'aleksandar.anzel@uni-marburg.de'
-__status__ = 'Dev'
+__email__ = 'AnzelA@rki.de'
+__status__ = 'Stable'
 
 # ==============================================
 # This script is used to test the 'diag' library

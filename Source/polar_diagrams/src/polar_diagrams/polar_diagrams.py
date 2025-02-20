@@ -18,9 +18,9 @@ __author__ = 'Aleksandar Anžel'
 __copyright__ = ''
 __credits__ = ['Aleksandar Anžel']
 __license__ = 'GNU General Public License v3.0'
-__version__ = '1.2.0'
+__version__ = '1.3.0'
 __maintainer__ = 'Aleksandar Anžel'
-__email__ = 'aleksandar.anzel@uni-marburg.de'
+__email__ = 'AnzelA@rki.de'
 __status__ = 'Stable'
 
 
@@ -109,7 +109,7 @@ def df_calculate_td_properties(df_input, string_reference_model,
         dict_result[string_one_model].append(
             math.sqrt(mean_squared_error(
                 df_input[string_reference_model],
-                df_input[string_one_model], squared=True) -
+                df_input[string_one_model]) -
                       (np.mean(df_input[string_reference_model]) -
                        np.mean(df_input[string_one_model]))**2))
 
