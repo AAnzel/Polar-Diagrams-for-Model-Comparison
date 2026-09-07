@@ -205,7 +205,7 @@ def _float_calculate_discrete_entropy(list_labels, int_base=2):
     if int_num_of_labels <= 1:
         return 0
 
-    list_value, list_counts = np.unique(list_labels, return_counts=True)
+    _list_value, list_counts = np.unique(list_labels, return_counts=True)
     list_probabilities = list_counts / int_num_of_labels
     int_num_of_classes = np.count_nonzero(list_probabilities)
 
@@ -265,7 +265,7 @@ def _dict_check_discrete_models(
             accept_sparse="csc",
             y_numeric=not dict_mi_parameters["bool_discrete_reference_model"],
         )
-    n_samples, n_features = X.shape
+    _n_samples, n_features = X.shape
 
     if isinstance(dict_mi_parameters["discrete_models"], (str, bool)):
         if isinstance(dict_mi_parameters["discrete_models"], str):
