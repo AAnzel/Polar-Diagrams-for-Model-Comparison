@@ -922,11 +922,10 @@ def _chart_create_diagram(
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
         string_tooltip_label_3 = "CRMSE"
-        bool_only_half = (
-            True
-            if (list_df_input[0][string_angular_column] <= 90).all()
-            else False
+        bool_only_half = bool(
+            (list_df_input[0][string_angular_column] <= 90).all()
         )
+
         np_angular_labels = (
             np_tmp
             if bool_only_half
@@ -950,11 +949,10 @@ def _chart_create_diagram(
             # TODO: Improve this below. We might have to check the second
             # TODO: version data set as well, since those models might go
             # TODO: on the other quarter of the circle
-            bool_only_half = bool_only_half = (
-                True
-                if (list_df_input[0][string_angular_column] <= 90).all()
-                else False
+            bool_only_half = bool(
+                (list_df_input[0][string_angular_column] <= 90).all()
             )
+
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
             np_angular_labels = np.round((np_angular_labels + 1) / 2, 3)
