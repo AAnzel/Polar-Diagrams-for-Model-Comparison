@@ -1,34 +1,34 @@
 import math
 import warnings
-import pandas as pd
+
 import numpy as np
-
-from scipy.sparse import issparse
-from scipy.stats import differential_entropy
-from sklearn.utils.validation import check_array, check_X_y
-from sklearn.metrics import mean_squared_error
-from sklearn.feature_selection import mutual_info_regression
-from sklearn.feature_selection import mutual_info_classif
-
+import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+from scipy.sparse import issparse
+from scipy.stats import differential_entropy
+from sklearn.feature_selection import (
+    mutual_info_classif,
+    mutual_info_regression,
+)
+from sklearn.metrics import mean_squared_error
+from sklearn.utils.validation import check_array, check_X_y
+
+__author__ = "Aleksandar Anžel"
+__copyright__ = ""
+__credits__ = ["Aleksandar Anžel"]
+__license__ = "GNU General Public License v3.0"
+__version__ = "1.3.0"
+__maintainer__ = "Aleksandar Anžel"
+__email__ = "AnzelA@rki.de"
+__status__ = "Stable"
 
 
-__author__ = 'Aleksandar Anžel'
-__copyright__ = ''
-__credits__ = ['Aleksandar Anžel']
-__license__ = 'GNU General Public License v3.0'
-__version__ = '1.3.0'
-__maintainer__ = 'Aleksandar Anžel'
-__email__ = 'AnzelA@rki.de'
-__status__ = 'Stable'
-
-
-_STRING_BACKGROUND_COLOR = '#FFFFFF'
-_STRING_GRID_COLOR = '#C0C0C0'
-_STRING_LABEL_TITLE_COLOR = '#404040'
-_STRING_TICK_COLOR = '#000000'
-_STRING_GRID_STYLE = 'solid'
+_STRING_BACKGROUND_COLOR = "#FFFFFF"
+_STRING_GRID_COLOR = "#C0C0C0"
+_STRING_LABEL_TITLE_COLOR = "#404040"
+_STRING_TICK_COLOR = "#000000"
+_STRING_GRID_STYLE = "solid"
 _INT_TICK_WIDTH = 2
 _INT_RANDOM_SEED = None
 _INT_MARKER_SIZE = 10
@@ -40,17 +40,46 @@ _INT_LEGEND_Y = -0.2
 _FLOAT_MARKER_OPACITY = 0.60
 _FLOAT_LEGEND_BORDER_WIDTH = 0.2
 
-# Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y # noqa
-_LIST_TABLEAU_10 = ['#1f77b4', '#2ca02c', '#7f7f7f', '#8c564b', '#17becf',
-                    '#9467bd', '#bcbd22', '#d62728', '#e377c2', '#ff7f0e']
-_LIST_TABLEAU_20 = ['#1f77b4', '#aec7e8', '#ff7f0e', '#ffbb78', '#2ca02c',
-                    '#98df8a', '#d62728', '#ff9896', '#9467bd', '#c5b0d5',
-                    '#8c564b', '#c49c94', '#e377c2', '#f7b6d2', '#7f7f7f',
-                    '#c7c7c7', '#bcbd22', '#dbdb8d', '#17becf', '#9edae5']
+# Note: Color acquired from: https://public.tableau.com/views/TableauColors/ColorsbyHexCode?%3Aembed=y&%3AshowVizHome=no&%3Adisplay_count=y&%3Adisplay_static_image=y
+_LIST_TABLEAU_10 = [
+    "#1f77b4",
+    "#2ca02c",
+    "#7f7f7f",
+    "#8c564b",
+    "#17becf",
+    "#9467bd",
+    "#bcbd22",
+    "#d62728",
+    "#e377c2",
+    "#ff7f0e",
+]
+_LIST_TABLEAU_20 = [
+    "#1f77b4",
+    "#aec7e8",
+    "#ff7f0e",
+    "#ffbb78",
+    "#2ca02c",
+    "#98df8a",
+    "#d62728",
+    "#ff9896",
+    "#9467bd",
+    "#c5b0d5",
+    "#8c564b",
+    "#c49c94",
+    "#e377c2",
+    "#f7b6d2",
+    "#7f7f7f",
+    "#c7c7c7",
+    "#bcbd22",
+    "#dbdb8d",
+    "#17becf",
+    "#9edae5",
+]
 
 
-def df_calculate_td_properties(df_input, string_reference_model,
-                               string_corr_method='pearson'):
+def df_calculate_td_properties(
+    df_input, string_reference_model, string_corr_method="pearson"
+):
     """
     df_calculate_td_properties caclulates all necessary statistical information
     for the Taylor diagram from the input data set.
@@ -78,10 +107,12 @@ def df_calculate_td_properties(df_input, string_reference_model,
 
     df_input = _df_check_df_raw_input(df_input)
 
-    list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
+    list_valid_corr_methods = ["pearson", "kendall", "spearman"]
     if string_corr_method not in list_valid_corr_methods:
-        raise ValueError('string_corr_method is not one of the following:' +
-                         str(list_valid_corr_methods))
+        raise ValueError(
+            "string_corr_method is not one of the following:"
+            + str(list_valid_corr_methods)
+        )
 
     list_all_features = df_input.columns.to_list()
 
@@ -93,42 +124,62 @@ def df_calculate_td_properties(df_input, string_reference_model,
     for string_one_model in list_all_features:
         # Calculating standard deviations
         dict_result[string_one_model].append(
-            df_input[string_one_model].std(ddof=0))
+            df_input[string_one_model].std(ddof=0)
+        )
 
         # Calculating Pearson's correlation
         dict_result[string_one_model].append(
             df_input[string_reference_model].corr(
-                df_input[string_one_model], method=string_corr_method))
+                df_input[string_one_model], method=string_corr_method
+            )
+        )
 
         # Calculate arccos of Pearson's correlation
-        dict_result[string_one_model].append(math.degrees(
-            math.acos(dict_result[string_one_model][-1])))
+        dict_result[string_one_model].append(
+            math.degrees(math.acos(dict_result[string_one_model][-1]))
+        )
 
     for string_one_model in list_all_features:
         # Calculating CRMSE
         dict_result[string_one_model].append(
-            math.sqrt(mean_squared_error(
-                df_input[string_reference_model],
-                df_input[string_one_model]) -
-                      (np.mean(df_input[string_reference_model]) -
-                       np.mean(df_input[string_one_model]))**2))
+            math.sqrt(
+                mean_squared_error(
+                    df_input[string_reference_model], df_input[string_one_model]
+                )
+                - (
+                    np.mean(df_input[string_reference_model])
+                    - np.mean(df_input[string_one_model])
+                )
+                ** 2
+            )
+        )
 
         # Normalizing the CRMSE as in the paper
         dict_result[string_one_model].append(
-            dict_result[string_one_model][3] /
-            dict_result[string_reference_model][0])
+            dict_result[string_one_model][3]
+            / dict_result[string_reference_model][0]
+        )
 
         # Calculating normalized standard deviation
         dict_result[string_one_model].append(
-            dict_result[string_one_model][0] / dict_result[
-                string_reference_model][0])
+            dict_result[string_one_model][0]
+            / dict_result[string_reference_model][0]
+        )
 
     df_result = pd.DataFrame().from_dict(
-        dict_result, orient='index',
-        columns=['Standard Deviation', 'Correlation', 'Angle', 'CRMSE',
-                 'Normalized CRMSE', 'Normalized Standard Deviation'])
+        dict_result,
+        orient="index",
+        columns=[
+            "Standard Deviation",
+            "Correlation",
+            "Angle",
+            "CRMSE",
+            "Normalized CRMSE",
+            "Normalized Standard Deviation",
+        ],
+    )
 
-    df_result = df_result.reset_index().rename(columns={'index': 'Model'})
+    df_result = df_result.reset_index().rename(columns={"index": "Model"})
 
     return df_result
 
@@ -165,13 +216,15 @@ def _float_calculate_discrete_entropy(list_labels, int_base=2):
 
     for float_one_probability in list_probabilities:
         float_entropy -= float_one_probability * math.log(
-            float_one_probability, int_base)
+            float_one_probability, int_base
+        )
 
     return float_entropy
 
 
-def _dict_check_discrete_models(df_input, string_reference_model,
-                                dict_mi_parameters):
+def _dict_check_discrete_models(
+    df_input, string_reference_model, dict_mi_parameters
+):
     """
     _dict_check_discrete_models checks if
     dict_mi_parameters['discrete_models'] is valid argument as defined in
@@ -199,29 +252,33 @@ def _dict_check_discrete_models(df_input, string_reference_model,
           using this function.
     """
 
-    # This check was acquired from https://github.com/scikit-learn/scikit-learn/blob/d949e7f731c99db8a88d16532f5476b52033bf8f/sklearn/feature_selection/_mutual_info.py#L5 # noqa
+    # This check was acquired from https://github.com/scikit-learn/scikit-learn/blob/d949e7f731c99db8a88d16532f5476b52033bf8f/sklearn/feature_selection/_mutual_info.py#L5
 
     X = df_input.drop(string_reference_model, axis=1)
     y = df_input[string_reference_model]
     list_X_columns = X.columns
 
-    if dict_mi_parameters['bool_discrete_reference_model'] is False:
+    if dict_mi_parameters["bool_discrete_reference_model"] is False:
         X, y = check_X_y(
-            X, y, accept_sparse="csc",
-            y_numeric=not dict_mi_parameters['bool_discrete_reference_model'])
+            X,
+            y,
+            accept_sparse="csc",
+            y_numeric=not dict_mi_parameters["bool_discrete_reference_model"],
+        )
     n_samples, n_features = X.shape
 
-    if isinstance(dict_mi_parameters['discrete_models'], (str, bool)):
-        if isinstance(dict_mi_parameters['discrete_models'], str):
-            if dict_mi_parameters['discrete_models'] == "auto":
+    if isinstance(dict_mi_parameters["discrete_models"], (str, bool)):
+        if isinstance(dict_mi_parameters["discrete_models"], str):
+            if dict_mi_parameters["discrete_models"] == "auto":
                 discrete_models = issparse(X)
             else:
                 raise ValueError("Invalid string value for discrete_models.")
         discrete_mask = np.empty(n_features, dtype=bool)
-        discrete_mask.fill(dict_mi_parameters['discrete_models'])
+        discrete_mask.fill(dict_mi_parameters["discrete_models"])
     else:
         discrete_models = check_array(
-            dict_mi_parameters['discrete_models'], ensure_2d=False)
+            dict_mi_parameters["discrete_models"], ensure_2d=False
+        )
         if discrete_models.dtype != "bool":
             discrete_mask = np.zeros(n_features, dtype=bool)
             discrete_mask[discrete_models] = True
@@ -230,19 +287,24 @@ def _dict_check_discrete_models(df_input, string_reference_model,
 
     dict_feature_discrete_mask = dict()
     for int_i, string_one_column_name in enumerate(list_X_columns):
-        dict_feature_discrete_mask[
-            string_one_column_name] = discrete_mask[int_i]
+        dict_feature_discrete_mask[string_one_column_name] = discrete_mask[
+            int_i
+        ]
 
     return dict_feature_discrete_mask
 
 
-def df_calculate_mid_properties(df_input, string_reference_model,
-                                dict_mi_parameters=dict(
-                                    string_entropy_method='auto',
-                                    int_mi_n_neighbors=3,
-                                    discrete_models='auto',
-                                    bool_discrete_reference_model=False,
-                                    int_random_state=_INT_RANDOM_SEED)):
+def df_calculate_mid_properties(
+    df_input,
+    string_reference_model,
+    dict_mi_parameters=dict(
+        string_entropy_method="auto",
+        int_mi_n_neighbors=3,
+        discrete_models="auto",
+        bool_discrete_reference_model=False,
+        int_random_state=_INT_RANDOM_SEED,
+    ),
+):
     """
     df_calculate_mid_properties caclulates all necessary information theory
     properties for the Mutual Information diagram from the input data set.
@@ -276,33 +338,57 @@ def df_calculate_mid_properties(df_input, string_reference_model,
     df_input = _df_check_df_raw_input(df_input)
 
     dict_feature_discrete_mask = _dict_check_discrete_models(
-        df_input, string_reference_model, dict_mi_parameters)
+        df_input, string_reference_model, dict_mi_parameters
+    )
 
-    list_valid_parameters = ['int_mi_n_neighbors', 'string_entropy_method',
-                             'bool_discrete_reference_model',
-                             'int_random_state']
-    list_valid_entropy_methods = ['vasicek', 'van es', 'ebrahimi', 'correa',
-                                  'auto']
+    list_valid_parameters = [
+        "int_mi_n_neighbors",
+        "string_entropy_method",
+        "bool_discrete_reference_model",
+        "int_random_state",
+    ]
+    list_valid_entropy_methods = [
+        "vasicek",
+        "van es",
+        "ebrahimi",
+        "correa",
+        "auto",
+    ]
     list_valid_discrete_target = [True, False]
     list_valid_float_types = [np.float64, np.float32, np.double]
 
-    if not all(string_parameter in dict_mi_parameters
-               for string_parameter in list_valid_parameters):
-        raise ValueError('dict_mi_parameters must contain all of the keys' +
-                         ' from this list ' + str(list_valid_parameters))
+    if not all(
+        string_parameter in dict_mi_parameters
+        for string_parameter in list_valid_parameters
+    ):
+        raise ValueError(
+            "dict_mi_parameters must contain all of the keys"
+            + " from this list "
+            + str(list_valid_parameters)
+        )
 
-    if dict_mi_parameters['int_mi_n_neighbors'] <= 0:
-        raise ValueError('int_mi_n_neighbors has to be greater than 0.')
+    if dict_mi_parameters["int_mi_n_neighbors"] <= 0:
+        raise ValueError("int_mi_n_neighbors has to be greater than 0.")
 
-    if dict_mi_parameters[
-            'string_entropy_method'] not in list_valid_entropy_methods:
-        raise ValueError('string_entropy_method is not one of the' +
-                         ' following:' + str(list_valid_entropy_methods))
+    if (
+        dict_mi_parameters["string_entropy_method"]
+        not in list_valid_entropy_methods
+    ):
+        raise ValueError(
+            "string_entropy_method is not one of the"
+            + " following:"
+            + str(list_valid_entropy_methods)
+        )
 
-    if dict_mi_parameters[
-            'bool_discrete_reference_model'] not in list_valid_discrete_target:
-        raise ValueError('bool_discrete_reference_model is not one of the' +
-                         ' following:' + str(list_valid_discrete_target))
+    if (
+        dict_mi_parameters["bool_discrete_reference_model"]
+        not in list_valid_discrete_target
+    ):
+        raise ValueError(
+            "bool_discrete_reference_model is not one of the"
+            + " following:"
+            + str(list_valid_discrete_target)
+        )
 
     list_all_features = df_input.columns.to_list()
 
@@ -317,48 +403,57 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # Calculate entropies
         # 0 in the list
         if string_one_model == string_reference_model:
-            if dict_mi_parameters['bool_discrete_reference_model']:
+            if dict_mi_parameters["bool_discrete_reference_model"]:
                 dict_result[string_one_model].append(
                     _float_calculate_discrete_entropy(
-                        df_input[string_one_model], int_base=2))
+                        df_input[string_one_model], int_base=2
+                    )
+                )
             else:
                 if df_input[string_one_model].dtype in list_valid_float_types:
                     dict_result[string_one_model].append(
-                        differential_entropy(df_input[string_one_model],
-                                             base=2))
+                        differential_entropy(df_input[string_one_model], base=2)
+                    )
                 else:
                     raise RuntimeError(
-                        'Model named ' + string_one_model +
-                        ' is said to be contionus but has values' +
-                        ' that are not one of the following type ' +
-                        str(list_valid_float_types))
+                        "Model named "
+                        + string_one_model
+                        + " is said to be contionus but has values"
+                        + " that are not one of the following type "
+                        + str(list_valid_float_types)
+                    )
         else:
             if dict_feature_discrete_mask[string_one_model]:
                 dict_result[string_one_model].append(
                     _float_calculate_discrete_entropy(
-                        df_input[string_one_model], int_base=2))
+                        df_input[string_one_model], int_base=2
+                    )
+                )
             else:
                 if df_input[string_one_model].dtype in list_valid_float_types:
                     dict_result[string_one_model].append(
-                        differential_entropy(df_input[string_one_model],
-                                             base=2))
+                        differential_entropy(df_input[string_one_model], base=2)
+                    )
                 else:
                     raise RuntimeError(
-                        'Model named ' + string_one_model +
-                        ' is said to be contionus but has values' +
-                        ' that are not one of the following type ' +
-                        str(list_valid_float_types))
+                        "Model named "
+                        + string_one_model
+                        + " is said to be contionus but has values"
+                        + " that are not one of the following type "
+                        + str(list_valid_float_types)
+                    )
 
-        if dict_mi_parameters['bool_discrete_reference_model']:
+        if dict_mi_parameters["bool_discrete_reference_model"]:
             # Calculate mutual informations against the reference feature
             # 1 in the list
             dict_result[string_one_model].append(
                 mutual_info_classif(
                     df_input[string_one_model].to_numpy().reshape(-1, 1),
                     df_input[string_reference_model],
-                    random_state=dict_mi_parameters['int_random_state'],
-                    discrete_features=dict_mi_parameters['discrete_models']
-                    )[0])
+                    random_state=dict_mi_parameters["int_random_state"],
+                    discrete_features=dict_mi_parameters["discrete_models"],
+                )[0]
+            )
 
         else:
             # Calculate mutual informations against the reference feature
@@ -367,9 +462,10 @@ def df_calculate_mid_properties(df_input, string_reference_model,
                 mutual_info_regression(
                     df_input[string_one_model].to_numpy().reshape(-1, 1),
                     df_input[string_reference_model],
-                    random_state=dict_mi_parameters['int_random_state'],
-                    discrete_features=dict_mi_parameters['discrete_models']
-                    )[0])
+                    random_state=dict_mi_parameters["int_random_state"],
+                    discrete_features=dict_mi_parameters["discrete_models"],
+                )[0]
+            )
 
     for string_one_model in list_all_features:
         # Calculating fixed MI from equation 17 from the paper
@@ -378,15 +474,19 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # afterwards
         # 2 in the list
         dict_result[string_one_model].append(
-            dict_result[string_one_model][1] *
-            (dict_result[string_reference_model][0] /
-             dict_result[string_reference_model][1]))
+            dict_result[string_one_model][1]
+            * (
+                dict_result[string_reference_model][0]
+                / dict_result[string_reference_model][1]
+            )
+        )
 
         # Calculate normalized (centered) entropies
         # 3 in the list
         dict_result[string_one_model].append(
-            dict_result[string_one_model][0] /
-            dict_result[string_reference_model][0])
+            dict_result[string_one_model][0]
+            / dict_result[string_reference_model][0]
+        )
 
         # Calculate normalized mutual information according to the paper
         # NMI(X,Y) = I(X,Y) / sqrt(H(X) * H(Y))
@@ -394,14 +494,17 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # differential entropies. NMI is not used at all for the MI chart
         # that spans two quadrants
         # 4 in the list
-        float_product = dict_result[string_reference_model][0] *\
-            dict_result[string_one_model][0]
+        float_product = (
+            dict_result[string_reference_model][0]
+            * dict_result[string_one_model][0]
+        )
 
         if float_product < 0:
             float_product = 1
 
-        float_divide = dict_result[string_one_model][2] /\
-            math.sqrt(float_product)
+        float_divide = dict_result[string_one_model][2] / math.sqrt(
+            float_product
+        )
 
         dict_result[string_one_model].append(float_divide)
 
@@ -409,14 +512,13 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # paper arccos(NMI(X,Y))
         # 5 in the list
         if float_divide > 1:
-            dict_result[string_one_model].append(
-                math.degrees(math.acos(1)))
+            dict_result[string_one_model].append(math.degrees(math.acos(1)))
         elif float_divide < -1:
-            dict_result[string_one_model].append(
-                math.degrees(math.acos(-1)))
+            dict_result[string_one_model].append(math.degrees(math.acos(-1)))
         else:
             dict_result[string_one_model].append(
-                math.degrees(math.acos(float_divide)))
+                math.degrees(math.acos(float_divide))
+            )
 
         # Calculate root entropy
         # 6 in the list
@@ -435,40 +537,44 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # I(X,Y) = H(X) + H(Y) - H(X,Y) => H(X,Y) = H(X) + H(Y) - I(X,Y)
         # 7 in the list
         dict_result[string_one_model].append(
-            dict_result[string_reference_model][0] +
-            dict_result[string_one_model][0] -
-            dict_result[string_one_model][2])
+            dict_result[string_reference_model][0]
+            + dict_result[string_one_model][0]
+            - dict_result[string_one_model][2]
+        )
 
         # Calculate scaled mutual information according to the paper
         # SMI(X,Y) = I(X,Y) * ((H(X,Y) / (H(X)*H(Y)))) (equation 15)
         # 8 in the list
         smi_x_y = dict_result[string_one_model][2] * (
-            dict_result[string_one_model][-1] /
-            (dict_result[string_reference_model][0]
-             * dict_result[string_one_model][0]))
+            dict_result[string_one_model][-1]
+            / (
+                dict_result[string_reference_model][0]
+                * dict_result[string_one_model][0]
+            )
+        )
 
         dict_result[string_one_model].append(smi_x_y)
 
         # Calculate arccos of biased scaled mutual information according to the
         # paper arccos(c(X,Y)) where c(X,Y) = 2*SMI(X,Y) - 1
         # 9 in the list
-        float_c_x_y = 2*smi_x_y - 1
+        float_c_x_y = 2 * smi_x_y - 1
 
         if float_c_x_y > 1:
-            dict_result[string_one_model].append(
-                math.degrees(math.acos(1)))
+            dict_result[string_one_model].append(math.degrees(math.acos(1)))
         elif float_c_x_y < -1:
-            dict_result[string_one_model].append(
-                math.degrees(math.acos(-1)))
+            dict_result[string_one_model].append(math.degrees(math.acos(-1)))
         else:
             dict_result[string_one_model].append(
-                math.degrees(math.acos(float_c_x_y)))
+                math.degrees(math.acos(float_c_x_y))
+            )
 
         # Calculate normalized root entropy
         # 10 in the list
         dict_result[string_one_model].append(
-            dict_result[string_one_model][6] /
-            dict_result[string_reference_model][6])
+            dict_result[string_one_model][6]
+            / dict_result[string_reference_model][6]
+        )
 
         ######################################################################
 
@@ -476,9 +582,10 @@ def df_calculate_mid_properties(df_input, string_reference_model,
         # from the paper: VI(X,Y) = H(X) + H(Y) - 2I(X;Y)
         # 11 in the list
         dict_result[string_one_model].append(
-            dict_result[string_reference_model][0] +
-            dict_result[string_one_model][0] -
-            2 * dict_result[string_one_model][2])
+            dict_result[string_reference_model][0]
+            + dict_result[string_one_model][0]
+            - 2 * dict_result[string_one_model][2]
+        )
 
         # Calculate the root variation of information (RVI)
         # 12 in the list
@@ -486,28 +593,46 @@ def df_calculate_mid_properties(df_input, string_reference_model,
             dict_result[string_one_model].append(-1)
         else:
             dict_result[string_one_model].append(
-                math.sqrt(dict_result[string_one_model][-1]))
+                math.sqrt(dict_result[string_one_model][-1])
+            )
 
     df_result = pd.DataFrame().from_dict(
-        dict_result, orient='index',
-        columns=['Entropy', 'Mutual Information', 'Fixed_MI',
-                 'Normalized Entropy', 'Normalized MI', 'Angle_NMI',
-                 'Root Entropy', 'Joint_entropies', 'Scaled MI',
-                 'Angle_SMI', 'Normalized Root Entropy', 'VI', 'RVI'])
+        dict_result,
+        orient="index",
+        columns=[
+            "Entropy",
+            "Mutual Information",
+            "Fixed_MI",
+            "Normalized Entropy",
+            "Normalized MI",
+            "Angle_NMI",
+            "Root Entropy",
+            "Joint_entropies",
+            "Scaled MI",
+            "Angle_SMI",
+            "Normalized Root Entropy",
+            "VI",
+            "RVI",
+        ],
+    )
 
-    df_result = df_result.reset_index().rename(columns={'index': 'Model'})
+    df_result = df_result.reset_index().rename(columns={"index": "Model"})
 
     return df_result
 
 
-def df_calculate_all_properties(df_input, string_reference_model,
-                                dict_mi_parameters=dict(
-                                    string_entropy_method='auto',
-                                    int_mi_n_neighbors=3,
-                                    discrete_models='auto',
-                                    bool_discrete_reference_model=False,
-                                    int_random_state=_INT_RANDOM_SEED),
-                                string_corr_method='pearson'):
+def df_calculate_all_properties(
+    df_input,
+    string_reference_model,
+    dict_mi_parameters=dict(
+        string_entropy_method="auto",
+        int_mi_n_neighbors=3,
+        discrete_models="auto",
+        bool_discrete_reference_model=False,
+        int_random_state=_INT_RANDOM_SEED,
+    ),
+    string_corr_method="pearson",
+):
     """
     df_calculate_all_properties caclulates all necessary statistical and
     information theory properties for the Taylor and Mutual Information diagram
@@ -538,11 +663,13 @@ def df_calculate_all_properties(df_input, string_reference_model,
     df_input = _df_check_df_raw_input(df_input)
 
     df_td = df_calculate_td_properties(
-        df_input, string_reference_model, string_corr_method)
+        df_input, string_reference_model, string_corr_method
+    )
     df_mid = df_calculate_mid_properties(
-        df_input, string_reference_model, dict_mi_parameters)
+        df_input, string_reference_model, dict_mi_parameters
+    )
 
-    df_result = df_td.merge(df_mid, on='Model', how='inner')
+    df_result = df_td.merge(df_mid, on="Model", how="inner")
 
     return df_result
 
@@ -560,13 +687,15 @@ def _tuple_hex_to_rgb(string_hex_color):
         tuple: The return value is a tuple (R, G, B) where R, G, B are
           integer values from 0 to 255.
     """
-    return tuple(
-        [int(string_hex_color.lstrip('#')[int_i:int_i+2], 16)
-         for int_i in (0, 2, 4)])
+    return tuple([
+        int(string_hex_color.lstrip("#")[int_i : int_i + 2], 16)
+        for int_i in (0, 2, 4)
+    ])
 
 
-def _dict_calculate_model_colors(list_model_names, string_reference_model,
-                                 int_number_of_datasets):
+def _dict_calculate_model_colors(
+    list_model_names, string_reference_model, int_number_of_datasets
+):
     """
     _dict_calculate_model_colors defines an RGBA color for each model parsed in
     the list_model_names. The reference model is always black.
@@ -599,10 +728,11 @@ def _dict_calculate_model_colors(list_model_names, string_reference_model,
         int_j = 0
         for string_model_name in list_model_names:
             if string_model_name == string_reference_model:
-                string_hex_color = '#000000'
+                string_hex_color = "#000000"
             else:
                 string_hex_color = list_color_scheme[
-                    int_j % int_num_discrete_colors]
+                    int_j % int_num_discrete_colors
+                ]
                 int_j += 1
 
             if string_model_name not in dict_result:
@@ -610,14 +740,17 @@ def _dict_calculate_model_colors(list_model_names, string_reference_model,
 
             tuple_rgb_color = _tuple_hex_to_rgb(string_hex_color)
             dict_result[string_model_name][int_i] = (
-                int(tuple_rgb_color[0]), int(tuple_rgb_color[1]),
-                int(tuple_rgb_color[2]))
+                int(tuple_rgb_color[0]),
+                int(tuple_rgb_color[1]),
+                int(tuple_rgb_color[2]),
+            )
 
     return dict_result
 
 
-def _warning_check_identical_model_values(df_input, string_diagram_type,
-                                          string_mid_type='scaled'):
+def _warning_check_identical_model_values(
+    df_input, string_diagram_type, string_mid_type="scaled"
+):
     """
     _warning_check_identical_model_values checks if there are models that have
     identical statistical or information theory properties. This check is
@@ -644,44 +777,62 @@ def _warning_check_identical_model_values(df_input, string_diagram_type,
     # We first round the results to two decimal places in order to catch
     # more overlapping models (circles)
     df_rounded_input = df_input.round(
-        pd.Series([2]*(df_input.shape[1]-1),
-                  index=df_input.columns.to_list()[1:]))
+        pd.Series(
+            [2] * (df_input.shape[1] - 1), index=df_input.columns.to_list()[1:]
+        )
+    )
 
-    if string_diagram_type == 'taylor' or string_diagram_type == 'both':
-        df_taylor_result = df_rounded_input[df_rounded_input.duplicated(
-            subset=['Standard Deviation', 'Correlation'], keep=False)]
+    if string_diagram_type == "taylor" or string_diagram_type == "both":
+        df_taylor_result = df_rounded_input[
+            df_rounded_input.duplicated(
+                subset=["Standard Deviation", "Correlation"], keep=False
+            )
+        ]
         if df_taylor_result.shape[0] != 0:
-            warnings.warn('WARNING: The following models have the same' +
-                          ' Standard Deviation and Correlation: ' +
-                          str(df_taylor_result['Model'].to_list()) +
-                          '.\nThe resulting Taylor diagram will have' +
-                          ' overlapping marks (circles).', RuntimeWarning)
+            warnings.warn(
+                "WARNING: The following models have the same"
+                + " Standard Deviation and Correlation: "
+                + str(df_taylor_result["Model"].to_list())
+                + ".\nThe resulting Taylor diagram will have"
+                + " overlapping marks (circles).",
+                RuntimeWarning,
+            )
 
     # This is the case where string_diagram_type is either 'mid' or 'both'
-    elif string_diagram_type == 'mid' or string_diagram_type == 'both':
-        if string_mid_type == 'scaled':
-            string_mi_column = ['Entropy', 'Scaled MI']
-            string_text = 'Scaled Mutual Information: '
+    elif string_diagram_type == "mid" or string_diagram_type == "both":
+        if string_mid_type == "scaled":
+            string_mi_column = ["Entropy", "Scaled MI"]
+            string_text = "Scaled Mutual Information: "
         else:
-            string_mi_column = ['Root Entropy', 'Normalized MI']
-            string_text = 'Normalized Mutual Information: '
+            string_mi_column = ["Root Entropy", "Normalized MI"]
+            string_text = "Normalized Mutual Information: "
 
-        df_mi_result = df_rounded_input[df_rounded_input.duplicated(
-            subset=[string_mi_column[0], string_mi_column[1]], keep=False)]
+        df_mi_result = df_rounded_input[
+            df_rounded_input.duplicated(
+                subset=[string_mi_column[0], string_mi_column[1]], keep=False
+            )
+        ]
         if df_mi_result.shape[0] != 0:
-            warnings.warn('WARNING: The following models have the same' +
-                          ' Entropy and ' + string_text +
-                          str(df_mi_result['Model'].to_list()) +
-                          '.\nThe resulting Mutual Information diagram will' +
-                          ' have overlapping marks (circles).', RuntimeWarning)
+            warnings.warn(
+                "WARNING: The following models have the same"
+                + " Entropy and "
+                + string_text
+                + str(df_mi_result["Model"].to_list())
+                + ".\nThe resulting Mutual Information diagram will"
+                + " have overlapping marks (circles).",
+                RuntimeWarning,
+            )
 
-    return None
 
-
-def _chart_create_diagram(list_df_input, string_reference_model,
-                          string_mid_type, string_diagram_type,
-                          bool_normalized_measures, bool_flag_as_subplot=False,
-                          chart_result_upper=None):
+def _chart_create_diagram(
+    list_df_input,
+    string_reference_model,
+    string_mid_type,
+    string_diagram_type,
+    bool_normalized_measures,
+    bool_flag_as_subplot=False,
+    chart_result_upper=None,
+):
     """
     _chart_create_diagram is a general function that creates both the Taylor
     and the Mutual Information diagrams according to the passed argument.
@@ -737,89 +888,101 @@ def _chart_create_diagram(list_df_input, string_reference_model,
           or Mutual Information diagram.
     """
 
-    list_valid_diagram_types = ['taylor', 'mid']
-    list_valid_mid_types = ['scaled', 'normalized', None]
+    list_valid_diagram_types = ["taylor", "mid"]
+    list_valid_mid_types = ["scaled", "normalized", None]
 
     if not isinstance(bool_normalized_measures, bool):
-        raise TypeError('bool_normalized_measures must be of bool type')
+        raise TypeError("bool_normalized_measures must be of bool type")
 
     if string_diagram_type not in list_valid_diagram_types:
-        raise ValueError('string_diagram_type not in ' +
-                         str(list_valid_diagram_types))
+        raise ValueError(
+            "string_diagram_type not in " + str(list_valid_diagram_types)
+        )
     if string_mid_type not in list_valid_mid_types:
-        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
+        raise ValueError("string_mid_type not in " + str(list_valid_mid_types))
 
     # General properties
-    string_tooltip_label_0 = 'Model'
+    string_tooltip_label_0 = "Model"
     int_number_of_models = len(
-        list_df_input[0][string_tooltip_label_0].to_list())
+        list_df_input[0][string_tooltip_label_0].to_list()
+    )
     int_number_of_datasets = len(list_df_input)
 
-    np_tmp = np.array(
-        [0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
+    np_tmp = np.array([0, 0.2, 0.4, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99, 1.0])
 
-    if string_diagram_type == 'taylor':
+    if string_diagram_type == "taylor":
         int_subplot_column_number = 1
 
         if bool_normalized_measures:
-            string_radial_column = 'Normalized Standard Deviation'
+            string_radial_column = "Normalized Standard Deviation"
         else:
-            string_radial_column = 'Standard Deviation'
-        string_angular_column = 'Angle'
-        string_angular_column_label = 'Correlation'
+            string_radial_column = "Standard Deviation"
+        string_angular_column = "Angle"
+        string_angular_column_label = "Correlation"
         string_tooltip_label_1 = string_radial_column
         string_tooltip_label_2 = string_angular_column_label
-        string_tooltip_label_3 = 'CRMSE'
-        bool_only_half = True if (
-            list_df_input[0][string_angular_column] <= 90).all() else False
-        np_angular_labels = np_tmp if bool_only_half else np.concatenate(
-            (-np_tmp[:0:-1], np_tmp))
+        string_tooltip_label_3 = "CRMSE"
+        bool_only_half = (
+            True
+            if (list_df_input[0][string_angular_column] <= 90).all()
+            else False
+        )
+        np_angular_labels = (
+            np_tmp
+            if bool_only_half
+            else np.concatenate((-np_tmp[:0:-1], np_tmp))
+        )
         np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
     else:
         int_subplot_column_number = 2
 
-        if string_mid_type == 'scaled':
-            string_angular_column = 'Angle_SMI'
+        if string_mid_type == "scaled":
+            string_angular_column = "Angle_SMI"
             if bool_normalized_measures:
-                string_radial_column = 'Normalized Entropy'
+                string_radial_column = "Normalized Entropy"
             else:
-                string_radial_column = 'Entropy'
-            string_angular_column_label = 'Scaled Mutual Information'
+                string_radial_column = "Entropy"
+            string_angular_column_label = "Scaled Mutual Information"
             string_tooltip_label_1 = string_radial_column
-            string_tooltip_label_2 = 'Scaled MI'
-            string_tooltip_label_3 = 'VI'
+            string_tooltip_label_2 = "Scaled MI"
+            string_tooltip_label_3 = "VI"
             # TODO: Improve this below. We might have to check the second
             # TODO: version data set as well, since those models might go
             # TODO: on the other quarter of the circle
-            bool_only_half = bool_only_half = True if (
-                list_df_input[0][string_angular_column] <= 90).all() else False
+            bool_only_half = bool_only_half = (
+                True
+                if (list_df_input[0][string_angular_column] <= 90).all()
+                else False
+            )
             np_angular_labels = np.concatenate((-np_tmp[:0:-1], np_tmp))
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
             np_angular_labels = np.round((np_angular_labels + 1) / 2, 3)
 
         else:
-            string_angular_column = 'Angle_NMI'
+            string_angular_column = "Angle_NMI"
             if bool_normalized_measures:
-                string_radial_column = 'Normalized Root Entropy'
+                string_radial_column = "Normalized Root Entropy"
             else:
-                string_radial_column = 'Root Entropy'
-            string_angular_column_label = 'Normalized Mutual Information'
+                string_radial_column = "Root Entropy"
+            string_angular_column_label = "Normalized Mutual Information"
             string_tooltip_label_1 = string_radial_column
-            string_tooltip_label_2 = 'Normalized MI'
-            string_tooltip_label_3 = 'RVI'
+            string_tooltip_label_2 = "Normalized MI"
+            string_tooltip_label_3 = "RVI"
             bool_only_half = True
             np_angular_labels = np_tmp
             np_angular_ticks = np.degrees(np.arccos(np_angular_labels))
 
-    string_scalar_column = 'Scalar'
+    string_scalar_column = "Scalar"
     int_max_angle = 90 if bool_only_half else 180
 
     if list_df_input[0][string_radial_column].std() <= 0.1:
-        float_max_r = list_df_input[0][string_radial_column].max()*1.5
+        float_max_r = list_df_input[0][string_radial_column].max() * 1.5
     else:
-        float_max_r = list_df_input[0][string_radial_column].max() +\
-            list_df_input[0][string_radial_column].std()
+        float_max_r = (
+            list_df_input[0][string_radial_column].max()
+            + list_df_input[0][string_radial_column].std()
+        )
 
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] != 2:
         # We check if it is NOT a scenario where user inputed dataframe with
@@ -830,17 +993,18 @@ def _chart_create_diagram(list_df_input, string_reference_model,
         # 1    y2  0.271349
         float_max_r = max(
             float_max_r,
-            list_df_input[1][string_radial_column].max() +
-            list_df_input[1][string_radial_column].std() if
-            list_df_input[1][string_radial_column].std() > 0.1 else
-            list_df_input[1][string_radial_column].max()*1.5)
+            list_df_input[1][string_radial_column].max()
+            + list_df_input[1][string_radial_column].std()
+            if list_df_input[1][string_radial_column].std() > 0.1
+            else list_df_input[1][string_radial_column].max() * 1.5,
+        )
 
     if bool_flag_as_subplot:
         chart_result = chart_result_upper
     else:
         chart_result = go.Figure()
 
-    string_tooltip_suffix = ''
+    string_tooltip_suffix = ""
 
     dict_polar_chart = dict(
         sector=[0, int_max_angle],
@@ -849,21 +1013,21 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             range=[0, float_max_r],
             griddash=_STRING_GRID_STYLE,
             gridcolor=_STRING_GRID_COLOR,
-            ticks='outside',
+            ticks="outside",
             tickwidth=_INT_TICK_WIDTH,
             tickcolor=_STRING_TICK_COLOR,
             tickfont=dict(color=_STRING_LABEL_TITLE_COLOR),
             showline=True,
             linecolor=_STRING_TICK_COLOR,
-            layer='below traces',
+            layer="below traces",
             title=dict(
-                text='<br>' + string_radial_column,
-                font=dict(
-                    color=_STRING_LABEL_TITLE_COLOR,
-                    size=16))),
+                text="<br>" + string_radial_column,
+                font=dict(color=_STRING_LABEL_TITLE_COLOR, size=16),
+            ),
+        ),
         angularaxis=dict(
             direction="counterclockwise",
-            ticks='outside',
+            ticks="outside",
             tickwidth=_INT_TICK_WIDTH,
             tickvals=np_angular_ticks,
             ticktext=np_angular_labels,
@@ -873,22 +1037,25 @@ def _chart_create_diagram(list_df_input, string_reference_model,
             gridcolor=_STRING_GRID_COLOR,
             showline=True,
             linecolor=_STRING_TICK_COLOR,
-            layer='below traces'))
+            layer="below traces",
+        ),
+    )
     dict_legend = dict(
         title=dict(text=string_tooltip_label_0),
-        font=dict(
-            color=_STRING_LABEL_TITLE_COLOR),
+        font=dict(color=_STRING_LABEL_TITLE_COLOR),
         bgcolor=_STRING_BACKGROUND_COLOR,
         bordercolor=_STRING_GRID_COLOR,
         borderwidth=_FLOAT_LEGEND_BORDER_WIDTH,
-        orientation='h',
+        orientation="h",
         x=_INT_LEGEND_X,
-        y=_INT_LEGEND_Y)
+        y=_INT_LEGEND_Y,
+    )
 
     dict_model_colors = _dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
         string_reference_model,
-        int_number_of_datasets)
+        int_number_of_datasets,
+    )
 
     # Calculate marker sizes if we have a scalar dataset
     # And also check if we have a second version dataset so that we have a
@@ -899,15 +1066,17 @@ def _chart_create_diagram(list_df_input, string_reference_model,
     # version dataset
     if int_number_of_datasets == 2 and list_df_input[1].shape[1] == 2:
         np_first_row = list_df_input[1][string_scalar_column].to_numpy()
-        np_scaled_values = (np_first_row - np.min(np_first_row)) /\
-            (np.max(np_first_row) - np.min(np_first_row))
+        np_scaled_values = (np_first_row - np.min(np_first_row)) / (
+            np.max(np_first_row) - np.min(np_first_row)
+        )
 
-        dict_model_marker_sizes = dict(zip(
-            list_df_input[0][string_tooltip_label_0],
-            np_scaled_values))
+        dict_model_marker_sizes = dict(
+            zip(list_df_input[0][string_tooltip_label_0], np_scaled_values)
+        )
 
-        float_concentric_sizeref = np_scaled_values.max() / (
-            _INT_MARKER_SIZE*2)**2
+        float_concentric_sizeref = (
+            np_scaled_values.max() / (_INT_MARKER_SIZE * 2) ** 2
+        )
 
         int_dataset_option = 1
 
@@ -918,38 +1087,47 @@ def _chart_create_diagram(list_df_input, string_reference_model,
 
     for int_i, df_input in enumerate(list_df_input):
         list_tooltip_columns = [
-            string_tooltip_label_0, string_tooltip_label_1,
-            string_tooltip_label_2, string_tooltip_label_3]
+            string_tooltip_label_0,
+            string_tooltip_label_1,
+            string_tooltip_label_2,
+            string_tooltip_label_3,
+        ]
 
         if int_dataset_option == 0:
-            string_tooltip_suffix = '<br>'
+            string_tooltip_suffix = "<br>"
         elif int_dataset_option == 1:
             df_input = list_df_input[0].merge(
-                list_df_input[1], on=string_tooltip_label_0, how='inner')
+                list_df_input[1], on=string_tooltip_label_0, how="inner"
+            )
             list_tooltip_columns.append(string_scalar_column)
-            string_tooltip_suffix = '<br>' + string_scalar_column +\
-                ': %{customdata[4]:.3f}<br>'
+            string_tooltip_suffix = (
+                "<br>" + string_scalar_column + ": %{customdata[4]:.3f}<br>"
+            )
         else:
-            string_tooltip_suffix = ' - <b>Version ' + str(int_i) +\
-                '</b><br>'
+            string_tooltip_suffix = " - <b>Version " + str(int_i) + "</b><br>"
 
-        np_tooltip_data = list(
-            df_input[list_tooltip_columns].to_numpy())
+        np_tooltip_data = list(df_input[list_tooltip_columns].to_numpy())
 
         string_tooltip_hovertemplate = (
-            string_tooltip_label_0 + ': %{customdata[0]}' +
-            string_tooltip_suffix +
-            string_tooltip_label_1 + ': %{customdata[1]:.3f}<br>' +
-            string_tooltip_label_2 + ': %{customdata[2]:.3f}<br>' +
-            'Reference distance (' + string_tooltip_label_3 +
-            '): %{customdata[3]:.3f}<br>' + '<extra></extra>')
+            string_tooltip_label_0
+            + ": %{customdata[0]}"
+            + string_tooltip_suffix
+            + string_tooltip_label_1
+            + ": %{customdata[1]:.3f}<br>"
+            + string_tooltip_label_2
+            + ": %{customdata[2]:.3f}<br>"
+            + "Reference distance ("
+            + string_tooltip_label_3
+            + "): %{customdata[3]:.3f}<br>"
+            + "<extra></extra>"
+        )
 
         for tmp_r, tmp_angle, tmp_model_int, tmp_model in zip(
-                df_input[string_radial_column],
-                df_input[string_angular_column],
-                pd.factorize(df_input[string_tooltip_label_0])[0],
-                df_input[string_tooltip_label_0]):
-
+            df_input[string_radial_column],
+            df_input[string_angular_column],
+            pd.factorize(df_input[string_tooltip_label_0])[0],
+            df_input[string_tooltip_label_0],
+        ):
             string_marker_color = dict_model_colors[tmp_model][int_i]
 
             if int_i == 1 and int_dataset_option == 1:
@@ -958,29 +1136,34 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                 string_marker_color = dict_model_colors[tmp_model][0]
                 dict_marker = dict(
                     line=dict(
-                        color='rgba' + str(string_marker_color + (1,)),
-                        width=_INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(string_marker_color + (0,)),
+                        color="rgba" + str(string_marker_color + (1,)),
+                        width=_INT_MARKER_LINE_WIDTH,
+                    ),
+                    color="rgba" + str(string_marker_color + (0,)),
                     size=[dict_model_marker_sizes[tmp_model]],
                     sizemin=_INT_MARKER_SIZE,
-                    sizemode='area',
-                    sizeref=float_concentric_sizeref)
+                    sizemode="area",
+                    sizeref=float_concentric_sizeref,
+                )
             elif int_i == 0 and int_dataset_option == 2:
                 dict_marker = dict(
-                    color='rgba' + str(
-                        string_marker_color + (_FLOAT_MARKER_OPACITY,)),
-                    size=_INT_MARKER_SIZE + _INT_MARKER_LINE_WIDTH)
+                    color="rgba"
+                    + str(string_marker_color + (_FLOAT_MARKER_OPACITY,)),
+                    size=_INT_MARKER_SIZE + _INT_MARKER_LINE_WIDTH,
+                )
             else:
                 dict_marker = dict(
                     line=dict(
-                        color='rgba' + str(string_marker_color + (1,)),
-                        width=_INT_MARKER_LINE_WIDTH),
-                    color='rgba' + str(
-                        string_marker_color + (_FLOAT_MARKER_OPACITY,)),
-                    size=_INT_MARKER_SIZE)
+                        color="rgba" + str(string_marker_color + (1,)),
+                        width=_INT_MARKER_LINE_WIDTH,
+                    ),
+                    color="rgba"
+                    + str(string_marker_color + (_FLOAT_MARKER_OPACITY,)),
+                    size=_INT_MARKER_SIZE,
+                )
 
             if bool_flag_as_subplot:
-                if string_diagram_type == 'taylor' and int_i == 0:
+                if string_diagram_type == "taylor" and int_i == 0:
                     bool_show_legend = True
                 else:
                     bool_show_legend = False
@@ -989,88 +1172,95 @@ def _chart_create_diagram(list_df_input, string_reference_model,
                         name=tmp_model,
                         r=[tmp_r],
                         theta=[tmp_angle],
-                        mode='markers',
+                        mode="markers",
                         legendgroup=tmp_model,
                         showlegend=bool_show_legend,
                         # This below has to be done like this, since we add
                         # traces one by one
-                        customdata=[np_tooltip_data[tmp_model_int]] *\
-                        int_number_of_models,
-
+                        customdata=[np_tooltip_data[tmp_model_int]]
+                        * int_number_of_models,
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
                             bgcolor=_STRING_BACKGROUND_COLOR,
-                            bordercolor='rgba' + str(
-                                string_marker_color + (1,)),
-                            font=dict(
-                                color=_STRING_TICK_COLOR)),
-                        marker=dict_marker),
+                            bordercolor="rgba"
+                            + str(string_marker_color + (1,)),
+                            font=dict(color=_STRING_TICK_COLOR),
+                        ),
+                        marker=dict_marker,
+                    ),
                     row=1,
-                    col=int_subplot_column_number)
+                    col=int_subplot_column_number,
+                )
 
             else:
                 bool_show_legend = True if int_i == 0 else False
                 chart_result.add_trace(
                     go.Scatterpolar(
-                        name=str(tmp_model_int) + '. ' + tmp_model,
+                        name=str(tmp_model_int) + ". " + tmp_model,
                         r=[tmp_r],
                         theta=[tmp_angle],
-                        mode='markers',
+                        mode="markers",
                         legendgroup=tmp_model,
                         showlegend=bool_show_legend,
                         # This below has to be done like this, since we add
                         # traces one by one
-                        customdata=[np_tooltip_data[tmp_model_int]] *\
-                        int_number_of_models,
-
+                        customdata=[np_tooltip_data[tmp_model_int]]
+                        * int_number_of_models,
                         hovertemplate=string_tooltip_hovertemplate,
                         hoverlabel=dict(
                             bgcolor=_STRING_BACKGROUND_COLOR,
-                            bordercolor='rgba' + str(
-                                string_marker_color + (1,)),
-                            font=dict(
-                                color=_STRING_TICK_COLOR)),
-                        marker=dict_marker))
+                            bordercolor="rgba"
+                            + str(string_marker_color + (1,)),
+                            font=dict(color=_STRING_TICK_COLOR),
+                        ),
+                        marker=dict_marker,
+                    )
+                )
 
     if bool_flag_as_subplot:
-        if string_diagram_type == 'taylor':
+        if string_diagram_type == "taylor":
             chart_result.update_layout(
                 polar=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
-                height=_INT_CHART_HEIGHT + 120*round(int_number_of_models/10),
-                showlegend=True)
+                height=_INT_CHART_HEIGHT
+                + 120 * round(int_number_of_models / 10),
+                showlegend=True,
+            )
 
         else:
             chart_result.update_layout(
                 polar2=dict_polar_chart,
                 legend=dict_legend,
                 width=_INT_CHART_WIDTH,
-                height=_INT_CHART_HEIGHT + 120*round(int_number_of_models/10),
-                showlegend=True)
+                height=_INT_CHART_HEIGHT
+                + 120 * round(int_number_of_models / 10),
+                showlegend=True,
+            )
 
     else:
         chart_result.update_layout(
             polar=dict_polar_chart,
             legend=dict_legend,
-            width=_INT_CHART_WIDTH/2 + 100,
-            height=_INT_CHART_HEIGHT + 80*round(int_number_of_models/4),
+            width=_INT_CHART_WIDTH / 2 + 100,
+            height=_INT_CHART_HEIGHT + 80 * round(int_number_of_models / 4),
             title=dict(
                 text=string_angular_column_label,
                 x=0.5,
-                xref='paper',
-                yref='paper',
-                xanchor='auto',
-                yanchor='auto',
-                font=dict(
-                    size=16,
-                    color=_STRING_LABEL_TITLE_COLOR)))
+                xref="paper",
+                yref="paper",
+                xanchor="auto",
+                yanchor="auto",
+                font=dict(size=16, color=_STRING_LABEL_TITLE_COLOR),
+            ),
+        )
 
     return chart_result
 
 
-def _df_sort_models_by_measure(list_df_input, string_reference_model,
-                               string_measure):
+def _df_sort_models_by_measure(
+    list_df_input, string_reference_model, string_measure
+):
     """
     _df_sort_models_by_measure sorts all pandas.DataFrames from list_df_input
     starting from the models with the highest chosen measure to the lowest. If
@@ -1115,40 +1305,65 @@ def _df_sort_models_by_measure(list_df_input, string_reference_model,
         number of their order.
     """
 
-    list_valid_measures = ['CRMSE', 'VI', 'RVI']
+    list_valid_measures = ["CRMSE", "VI", "RVI"]
     if string_measure not in list_valid_measures:
-        raise ValueError('string_measure not in ' + str(list_valid_measures))
+        raise ValueError("string_measure not in " + str(list_valid_measures))
 
     int_number_of_datasets = len(list_df_input)
     if int_number_of_datasets == 1:
-        list_df_input[0] = list_df_input[0].sort_values(
-            by=[string_measure], ascending=True).reset_index(drop=True)
+        list_df_input[0] = (
+            list_df_input[0]
+            .sort_values(by=[string_measure], ascending=True)
+            .reset_index(drop=True)
+        )
     elif int_number_of_datasets == 2 and (
-            list_df_input[1].columns[1] == 'Scalar'):
-        list_df_input[0] = list_df_input[0].sort_values(
-            by=[string_measure], ascending=True).reset_index(drop=True)
+        list_df_input[1].columns[1] == "Scalar"
+    ):
+        list_df_input[0] = (
+            list_df_input[0]
+            .sort_values(by=[string_measure], ascending=True)
+            .reset_index(drop=True)
+        )
 
-        list_tmp_sorted = list_df_input[0]['Model'].to_list()
-        list_df_input[1] = list_df_input[1].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+        list_tmp_sorted = list_df_input[0]["Model"].to_list()
+        list_df_input[1] = (
+            list_df_input[1]
+            .sort_values(
+                by=["Model"],
+                key=lambda arg_column: arg_column.map(
+                    lambda e: list_tmp_sorted.index(e)
+                ),
+            )
+            .reset_index(drop=True)
+        )
     else:
-        list_df_input[1] = list_df_input[1].sort_values(
-            by=[string_measure], ascending=True).reset_index(drop=True)
+        list_df_input[1] = (
+            list_df_input[1]
+            .sort_values(by=[string_measure], ascending=True)
+            .reset_index(drop=True)
+        )
 
-        list_tmp_sorted = list_df_input[1]['Model'].to_list()
-        list_df_input[0] = list_df_input[0].sort_values(
-            by=['Model'],
-            key=lambda arg_column: arg_column.map(
-                lambda e: list_tmp_sorted.index(e))).reset_index(drop=True)
+        list_tmp_sorted = list_df_input[1]["Model"].to_list()
+        list_df_input[0] = (
+            list_df_input[0]
+            .sort_values(
+                by=["Model"],
+                key=lambda arg_column: arg_column.map(
+                    lambda e: list_tmp_sorted.index(e)
+                ),
+            )
+            .reset_index(drop=True)
+        )
 
     return list_df_input
 
 
-def chart_create_taylor_diagram(list_df_input, string_reference_model,
-                                string_corr_method='pearson',
-                                bool_normalized_measures=False):
+def chart_create_taylor_diagram(
+    list_df_input,
+    string_reference_model,
+    string_corr_method="pearson",
+    bool_normalized_measures=False,
+):
     """
     chart_create_taylor_diagram creates the Taylor diagram according to the
     list_df_input argument where models are placed in columns and rows contain
@@ -1193,14 +1408,16 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
     """
     list_df_input = _list_check_list_df_input(list_df_input)
     list_df_td = []
-    list_valid_corr_methods = ['pearson', 'kendall', 'spearman']
+    list_valid_corr_methods = ["pearson", "kendall", "spearman"]
 
     if string_corr_method not in list_valid_corr_methods:
-        raise ValueError('string_corr_method is not one of the following:' +
-                         str(list_valid_corr_methods))
+        raise ValueError(
+            "string_corr_method is not one of the following:"
+            + str(list_valid_corr_methods)
+        )
 
     if not isinstance(bool_normalized_measures, bool):
-        raise TypeError('bool_normalized_measures must be of bool type')
+        raise TypeError("bool_normalized_measures must be of bool type")
 
     for int_i, df_input in enumerate(list_df_input):
         # We have to check if the second pandas.DataFrame has one or multiple
@@ -1213,35 +1430,46 @@ def chart_create_taylor_diagram(list_df_input, string_reference_model,
             # We consider that a scalar value which we encode using mark size
             list_df_td.append(
                 df_input.melt().rename(
-                    columns={'variable': 'Model', 'value': 'Scalar'}))
+                    columns={"variable": "Model", "value": "Scalar"}
+                )
+            )
             continue
 
         df_td = df_calculate_td_properties(
-            df_input, string_reference_model, string_corr_method)
+            df_input, string_reference_model, string_corr_method
+        )
         list_df_td.append(df_td)
-        _warning_check_identical_model_values(df_td, 'taylor')
+        _warning_check_identical_model_values(df_td, "taylor")
 
-    list_df_td = _df_sort_models_by_measure(list_df_td, string_reference_model,
-                                            string_measure='CRMSE')
+    list_df_td = _df_sort_models_by_measure(
+        list_df_td, string_reference_model, string_measure="CRMSE"
+    )
 
     chart_result = _chart_create_diagram(
-        list_df_td, string_reference_model=string_reference_model,
-        string_mid_type=None, bool_flag_as_subplot=False,
-        string_diagram_type='taylor',
-        bool_normalized_measures=bool_normalized_measures)
+        list_df_td,
+        string_reference_model=string_reference_model,
+        string_mid_type=None,
+        bool_flag_as_subplot=False,
+        string_diagram_type="taylor",
+        bool_normalized_measures=bool_normalized_measures,
+    )
 
     return chart_result
 
 
-def chart_create_mi_diagram(list_df_input, string_reference_model,
-                            string_mid_type='scaled',
-                            dict_mi_parameters=dict(
-                                string_entropy_method='auto',
-                                int_mi_n_neighbors=3,
-                                discrete_models='auto',
-                                bool_discrete_reference_model=False,
-                                int_random_state=_INT_RANDOM_SEED),
-                            bool_normalized_measures=False):
+def chart_create_mi_diagram(
+    list_df_input,
+    string_reference_model,
+    string_mid_type="scaled",
+    dict_mi_parameters=dict(
+        string_entropy_method="auto",
+        int_mi_n_neighbors=3,
+        discrete_models="auto",
+        bool_discrete_reference_model=False,
+        int_random_state=_INT_RANDOM_SEED,
+    ),
+    bool_normalized_measures=False,
+):
     """
     chart_create_mi_diagram creates the Mutual Information diagram according
     to the list_df_input argument where models are placed in columns and rows
@@ -1292,13 +1520,13 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
           Information diagram.
     """
 
-    list_valid_mid_types = ['normalized', 'scaled']
+    list_valid_mid_types = ["normalized", "scaled"]
 
     if not isinstance(bool_normalized_measures, bool):
-        raise TypeError('bool_normalized_measures must be of bool type')
+        raise TypeError("bool_normalized_measures must be of bool type")
 
     if string_mid_type not in list_valid_mid_types:
-        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
+        raise ValueError("string_mid_type not in " + str(list_valid_mid_types))
 
     list_df_input = _list_check_list_df_input(list_df_input)
     list_df_mid = []
@@ -1314,25 +1542,33 @@ def chart_create_mi_diagram(list_df_input, string_reference_model,
             # We consider that a scalar value which we encode using mark size
             list_df_mid.append(
                 df_input.melt().rename(
-                    columns={'variable': 'Model', 'value': 'Scalar'}))
+                    columns={"variable": "Model", "value": "Scalar"}
+                )
+            )
             continue
 
         df_mid = df_calculate_mid_properties(
-            df_input, string_reference_model, dict_mi_parameters)
+            df_input, string_reference_model, dict_mi_parameters
+        )
         list_df_mid.append(df_mid)
-        _warning_check_identical_model_values(df_mid, 'mid', string_mid_type)
+        _warning_check_identical_model_values(df_mid, "mid", string_mid_type)
 
-    string_sorting_column = 'VI' if string_mid_type == 'scaled' else 'RVI'
+    string_sorting_column = "VI" if string_mid_type == "scaled" else "RVI"
 
     list_df_mid = _df_sort_models_by_measure(
-        list_df_mid, string_reference_model,
-        string_measure=string_sorting_column)
+        list_df_mid,
+        string_reference_model,
+        string_measure=string_sorting_column,
+    )
 
     chart_result = _chart_create_diagram(
-        list_df_mid, string_reference_model=string_reference_model,
-        string_mid_type=string_mid_type, bool_flag_as_subplot=False,
-        string_diagram_type='mid',
-        bool_normalized_measures=bool_normalized_measures)
+        list_df_mid,
+        string_reference_model=string_reference_model,
+        string_mid_type=string_mid_type,
+        bool_flag_as_subplot=False,
+        string_diagram_type="mid",
+        bool_normalized_measures=bool_normalized_measures,
+    )
 
     return chart_result
 
@@ -1355,7 +1591,7 @@ def _df_check_df_raw_input(df_input):
     """
 
     if not isinstance(df_input, pd.DataFrame):
-        raise TypeError('df_input must be a pandas.DataFrame')
+        raise TypeError("df_input must be a pandas.DataFrame")
 
     return df_input
 
@@ -1403,35 +1639,45 @@ def _list_check_list_df_input(list_df_input):
         if isinstance(list_df_input, pd.DataFrame):
             list_df_input = [list_df_input]
     else:
-        raise TypeError('list_df_input is not a list nor a pandas.DataFrame')
+        raise TypeError("list_df_input is not a list nor a pandas.DataFrame")
 
-    if not all(isinstance(df_input, pd.DataFrame)
-               for df_input in list_df_input):
-        raise TypeError('list_df_input can contain only pandas.DataFrames' +
-                        ' elements')
+    if not all(
+        isinstance(df_input, pd.DataFrame) for df_input in list_df_input
+    ):
+        raise TypeError(
+            "list_df_input can contain only pandas.DataFrames" + " elements"
+        )
 
     if len(list_df_input) not in list_valid_list_df_input_lenghts:
-        raise ValueError('list_df_input can contain only one or two' +
-                         ' pandas.DataFrames')
+        raise ValueError(
+            "list_df_input can contain only one or two" + " pandas.DataFrames"
+        )
 
     if len(list_df_input) == 2:
         if set(list_df_input[0].columns.to_list()) != set(
-                list_df_input[1].columns.to_list()):
-            raise AttributeError('list_df_input dataframes need to have the ' +
-                                 'same set of columns')
+            list_df_input[1].columns.to_list()
+        ):
+            raise AttributeError(
+                "list_df_input dataframes need to have the "
+                + "same set of columns"
+            )
     return list_df_input
 
 
-def chart_create_all_diagrams(list_df_input, string_reference_model,
-                              string_mid_type='scaled',
-                              string_corr_method='pearson',
-                              dict_mi_parameters=dict(
-                                  string_entropy_method='auto',
-                                  int_mi_n_neighbors=3,
-                                  discrete_models='auto',
-                                  bool_discrete_reference_model=False,
-                                  int_random_state=_INT_RANDOM_SEED),
-                              bool_normalized_measures=False):
+def chart_create_all_diagrams(
+    list_df_input,
+    string_reference_model,
+    string_mid_type="scaled",
+    string_corr_method="pearson",
+    dict_mi_parameters=dict(
+        string_entropy_method="auto",
+        int_mi_n_neighbors=3,
+        discrete_models="auto",
+        bool_discrete_reference_model=False,
+        int_random_state=_INT_RANDOM_SEED,
+    ),
+    bool_normalized_measures=False,
+):
     """
     chart_create_all_diagrams creates both the Taylor and the Mutual
     Information diagrams (side-by-side) according to the list_df_input argument
@@ -1485,23 +1731,25 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
           and the Mutual Information diagrams side-by-side.
     """
 
-    list_valid_mid_types = ['normalized', 'scaled']
+    list_valid_mid_types = ["normalized", "scaled"]
 
     if not isinstance(bool_normalized_measures, bool):
-        raise TypeError('bool_normalized_measures must be of bool type')
+        raise TypeError("bool_normalized_measures must be of bool type")
 
     if string_mid_type not in list_valid_mid_types:
-        raise ValueError('string_mid_type not in ' + str(list_valid_mid_types))
+        raise ValueError("string_mid_type not in " + str(list_valid_mid_types))
 
     list_df_input = _list_check_list_df_input(list_df_input)
 
-    string_combined_chart_title = "Taylor Diagram and Mutual Information Diagram" # noqa
-    string_angular_title_td = 'Correlation'
+    string_combined_chart_title = (
+        "Taylor Diagram and Mutual Information Diagram"
+    )
+    string_angular_title_td = "Correlation"
 
-    if string_mid_type == 'scaled':
-        string_angular_title_mid = 'Scaled Mutual Information'
+    if string_mid_type == "scaled":
+        string_angular_title_mid = "Scaled Mutual Information"
     else:
-        string_angular_title_mid = 'Normalized Mutual Information'
+        string_angular_title_mid = "Normalized Mutual Information"
 
     list_df_all = []
 
@@ -1514,44 +1762,61 @@ def chart_create_all_diagrams(list_df_input, string_reference_model,
         if int_i == 1 and df_input.shape[0] == 1:
             # We don't calculate properties when we have one row
             # We consider that a scalar value which we encode using mark size
-            list_df_all.append(df_input.melt().rename(
-                    columns={'variable': 'Model', 'value': 'Scalar'}))
+            list_df_all.append(
+                df_input.melt().rename(
+                    columns={"variable": "Model", "value": "Scalar"}
+                )
+            )
             continue
 
         df_all = df_calculate_all_properties(
-            df_input=df_input, string_reference_model=string_reference_model,
+            df_input=df_input,
+            string_reference_model=string_reference_model,
             string_corr_method=string_corr_method,
-            dict_mi_parameters=dict_mi_parameters)
+            dict_mi_parameters=dict_mi_parameters,
+        )
         list_df_all.append(df_all)
-        _warning_check_identical_model_values(df_all, 'both', string_mid_type)
+        _warning_check_identical_model_values(df_all, "both", string_mid_type)
 
     chart_result = make_subplots(
-        rows=1, cols=2, specs=[[{'type': 'polar'}]*2],
-        subplot_titles=(string_angular_title_td,  string_angular_title_mid))
+        rows=1,
+        cols=2,
+        specs=[[{"type": "polar"}] * 2],
+        subplot_titles=(string_angular_title_td, string_angular_title_mid),
+    )
 
     chart_result = _chart_create_diagram(
-        list_df_all, string_reference_model=string_reference_model,
-        bool_flag_as_subplot=True, chart_result_upper=chart_result,
-        string_diagram_type='taylor', string_mid_type=None,
-        bool_normalized_measures=bool_normalized_measures)
+        list_df_all,
+        string_reference_model=string_reference_model,
+        bool_flag_as_subplot=True,
+        chart_result_upper=chart_result,
+        string_diagram_type="taylor",
+        string_mid_type=None,
+        bool_normalized_measures=bool_normalized_measures,
+    )
 
     chart_result = _chart_create_diagram(
-        list_df_all, string_reference_model=string_reference_model,
-        string_mid_type=string_mid_type, bool_flag_as_subplot=True,
-        chart_result_upper=chart_result, string_diagram_type='mid',
-        bool_normalized_measures=bool_normalized_measures)
+        list_df_all,
+        string_reference_model=string_reference_model,
+        string_mid_type=string_mid_type,
+        bool_flag_as_subplot=True,
+        chart_result_upper=chart_result,
+        string_diagram_type="mid",
+        bool_normalized_measures=bool_normalized_measures,
+    )
 
     chart_result.update_annotations(
-        yshift=25, font_color=_STRING_LABEL_TITLE_COLOR)
+        yshift=25, font_color=_STRING_LABEL_TITLE_COLOR
+    )
     chart_result.update_layout(
         title=dict(
             text=string_combined_chart_title,
             x=0.5,
             y=0.95,
-            xanchor='center',
-            yanchor='top',
-            font=dict(
-                size=20,
-                color=_STRING_LABEL_TITLE_COLOR)))
+            xanchor="center",
+            yanchor="top",
+            font=dict(size=20, color=_STRING_LABEL_TITLE_COLOR),
+        )
+    )
 
     return chart_result
