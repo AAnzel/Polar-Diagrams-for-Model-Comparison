@@ -16,7 +16,7 @@ This library is created for the following paper:
 ***"Interactive Polar Diagrams for Model Comparison"*** by Aleksandar Anžel, Dominik Heider, and Georges Hattab
 
 Please cite the paper as:
-```latex
+```bibtex
 @article{ANZEL2023107843,
 title = {Interactive polar diagrams for model comparison},
 journal = {Computer Methods and Programs in Biomedicine},
