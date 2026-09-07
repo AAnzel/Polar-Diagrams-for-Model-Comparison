@@ -1004,50 +1004,50 @@ def _chart_create_diagram(
 
     string_tooltip_suffix = ""
 
-    dict_polar_chart = dict(
-        sector=[0, int_max_angle],
-        bgcolor=_STRING_BACKGROUND_COLOR,
-        radialaxis=dict(
-            range=[0, float_max_r],
-            griddash=_STRING_GRID_STYLE,
-            gridcolor=_STRING_GRID_COLOR,
-            ticks="outside",
-            tickwidth=_INT_TICK_WIDTH,
-            tickcolor=_STRING_TICK_COLOR,
-            tickfont=dict(color=_STRING_LABEL_TITLE_COLOR),
-            showline=True,
-            linecolor=_STRING_TICK_COLOR,
-            layer="below traces",
-            title=dict(
-                text="<br>" + string_radial_column,
-                font=dict(color=_STRING_LABEL_TITLE_COLOR, size=16),
-            ),
-        ),
-        angularaxis=dict(
-            direction="counterclockwise",
-            ticks="outside",
-            tickwidth=_INT_TICK_WIDTH,
-            tickvals=np_angular_ticks,
-            ticktext=np_angular_labels,
-            tickcolor=_STRING_TICK_COLOR,
-            tickfont=dict(color=_STRING_LABEL_TITLE_COLOR),
-            griddash=_STRING_GRID_STYLE,
-            gridcolor=_STRING_GRID_COLOR,
-            showline=True,
-            linecolor=_STRING_TICK_COLOR,
-            layer="below traces",
-        ),
-    )
-    dict_legend = dict(
-        title=dict(text=string_tooltip_label_0),
-        font=dict(color=_STRING_LABEL_TITLE_COLOR),
-        bgcolor=_STRING_BACKGROUND_COLOR,
-        bordercolor=_STRING_GRID_COLOR,
-        borderwidth=_FLOAT_LEGEND_BORDER_WIDTH,
-        orientation="h",
-        x=_INT_LEGEND_X,
-        y=_INT_LEGEND_Y,
-    )
+    dict_polar_chart = {
+        "sector": [0, int_max_angle],
+        "bgcolor": _STRING_BACKGROUND_COLOR,
+        "radialaxis": {
+            "range": [0, float_max_r],
+            "griddash": _STRING_GRID_STYLE,
+            "gridcolor": _STRING_GRID_COLOR,
+            "ticks": "outside",
+            "tickwidth": _INT_TICK_WIDTH,
+            "tickcolor": _STRING_TICK_COLOR,
+            "tickfont": {"color": _STRING_LABEL_TITLE_COLOR},
+            "showline": True,
+            "linecolor": _STRING_TICK_COLOR,
+            "layer": "below traces",
+            "title": {
+                "text": "<br>" + string_radial_column,
+                "font": {"color": _STRING_LABEL_TITLE_COLOR, "size": 16},
+            },
+        },
+        "angularaxis": {
+            "direction": "counterclockwise",
+            "ticks": "outside",
+            "tickwidth": _INT_TICK_WIDTH,
+            "tickvals": np_angular_ticks,
+            "ticktext": np_angular_labels,
+            "tickcolor": _STRING_TICK_COLOR,
+            "tickfont": {"color": _STRING_LABEL_TITLE_COLOR},
+            "griddash": _STRING_GRID_STYLE,
+            "gridcolor": _STRING_GRID_COLOR,
+            "showline": True,
+            "linecolor": _STRING_TICK_COLOR,
+            "layer": "below traces",
+        },
+    }
+    dict_legend = {
+        "title": {"text": string_tooltip_label_0},
+        "font": {"color": _STRING_LABEL_TITLE_COLOR},
+        "bgcolor": _STRING_BACKGROUND_COLOR,
+        "bordercolor": _STRING_GRID_COLOR,
+        "borderwidth": _FLOAT_LEGEND_BORDER_WIDTH,
+        "orientation": "h",
+        "x": _INT_LEGEND_X,
+        "y": _INT_LEGEND_Y,
+    }
 
     dict_model_colors = _dict_calculate_model_colors(
         list_df_input[0][string_tooltip_label_0].to_list(),
@@ -1132,33 +1132,33 @@ def _chart_create_diagram(
                 # The marker type for the scalar second dataset
                 # We add aditional marker with only border
                 string_marker_color = dict_model_colors[tmp_model][0]
-                dict_marker = dict(
-                    line=dict(
-                        color="rgba" + str(string_marker_color + (1,)),
-                        width=_INT_MARKER_LINE_WIDTH,
-                    ),
-                    color="rgba" + str(string_marker_color + (0,)),
-                    size=[dict_model_marker_sizes[tmp_model]],
-                    sizemin=_INT_MARKER_SIZE,
-                    sizemode="area",
-                    sizeref=float_concentric_sizeref,
-                )
+                dict_marker = {
+                    "line": {
+                        "color": "rgba" + str(string_marker_color + (1,)),
+                        "width": _INT_MARKER_LINE_WIDTH,
+                    },
+                    "color": "rgba" + str(string_marker_color + (0,)),
+                    "size": [dict_model_marker_sizes[tmp_model]],
+                    "sizemin": _INT_MARKER_SIZE,
+                    "sizemode": "area",
+                    "sizeref": float_concentric_sizeref,
+                }
             elif int_i == 0 and int_dataset_option == 2:
-                dict_marker = dict(
-                    color="rgba"
+                dict_marker = {
+                    "color": "rgba"
                     + str(string_marker_color + (_FLOAT_MARKER_OPACITY,)),
-                    size=_INT_MARKER_SIZE + _INT_MARKER_LINE_WIDTH,
-                )
+                    "size": _INT_MARKER_SIZE + _INT_MARKER_LINE_WIDTH,
+                }
             else:
-                dict_marker = dict(
-                    line=dict(
-                        color="rgba" + str(string_marker_color + (1,)),
-                        width=_INT_MARKER_LINE_WIDTH,
-                    ),
-                    color="rgba"
+                dict_marker = {
+                    "line": {
+                        "color": "rgba" + str(string_marker_color + (1,)),
+                        "width": _INT_MARKER_LINE_WIDTH,
+                    },
+                    "color": "rgba"
                     + str(string_marker_color + (_FLOAT_MARKER_OPACITY,)),
-                    size=_INT_MARKER_SIZE,
-                )
+                    "size": _INT_MARKER_SIZE,
+                }
 
             if bool_flag_as_subplot:
                 if string_diagram_type == "taylor" and int_i == 0:
@@ -1178,12 +1178,12 @@ def _chart_create_diagram(
                         customdata=[np_tooltip_data[tmp_model_int]]
                         * int_number_of_models,
                         hovertemplate=string_tooltip_hovertemplate,
-                        hoverlabel=dict(
-                            bgcolor=_STRING_BACKGROUND_COLOR,
-                            bordercolor="rgba"
+                        hoverlabel={
+                            "bgcolor": _STRING_BACKGROUND_COLOR,
+                            "bordercolor": "rgba"
                             + str(string_marker_color + (1,)),
-                            font=dict(color=_STRING_TICK_COLOR),
-                        ),
+                            "font": {"color": _STRING_TICK_COLOR},
+                        },
                         marker=dict_marker,
                     ),
                     row=1,
@@ -1205,12 +1205,12 @@ def _chart_create_diagram(
                         customdata=[np_tooltip_data[tmp_model_int]]
                         * int_number_of_models,
                         hovertemplate=string_tooltip_hovertemplate,
-                        hoverlabel=dict(
-                            bgcolor=_STRING_BACKGROUND_COLOR,
-                            bordercolor="rgba"
+                        hoverlabel={
+                            "bgcolor": _STRING_BACKGROUND_COLOR,
+                            "bordercolor": "rgba"
                             + str(string_marker_color + (1,)),
-                            font=dict(color=_STRING_TICK_COLOR),
-                        ),
+                            "font": {"color": _STRING_TICK_COLOR},
+                        },
                         marker=dict_marker,
                     )
                 )
@@ -1242,15 +1242,15 @@ def _chart_create_diagram(
             legend=dict_legend,
             width=_INT_CHART_WIDTH / 2 + 100,
             height=_INT_CHART_HEIGHT + 80 * round(int_number_of_models / 4),
-            title=dict(
-                text=string_angular_column_label,
-                x=0.5,
-                xref="paper",
-                yref="paper",
-                xanchor="auto",
-                yanchor="auto",
-                font=dict(size=16, color=_STRING_LABEL_TITLE_COLOR),
-            ),
+            title={
+                "text": string_angular_column_label,
+                "x": 0.5,
+                "xref": "paper",
+                "yref": "paper",
+                "xanchor": "auto",
+                "yanchor": "auto",
+                "font": {"size": 16, "color": _STRING_LABEL_TITLE_COLOR},
+            },
         )
 
     return chart_result
@@ -1807,14 +1807,14 @@ def chart_create_all_diagrams(
         yshift=25, font_color=_STRING_LABEL_TITLE_COLOR
     )
     chart_result.update_layout(
-        title=dict(
-            text=string_combined_chart_title,
-            x=0.5,
-            y=0.95,
-            xanchor="center",
-            yanchor="top",
-            font=dict(size=20, color=_STRING_LABEL_TITLE_COLOR),
-        )
+        title={
+            "text": string_combined_chart_title,
+            "x": 0.5,
+            "y": 0.95,
+            "xanchor": "center",
+            "yanchor": "top",
+            "font": {"size": 20, "color": _STRING_LABEL_TITLE_COLOR},
+        }
     )
 
     return chart_result
