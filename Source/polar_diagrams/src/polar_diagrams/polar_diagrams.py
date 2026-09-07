@@ -831,7 +831,7 @@ def _chart_create_diagram(
     string_diagram_type,
     bool_normalized_measures,
     bool_flag_as_subplot=False,
-    chart_result_upper=None,
+    chart_result_upper=go.Figure(),
 ):
     """
     _chart_create_diagram is a general function that creates both the Taylor
