@@ -1191,7 +1191,7 @@ def _chart_create_diagram(
                 )
 
             else:
-                bool_show_legend = True if int_i == 0 else False
+                bool_show_legend = bool(int_i == 0)
                 chart_result.add_trace(
                     go.Scatterpolar(
                         name=str(tmp_model_int) + ". " + tmp_model,
@@ -1328,9 +1328,9 @@ def _df_sort_models_by_measure(
             list_df_input[1]
             .sort_values(
                 by=["Model"],
-                key=lambda arg_column: arg_column.map(
-                    lambda e: list_tmp_sorted.index(e)
-                ),
+                key=lambda arg_column: arg_column.map({
+                    v: i for i, v in enumerate(list_tmp_sorted)
+                }),
             )
             .reset_index(drop=True)
         )
@@ -1346,9 +1346,9 @@ def _df_sort_models_by_measure(
             list_df_input[0]
             .sort_values(
                 by=["Model"],
-                key=lambda arg_column: arg_column.map(
-                    lambda e: list_tmp_sorted.index(e)
-                ),
+                key=lambda arg_column: arg_column.map({
+                    v: i for i, v in enumerate(list_tmp_sorted)
+                }),
             )
             .reset_index(drop=True)
         )
@@ -1651,14 +1651,12 @@ def _list_check_list_df_input(list_df_input):
             "list_df_input can contain only one or two" + " pandas.DataFrames"
         )
 
-    if len(list_df_input) == 2:
-        if set(list_df_input[0].columns.to_list()) != set(
-            list_df_input[1].columns.to_list()
-        ):
-            raise AttributeError(
-                "list_df_input dataframes need to have the "
-                + "same set of columns"
-            )
+    if len(list_df_input) == 2 and set(
+        list_df_input[0].columns.to_list()
+    ) != set(list_df_input[1].columns.to_list()):
+        raise AttributeError(
+            "list_df_input dataframes need to have the " + "same set of columns"
+        )
     return list_df_input
 
 
