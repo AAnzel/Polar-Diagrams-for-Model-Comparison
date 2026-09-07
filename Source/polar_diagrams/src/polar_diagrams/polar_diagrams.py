@@ -285,7 +285,7 @@ def _dict_check_discrete_models(
         else:
             discrete_mask = discrete_models
 
-    dict_feature_discrete_mask = dict()
+    dict_feature_discrete_mask = {}
     for int_i, string_one_column_name in enumerate(list_X_columns):
         dict_feature_discrete_mask[string_one_column_name] = discrete_mask[
             int_i
@@ -722,7 +722,7 @@ def _dict_calculate_model_colors(
         list_color_scheme = _LIST_TABLEAU_20
     int_num_discrete_colors = len(list_color_scheme)
 
-    dict_result = dict()
+    dict_result = {}
 
     for int_i in range(int_number_of_datasets):
         int_j = 0
@@ -736,7 +736,7 @@ def _dict_calculate_model_colors(
                 int_j += 1
 
             if string_model_name not in dict_result:
-                dict_result[string_model_name] = dict()
+                dict_result[string_model_name] = {}
 
             tuple_rgb_color = _tuple_hex_to_rgb(string_hex_color)
             dict_result[string_model_name][int_i] = (
