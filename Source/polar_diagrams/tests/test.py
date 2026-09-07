@@ -16,7 +16,7 @@ __email__ = "AnzelA@rki.de"
 __status__ = "Stable"
 
 # ==============================================
-# This script is used to test the 'diag' library
+# This script is used to test the 'polar_diagrams' library
 # ==============================================
 
 _INT_RANDOM_SEED = 42
@@ -53,14 +53,6 @@ _LIST_COMBINED_COLUMNS = (
 )
 
 np.random.seed(_INT_RANDOM_SEED)
-
-dict_mi_parameters_features_continous_target_continous = dict(
-    string_entropy_method="auto",
-    int_mi_n_neighbors=3,
-    bool_discrete_reference_model=False,
-    discrete_models=False,
-    int_random_state=_INT_RANDOM_SEED,
-)
 # TODO: Assert column names and the number of columns of calculate_* return
 # TODO: values. Assert the number of rows of return values (must be the same as
 # TODO: the number of models)
