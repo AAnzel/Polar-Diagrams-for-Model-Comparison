@@ -297,13 +297,11 @@ def _dict_check_discrete_models(
 def df_calculate_mid_properties(
     df_input,
     string_reference_model,
-    dict_mi_parameters=dict(
-        string_entropy_method="auto",
-        int_mi_n_neighbors=3,
-        discrete_models="auto",
-        bool_discrete_reference_model=False,
-        int_random_state=_INT_RANDOM_SEED,
-    ),
+    string_entropy_method="auto",
+    int_mi_n_neighbors=3,
+    discrete_models="auto",
+    bool_discrete_reference_model=False,
+    int_random_state=_INT_RANDOM_SEED,
 ):
     """
     df_calculate_mid_properties caclulates all necessary information theory
@@ -317,12 +315,17 @@ def df_calculate_mid_properties(
           model present in the df_input argument (as a column) which can be
           considered as a reference point in the final diagram. This is often
           the ground truth.
-        dict_mi_parameters (dict, optional): This dictionary contains
-          configuration parameters for the calculation of entropy and mutual
-          information. Defaults to
-          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-               bool_discrete_reference_model=False, discrete_models='auto',
-               int_random_state=_INT_RANDOM_SEED).
+        int_mi_n_neighbors (int): Number of neighbors for k‑NN–based mutual
+          information estimation.
+        string_entropy_method (str): Method for entropy estimation. Options:
+          'auto' or any method supported by the underlying MI estimator.
+        bool_discrete_reference_model (bool): Whether to treat the reference
+          model as a discrete variable in mutual information calculations.
+        discrete_fetures (str or list): Specification of which features or
+          models are to be treated as discrete. 'auto' triggers automatic
+          detection.
+        int_random_state (int): Random seed for reproducibility of stochastic
+          components.
 
     Raises:
         ValueError: The error is raised if int_mi_n_neighbors is less or equal
@@ -336,6 +339,13 @@ def df_calculate_mid_properties(
     """
 
     df_input = _df_check_df_raw_input(df_input)
+    dict_mi_parameters = {
+        "string_entropy_method": string_entropy_method,
+        "int_mi_n_neighbors": int_mi_n_neighbors,
+        "discrete_models": discrete_models,
+        "bool_discrete_reference_model": bool_discrete_reference_model,
+        "int_random_state": int_random_state,
+    }
 
     dict_feature_discrete_mask = _dict_check_discrete_models(
         df_input, string_reference_model, dict_mi_parameters
@@ -624,13 +634,11 @@ def df_calculate_mid_properties(
 def df_calculate_all_properties(
     df_input,
     string_reference_model,
-    dict_mi_parameters=dict(
-        string_entropy_method="auto",
-        int_mi_n_neighbors=3,
-        discrete_models="auto",
-        bool_discrete_reference_model=False,
-        int_random_state=_INT_RANDOM_SEED,
-    ),
+    string_entropy_method="auto",
+    int_mi_n_neighbors=3,
+    discrete_models="auto",
+    bool_discrete_reference_model=False,
+    int_random_state=_INT_RANDOM_SEED,
     string_corr_method="pearson",
 ):
     """
@@ -646,12 +654,15 @@ def df_calculate_all_properties(
           model present in the df_input argument (as a column) which can be
           considered as a reference point in the final diagram. This is often
           the ground truth.
-        dict_mi_parameters (dict, optional): This dictionary contains
-          configuration parameters for the calculation of entropy and mutual
-          information. Defaults to
-          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-               bool_discrete_reference_model=False, discrete_fetures='auto',
-               int_random_state=_INT_RANDOM_SEED).
+        string_entropy_method (str): Method for entropy estimation. Options:
+          'auto' or any method supported by the underlying MI estimator.
+        bool_discrete_reference_model (bool): Whether to treat the reference
+          model as a discrete variable in mutual information calculations.
+        discrete_fetures (str or list): Specification of which features or
+          models are to be treated as discrete. 'auto' triggers automatic
+          detection.
+        int_random_state (int): Random seed for reproducibility of stochastic
+          components.
         string_corr_method (str, optional): This string contains the name of
           the method to be used when calculating the correlation. Defaults to
           'pearson'.
@@ -666,7 +677,13 @@ def df_calculate_all_properties(
         df_input, string_reference_model, string_corr_method
     )
     df_mid = df_calculate_mid_properties(
-        df_input, string_reference_model, dict_mi_parameters
+        df_input,
+        string_reference_model,
+        string_entropy_method=string_entropy_method,
+        int_mi_n_neighbors=int_mi_n_neighbors,
+        discrete_models=discrete_models,
+        bool_discrete_reference_model=bool_discrete_reference_model,
+        int_random_state=int_random_state,
     )
 
     df_result = df_td.merge(df_mid, on="Model", how="inner")
@@ -1461,13 +1478,11 @@ def chart_create_mi_diagram(
     list_df_input,
     string_reference_model,
     string_mid_type="scaled",
-    dict_mi_parameters=dict(
-        string_entropy_method="auto",
-        int_mi_n_neighbors=3,
-        discrete_models="auto",
-        bool_discrete_reference_model=False,
-        int_random_state=_INT_RANDOM_SEED,
-    ),
+    string_entropy_method="auto",
+    int_mi_n_neighbors=3,
+    discrete_models="auto",
+    bool_discrete_reference_model=False,
+    int_random_state=_INT_RANDOM_SEED,
     bool_normalized_measures=False,
 ):
     """
@@ -1497,12 +1512,15 @@ def chart_create_mi_diagram(
           Mutual Information diagram. If it is 'scaled' then it will span both
           quadrants. If it is 'normalized', it will span only the first
           quadrant of the circle. Defaults to 'scaled'.
-        dict_mi_parameters (dict, optional): This dictionary contains
-          configuration parameters for the calculation of entropy and mutual
-          information. Defaults to
-          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-               bool_discrete_reference_model=False, discrete_fetures='auto',
-               int_random_state=_INT_RANDOM_SEED).
+        string_entropy_method (str): Method for entropy estimation. Options:
+          'auto' or any method supported by the underlying MI estimator.
+        bool_discrete_reference_model (bool): Whether to treat the reference
+          model as a discrete variable in mutual information calculations.
+        discrete_fetures (str or list): Specification of which features or
+          models are to be treated as discrete. 'auto' triggers automatic
+          detection.
+        int_random_state (int): Random seed for reproducibility of stochastic
+          components.
         bool_normalized_measures (bool, optional): This boolean parameter is
           used to determine if the passed chart should have normalized entropy
           and STD values or not. If it is False, then real entropy and STD
@@ -1548,7 +1566,13 @@ def chart_create_mi_diagram(
             continue
 
         df_mid = df_calculate_mid_properties(
-            df_input, string_reference_model, dict_mi_parameters
+            df_input,
+            string_reference_model,
+            string_entropy_method=string_entropy_method,
+            int_mi_n_neighbors=int_mi_n_neighbors,
+            discrete_models=discrete_models,
+            bool_discrete_reference_model=bool_discrete_reference_model,
+            int_random_state=int_random_state,
         )
         list_df_mid.append(df_mid)
         _warning_check_identical_model_values(df_mid, "mid", string_mid_type)
@@ -1667,13 +1691,11 @@ def chart_create_all_diagrams(
     string_reference_model,
     string_mid_type="scaled",
     string_corr_method="pearson",
-    dict_mi_parameters=dict(
-        string_entropy_method="auto",
-        int_mi_n_neighbors=3,
-        discrete_models="auto",
-        bool_discrete_reference_model=False,
-        int_random_state=_INT_RANDOM_SEED,
-    ),
+    string_entropy_method="auto",
+    int_mi_n_neighbors=3,
+    discrete_models="auto",
+    bool_discrete_reference_model=False,
+    int_random_state=_INT_RANDOM_SEED,
     bool_normalized_measures=False,
 ):
     """
@@ -1706,12 +1728,15 @@ def chart_create_all_diagrams(
           Mutual Information diagram. If it is 'scaled' then it will span both
           quadrants. If it is 'normalized', it will span only the first
           quadrant of the circle. Defaults to 'scaled'.
-        dict_mi_parameters (dict, optional): This dictionary contains
-          configuration parameters for the calculation of entropy and mutual
-          information. Defaults to
-          dict(int_mi_n_neighbors=3, string_entropy_method='auto',
-               bool_discrete_reference_model=False, discrete_fetures='auto',
-               int_random_state=_INT_RANDOM_SEED).
+        string_entropy_method (str): Method for entropy estimation. Options:
+          'auto' or any method supported by the underlying MI estimator.
+        bool_discrete_reference_model (bool): Whether to treat the reference
+          model as a discrete variable in mutual information calculations.
+        discrete_fetures (str or list): Specification of which features or
+          models are to be treated as discrete. 'auto' triggers automatic
+          detection.
+        int_random_state (int): Random seed for reproducibility of stochastic
+          components.
         bool_normalized_measures (bool, optional): This boolean parameter is
           used to determine if the passed chart should have normalized entropy
           and STD values or not. If it is False, then real entropy and STD
@@ -1771,7 +1796,11 @@ def chart_create_all_diagrams(
             df_input=df_input,
             string_reference_model=string_reference_model,
             string_corr_method=string_corr_method,
-            dict_mi_parameters=dict_mi_parameters,
+            string_entropy_method=string_entropy_method,
+            int_mi_n_neighbors=int_mi_n_neighbors,
+            discrete_models=discrete_models,
+            bool_discrete_reference_model=bool_discrete_reference_model,
+            int_random_state=int_random_state,
         )
         list_df_all.append(df_all)
         _warning_check_identical_model_values(df_all, "both", string_mid_type)
