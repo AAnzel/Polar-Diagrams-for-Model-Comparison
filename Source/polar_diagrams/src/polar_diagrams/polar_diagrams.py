@@ -1055,6 +1055,8 @@ def _chart_create_diagram(
         int_number_of_datasets,
     )
 
+    dict_model_marker_sizes = {}
+    float_concentric_sizeref = 0.0
     # Calculate marker sizes if we have a scalar dataset
     # And also check if we have a second version dataset so that we have a
     # nicer tooltip information
