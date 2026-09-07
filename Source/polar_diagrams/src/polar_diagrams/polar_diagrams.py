@@ -848,7 +848,7 @@ def _chart_create_diagram(
     string_diagram_type,
     bool_normalized_measures,
     bool_flag_as_subplot=False,
-    chart_result_upper=go.Figure(),
+    chart_result_upper=None,
 ):
     """
     _chart_create_diagram is a general function that creates both the Taylor
@@ -1014,7 +1014,7 @@ def _chart_create_diagram(
             else list_df_input[1][string_radial_column].max() * 1.5,
         )
 
-    if bool_flag_as_subplot:
+    if bool_flag_as_subplot and chart_result_upper is not None:
         chart_result = chart_result_upper
     else:
         chart_result = go.Figure()
