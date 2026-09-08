@@ -62,16 +62,16 @@ The library can be used to quickly and easily assess the performances of complex
 
 ## Dependencies
 
-The code is written in Python 3.9.15 and tested on Linux with the following libraries installed:
+The code is written in Python 3.13.13 and tested on Linux with the following libraries installed:
 
 |Library|Version|
 |---|---|
-|numpy|1.23.5|
-|pandas|1.5.2|
-|scikit-learn|1.2.0|
-|scipy|1.9.3|
-|plotly|5.9.0|
-|kaleido|0.2.1|
+|kaleido (for saving static figures)|1.3.0|
+|numpy|2.5.2|
+|pandas|3.0.5|
+|plotly|6.9.0|
+|scikit-learn|1.9.0|
+|scipy|1.18.0|
 
 The dependencies can also be found in [requirements.txt](https://github.com/AAnzel/Polar-Diagrams-for-Model-Comparison/tree/master/requirements.txt).
 
